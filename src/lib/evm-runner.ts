@@ -54,7 +54,7 @@ export async function runTests(
   if (deployResult.execResult.exceptionError || !deployResult.createdAddress) {
     results.push({
       passed: false,
-      message: `컨트랙트 배포 실패: ${deployResult.execResult.exceptionError?.error || "주소 생성 실패"}`,
+      message: `Contract deployment failed: ${deployResult.execResult.exceptionError?.error || "Address creation failed"}`,
     });
     return results;
   }
@@ -95,7 +95,7 @@ export async function runTests(
           passed: reverted,
           message: reverted
             ? tc.message
-            : `${tc.message} - revert가 예상되었지만 성공했습니다`,
+            : `${tc.message} - Expected revert but succeeded`,
         });
         continue;
       }
@@ -103,7 +103,7 @@ export async function runTests(
       if (reverted) {
         results.push({
           passed: false,
-          message: `${tc.message} - 실행 중 revert 발생`,
+          message: `${tc.message} - Reverted during execution`,
         });
         continue;
       }
@@ -127,12 +127,12 @@ export async function runTests(
         passed,
         message: passed
           ? tc.message
-          : `${tc.message} - 예상: ${expected}, 실제: ${actual}`,
+          : `${tc.message} - Expected: ${expected}, Actual: ${actual}`,
       });
     } catch (err) {
       results.push({
         passed: false,
-        message: `${tc.message} - 오류: ${err instanceof Error ? err.message : String(err)}`,
+        message: `${tc.message} - Error: ${err instanceof Error ? err.message : String(err)}`,
       });
     }
   }

@@ -10,6 +10,9 @@ import {
   getNextProblem,
   getPrevProblem,
 } from "@/data/problems";
+import type { TestResult } from "@/lib/evm-runner";
+
+type ClientProblem = Omit<Problem, "solution" | "hints">;
 
 const SolidityEditor = dynamic(() => import("@/components/SolidityEditor"), {
   ssr: false,
@@ -19,11 +22,6 @@ const SolidityEditor = dynamic(() => import("@/components/SolidityEditor"), {
     </div>
   ),
 });
-
-interface TestResult {
-  passed: boolean;
-  message: string;
-}
 
 const resultsContainerVariants = {
   hidden: {},
@@ -37,12 +35,33 @@ const fadeInUpVariant = {
   visible: { opacity: 1, y: 0 },
 };
 
-export default function ProblemClient({ problem }: { problem: Problem }) {
+function highlightSolidity(code: string): string {
+  const keywords = /\b(pragma|solidity|contract|interface|library|is|function|modifier|event|struct|enum|mapping|if|else|for|while|do|return|returns|require|revert|assert|emit|new|delete|constructor|fallback|receive|virtual|override|abstract|using|import|error|unchecked)\b/g;
+  const types = /\b(address|bool|string|bytes\d*|byte|u?int\d*|u?fixed|public|private|internal|external|pure|view|payable|constant|immutable|memory|storage|calldata|indexed)\b/g;
+  const literals = /\b(true|false|wei|gwei|ether)\b/g;
+  const numbers = /\b(0x[0-9a-fA-F]+|\d+)\b/g;
+
+  return code
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/\/\/.*$/gm, (m) => `<span style="color:var(--color-muted)">${m}</span>`)
+    .replace(/\/\*[\s\S]*?\*\//g, (m) => `<span style="color:var(--color-muted)">${m}</span>`)
+    .replace(/"[^"]*"/g, (m) => `<span style="color:var(--color-success)">${m}</span>`)
+    .replace(/'[^']*'/g, (m) => `<span style="color:var(--color-success)">${m}</span>`)
+    .replace(keywords, (m) => `<span style="color:var(--color-accent)">${m}</span>`)
+    .replace(types, (m) => `<span style="color:#c084fc">${m}</span>`)
+    .replace(literals, (m) => `<span style="color:var(--color-warning)">${m}</span>`)
+    .replace(numbers, (m) => `<span style="color:var(--color-warning)">${m}</span>`);
+}
+
+export default function ProblemClient({ problem }: { problem: ClientProblem }) {
   const [code, setCode] = useState(problem.starterCode);
   const [isCompiling, setIsCompiling] = useState(false);
   const [results, setResults] = useState<TestResult[] | null>(null);
   const [showHints, setShowHints] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
+  const [hints, setHints] = useState<string[]>([]);
+  const [solution, setSolution] = useState<string | null>(null);
+  const [mobilePanel, setMobilePanel] = useState<"description" | "editor">("description");
   const [activeTab, setActiveTab] = useState<"description" | "results">(
     "description"
   );
@@ -75,6 +94,18 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
       }
     }
   }, [allPassed, problem.id]);
+
+  const fetchSolutionData = useCallback(async () => {
+    if (solution !== null) return; // already fetched
+    try {
+      const res = await fetch(`/api/solution?id=${problem.id}`);
+      const data = await res.json();
+      setHints(data.hints ?? []);
+      setSolution(data.solution ?? "");
+    } catch {
+      // ignore
+    }
+  }, [problem.id, solution]);
 
   const handleCompile = useCallback(async () => {
     setIsCompiling(true);
@@ -133,12 +164,14 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
       // Cmd/Ctrl + Shift + H → Toggle hints
       if (mod && e.shiftKey && e.key === "H") {
         e.preventDefault();
+        fetchSolutionData();
         setShowHints((prev) => !prev);
         setActiveTab("description");
       }
       // Cmd/Ctrl + Shift + S → Toggle solution
       if (mod && e.shiftKey && e.key === "S") {
         e.preventDefault();
+        fetchSolutionData();
         setShowSolution((prev) => !prev);
         setActiveTab("description");
       }
@@ -146,12 +179,36 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleCompile]);
+  }, [handleCompile, fetchSolutionData]);
 
   return (
-    <div className="h-[calc(100vh-56px)] flex">
+    <div className="h-[calc(100vh-56px)] flex flex-col lg:flex-row">
+      {/* Mobile panel toggle */}
+      <div className="flex lg:hidden border-b border-[var(--color-border)] bg-[var(--color-surface)]">
+        <button
+          onClick={() => setMobilePanel("description")}
+          className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
+            mobilePanel === "description"
+              ? "text-[var(--color-foreground)] border-b-2 border-[var(--color-accent)]"
+              : "text-[var(--color-muted)]"
+          }`}
+        >
+          Description
+        </button>
+        <button
+          onClick={() => setMobilePanel("editor")}
+          className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
+            mobilePanel === "editor"
+              ? "text-[var(--color-foreground)] border-b-2 border-[var(--color-accent)]"
+              : "text-[var(--color-muted)]"
+          }`}
+        >
+          Editor
+        </button>
+      </div>
+
       {/* Left Panel - Description */}
-      <div className="w-[480px] min-w-[380px] border-r border-[var(--color-border)] flex flex-col bg-[var(--color-surface)]">
+      <div className={`${mobilePanel === "description" ? "flex" : "hidden"} lg:flex w-full lg:w-[480px] lg:min-w-[380px] border-r border-[var(--color-border)] flex-col bg-[var(--color-surface)] min-h-0 flex-1 lg:flex-initial`}>
         {/* Tabs */}
         <div className="flex border-b border-[var(--color-border)]">
           <button
@@ -222,51 +279,49 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
                 <Markdown content={problem.description} />
 
                 {/* Hints */}
-                {problem.hints.length > 0 && (
-                  <div className="mt-6">
-                    <button
-                      onClick={() => setShowHints(!showHints)}
-                      className="text-sm text-[var(--color-accent)] hover:text-[var(--color-accent-hover)] transition-colors"
-                    >
-                      {showHints ? "Hide Hints" : "Show Hints"}
-                      <span className="ml-1 text-xs opacity-50">&#8984;&#8679;H</span>
-                    </button>
-                    <AnimatePresence>
-                      {showHints && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.2 }}
-                          className="overflow-hidden"
-                        >
-                          <div className="mt-2 space-y-2">
-                            {problem.hints.map((hint, i) => (
-                              <div
-                                key={i}
-                                className="text-sm text-[var(--color-muted)] bg-[var(--color-background)] border border-[var(--color-border)] rounded-lg p-3"
-                              >
-                                {hint}
-                              </div>
-                            ))}
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                )}
+                <div className="mt-6">
+                  <button
+                    onClick={() => { fetchSolutionData(); setShowHints(!showHints); }}
+                    className="text-sm text-[var(--color-accent)] hover:text-[var(--color-accent-hover)] transition-colors"
+                  >
+                    {showHints ? "Hide Hints" : "Show Hints"}
+                    <span className="ml-1 text-xs opacity-50">&#8984;&#8679;H</span>
+                  </button>
+                  <AnimatePresence>
+                    {showHints && hints.length > 0 && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="mt-2 space-y-2">
+                          {hints.map((hint, i) => (
+                            <div
+                              key={i}
+                              className="text-sm text-[var(--color-muted)] bg-[var(--color-background)] border border-[var(--color-border)] rounded-lg p-3"
+                            >
+                              {hint}
+                            </div>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
 
                 {/* Solution toggle */}
                 <div className="mt-4">
                   <button
-                    onClick={() => setShowSolution(!showSolution)}
+                    onClick={() => { fetchSolutionData(); setShowSolution(!showSolution); }}
                     className="text-sm text-[var(--color-warning)] hover:text-yellow-300 transition-colors"
                   >
                     {showSolution ? "Hide Solution" : "Show Solution"}
                     <span className="ml-1 text-xs opacity-50">&#8984;&#8679;S</span>
                   </button>
                   <AnimatePresence>
-                    {showSolution && (
+                    {showSolution && solution && (
                       <motion.div
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: "auto", opacity: 1 }}
@@ -276,13 +331,14 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
                       >
                         <div className="mt-2">
                           <pre className="text-sm bg-[var(--color-background)] border border-[var(--color-border)] rounded-lg p-4 overflow-x-auto">
-                            <code className="text-[var(--color-foreground)]">
-                              {problem.solution}
-                            </code>
+                            <code
+                              className="text-[var(--color-foreground)]"
+                              dangerouslySetInnerHTML={{ __html: highlightSolidity(solution) }}
+                            />
                           </pre>
                           <button
                             onClick={() => {
-                              setCode(problem.solution);
+                              setCode(solution);
                               setShowSolution(false);
                             }}
                             className="mt-2 text-xs text-[var(--color-muted)] hover:text-[var(--color-foreground)] transition-colors"
@@ -468,7 +524,7 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
       </div>
 
       {/* Right Panel - Editor */}
-      <div className="flex-1 flex flex-col">
+      <div className={`${mobilePanel === "editor" ? "flex" : "hidden"} lg:flex flex-1 flex-col min-h-0`}>
         {/* Editor toolbar - file info */}
         <div className="flex items-center justify-between px-4 py-2 border-b border-[var(--color-border)] bg-[var(--color-surface)]">
           <div className="flex items-center gap-3">
@@ -494,7 +550,7 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
           <button
             onClick={handleCompile}
             disabled={isCompiling}
-            className="inline-flex items-center gap-1.5 text-sm px-4 py-1.5 rounded-full border border-blue-500/40 text-blue-400 hover:bg-blue-500/10 font-medium transition-all duration-200 disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 text-sm px-4 py-1.5 rounded-full border border-green-500/40 text-green-400 hover:bg-green-500/10 font-medium transition-all duration-200 disabled:opacity-50"
           >
             <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M8 5v14l11-7z" />
@@ -503,24 +559,14 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
               <span className="inline-flex items-center gap-1">
                 Compiling
                 <span className="inline-flex gap-0.5">
-                  <span className="w-1 h-1 rounded-full bg-blue-400 animate-[dotPulse_1.4s_infinite_0s]" />
-                  <span className="w-1 h-1 rounded-full bg-blue-400 animate-[dotPulse_1.4s_infinite_0.2s]" />
-                  <span className="w-1 h-1 rounded-full bg-blue-400 animate-[dotPulse_1.4s_infinite_0.4s]" />
+                  <span className="w-1 h-1 rounded-full bg-green-400 animate-[dotPulse_1.4s_infinite_0s]" />
+                  <span className="w-1 h-1 rounded-full bg-green-400 animate-[dotPulse_1.4s_infinite_0.2s]" />
+                  <span className="w-1 h-1 rounded-full bg-green-400 animate-[dotPulse_1.4s_infinite_0.4s]" />
                 </span>
               </span>
             ) : (
-              "Run"
+              "Run Tests"
             )}
-          </button>
-          <button
-            onClick={() => { handleCompile(); }}
-            disabled={isCompiling}
-            className="inline-flex items-center gap-1.5 text-sm px-4 py-1.5 rounded-full border border-green-500/40 text-green-400 hover:bg-green-500/10 font-medium transition-all duration-200 disabled:opacity-50"
-          >
-            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M8 5v14l11-7z" />
-            </svg>
-            Test
           </button>
           <button
             onClick={handleReset}

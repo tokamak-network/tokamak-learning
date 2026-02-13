@@ -1,7 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import solc from "solc";
-import { runTests } from "@/lib/evm-runner";
+import { runTests, type TestResult } from "@/lib/evm-runner";
 import type { TestCase } from "@/data/problems";
+
+// Simple in-memory rate limiter: max 10 requests per 60s per IP
+const rateMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT = 10;
+const RATE_WINDOW = 60_000;
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateMap.get(ip);
+  if (!entry || now > entry.resetAt) {
+    rateMap.set(ip, { count: 1, resetAt: now + RATE_WINDOW });
+    return false;
+  }
+  entry.count++;
+  return entry.count > RATE_LIMIT;
+}
 
 interface CompileRequest {
   source: string;
@@ -12,19 +28,22 @@ interface CompileRequest {
   expectedContractName?: string;
 }
 
-interface TestResult {
-  passed: boolean;
-  message: string;
-}
-
 export async function POST(req: NextRequest) {
   try {
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    if (isRateLimited(ip)) {
+      return NextResponse.json(
+        { results: [{ passed: false, message: "Too many requests. Please wait a moment." }] },
+        { status: 429 }
+      );
+    }
+
     const body: CompileRequest = await req.json();
     const { source, expectedFunctions, expectedEvents, testCases, constructorArgs, expectedContractName } = body;
 
     if (!source) {
       return NextResponse.json(
-        { results: [{ passed: false, message: "코드가 비어있습니다" }] },
+        { results: [{ passed: false, message: "Code is empty" }] },
         { status: 400 }
       );
     }
@@ -64,12 +83,12 @@ export async function POST(req: NextRequest) {
     if (errors.length > 0) {
       results.push({
         passed: false,
-        message: `컴파일 실패:\n${errors[0]}`,
+        message: `Compilation failed:\n${errors[0]}`,
       });
       return NextResponse.json({ results });
     }
 
-    results.push({ passed: true, message: "컴파일 성공" });
+    results.push({ passed: true, message: "Compilation successful" });
 
     // Get contracts
     const contracts: Record<string, { abi: unknown[]; evm: { bytecode: { object: string } } }> = {};
@@ -85,7 +104,7 @@ export async function POST(req: NextRequest) {
     if (contractNames.length === 0) {
       results.push({
         passed: false,
-        message: "컨트랙트를 찾을 수 없습니다",
+        message: "Contract not found",
       });
       return NextResponse.json({ results });
     }
@@ -96,8 +115,8 @@ export async function POST(req: NextRequest) {
       results.push({
         passed: found,
         message: found
-          ? `컨트랙트 '${expectedContractName}' 이름 확인`
-          : `컨트랙트 이름이 '${expectedContractName}'이(가) 아닙니다. 현재: ${contractNames.join(", ")}`,
+          ? `Contract name '${expectedContractName}' verified`
+          : `Contract name is not '${expectedContractName}'. Found: ${contractNames.join(", ")}`,
       });
       if (!found) {
         return NextResponse.json({ results });
@@ -131,8 +150,8 @@ export async function POST(req: NextRequest) {
           results.push({
             passed: found,
             message: found
-              ? `함수 '${fn}' 존재 확인`
-              : `함수 '${fn}'을(를) 찾을 수 없습니다`,
+              ? `Function '${fn}' found`
+              : `Function '${fn}' not found`,
           });
         }
       }
@@ -147,8 +166,8 @@ export async function POST(req: NextRequest) {
           results.push({
             passed: found,
             message: found
-              ? `이벤트 '${ev}' 존재 확인`
-              : `이벤트 '${ev}'을(를) 찾을 수 없습니다`,
+              ? `Event '${ev}' found`
+              : `Event '${ev}' not found`,
           });
         }
       }
@@ -158,7 +177,7 @@ export async function POST(req: NextRequest) {
     if (warnings.length > 0) {
       results.push({
         passed: true,
-        message: `경고 ${warnings.length}개 (컴파일은 성공)`,
+        message: `${warnings.length} warning(s) (compilation succeeded)`,
       });
     }
 
@@ -169,7 +188,7 @@ export async function POST(req: NextRequest) {
         results: [
           {
             passed: false,
-            message: `서버 오류: ${err instanceof Error ? err.message : "Unknown error"}`,
+            message: `Server error: ${err instanceof Error ? err.message : "Unknown error"}`,
           },
         ],
       },

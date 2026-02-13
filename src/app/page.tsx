@@ -100,7 +100,7 @@ function CategoriesSection() {
               transition={{ duration: 0.4, delay: i * 0.08 }}
             >
               <Link
-                href="/language/solidity"
+                href={`/language/solidity#${cat.id}`}
                 className="glow-card group flex flex-col h-full rounded-xl p-6 border border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-accent)]/50 transition-all hover:-translate-y-1 hover:shadow-[var(--shadow-glow)]"
               >
                 <div className="flex items-center justify-between mb-4">
@@ -281,7 +281,7 @@ export default function Home() {
       <footer className="border-t border-[var(--color-border)] py-8">
         <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
           <div className="text-sm text-[var(--color-muted)]">
-            &copy; 2025 TokamakLearn[:run]. All rights reserved.
+            &copy; {new Date().getFullYear()} TokamakLearn[:run]. All rights reserved.
           </div>
           <a
             href="https://tokamak.network"

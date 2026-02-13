@@ -45,7 +45,7 @@ function CategorySection({ cat, completedProblems }: { cat: Category; completedP
   const progress = catProblems.length > 0 ? (completedCount / catProblems.length) * 100 : 0;
 
   return (
-    <section ref={ref}>
+    <section ref={ref} id={cat.id}>
       <div className="flex items-center gap-3 mb-2">
         <span className="text-xs font-mono font-medium text-[var(--color-accent)] bg-[var(--color-accent)]/10 px-2.5 py-1 rounded-md">
           {String(cat.order).padStart(2, "0")}

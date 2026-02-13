@@ -15,5 +15,10 @@ export default async function ProblemPage({
   const problem = getProblemById(id);
   if (!problem) notFound();
 
-  return <ProblemClient problem={problem} />;
+  // Strip solution/hints from client payload
+  const { solution, hints, ...clientProblem } = problem;
+  void solution;
+  void hints;
+
+  return <ProblemClient problem={clientProblem} />;
 }
