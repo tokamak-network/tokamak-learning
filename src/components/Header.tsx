@@ -13,7 +13,7 @@ export default function Header() {
         className={`flex items-center justify-between h-14 px-6 ${isProblemPage ? "" : "max-w-6xl mx-auto"}`}
       >
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-lg flex items-center justify-center font-bold text-white text-sm">
+          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-lg flex items-center justify-center font-bold text-white text-sm transition-transform duration-200 hover:scale-105">
             T
           </div>
           <span className="font-semibold text-white text-lg">Toka Learn</span>
@@ -22,9 +22,9 @@ export default function Header() {
         <nav className="flex items-center gap-6">
           <Link
             href="/language/solidity"
-            className={`text-sm transition-colors ${
+            className={`text-sm transition-colors relative ${
               pathname.startsWith("/language")
-                ? "text-white"
+                ? "text-white after:absolute after:bottom-[-17px] after:left-0 after:right-0 after:h-0.5 after:bg-[var(--color-accent)]"
                 : "text-gray-400 hover:text-white"
             }`}
           >
