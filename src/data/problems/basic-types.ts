@@ -3,83 +3,127 @@ import type { Problem } from "../problems";
 export const basic_types_problems: Problem[] = [
   {
     id: "bool-type",
-    title: "bool Type",
+    title: "Declare a Bool",
     category: "basic-types",
     order: 1,
     difficulty: "beginner",
-    description: `# bool Type
+    description: `# Declare a Bool
 
-\`bool\` stores \`true\` or \`false\` values. It's used for conditionals, flags, and more.
+## What you'll learn
+How to use the \`bool\` type for true/false values.
 
-\`\`\`solidity
-bool public isOpen = true;
-bool public isClosed = false;
-isOpen = !isOpen; // true → false
-\`\`\`
+\`bool\` stores either \`true\` or \`false\`. It's useful for flags, switches, and conditions — like an on/off button.
 
 ## Task
-Declare \`isActive\` as \`true\`, \`isPaused\` as \`false\`, and write a \`toggle()\` function that flips \`isActive\`.`,
+
+Type the following code inside the contract:
+
+\`\`\`solidity
+bool public isActive = true;
+\`\`\`
+
+> Bool values are written in lowercase: \`true\` or \`false\` (no quotes).`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
 contract BoolType {
     // TODO: Declare bool public isActive with value true
-    // TODO: Declare bool public isPaused with value false
-
-    function toggle() public {
-        // TODO: Flip isActive (use the ! operator)
-    }
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
 contract BoolType {
     bool public isActive = true;
-    bool public isPaused = false;
+}`,
+    hints: [
+      "The pattern is the same as uint/string: type public name = value;",
+      "Bool values don't use quotes — just true or false.",
+    ],
+    testDescription: "Checks that isActive() returns true.",
+    expectedFunctions: ["isActive"],
+    testCases: [
+      { fn: "isActive", expected: "true", message: "isActive() should return true" },
+    ],
+  },
+  {
+    id: "bool-toggle",
+    title: "Toggle a Bool",
+    category: "basic-types",
+    order: 2,
+    difficulty: "beginner",
+    description: `# Toggle a Bool
+
+## What you'll learn
+How to flip a bool value using the \`!\` (NOT) operator.
+
+The \`!\` operator flips a bool: \`!true\` becomes \`false\`, and \`!false\` becomes \`true\`.
+
+## Task
+
+Inside the \`toggle()\` function, flip the value of \`isActive\`:
+
+\`\`\`solidity
+isActive = !isActive;
+\`\`\``,
+    starterCode: `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+contract BoolToggle {
+    bool public isActive = true;
+
+    function toggle() public {
+        // TODO: Flip isActive using the ! operator
+    }
+}`,
+    solution: `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+contract BoolToggle {
+    bool public isActive = true;
 
     function toggle() public {
         isActive = !isActive;
     }
 }`,
-    hints: ["bool variables are initialized with true or false", "The ! operator flips a bool value: !true → false"],
-    testDescription: "Tests that isActive is true, isPaused is false, and toggle() flips isActive.",
-    expectedFunctions: ["isActive", "isPaused", "toggle"],
+    hints: [
+      "The ! operator flips a bool: !true becomes false.",
+      "Assign the flipped value back to the same variable.",
+    ],
+    testDescription: "Checks that toggle() flips isActive from true to false.",
+    expectedFunctions: ["isActive", "toggle"],
     testCases: [
       { fn: "isActive", expected: "true", message: "Initial isActive() should be true" },
-      { fn: "isPaused", expected: "false", message: "Initial isPaused() should be false" },
       { fn: "isActive", expected: "false", message: "After toggle(), isActive() should be false", setup: [{ fn: "toggle" }] },
     ],
   },
   {
     id: "address-type",
-    title: "address Type",
+    title: "The address Type",
     category: "basic-types",
-    order: 2,
+    order: 3,
     difficulty: "beginner",
-    description: `# address Type
+    description: `# The address Type
 
-\`address\` stores a 20-byte Ethereum address. \`msg.sender\` is the address that called the function.
+## What you'll learn
+How to use the \`address\` type to store Ethereum addresses.
 
-\`\`\`solidity
-address public owner;
-constructor() {
-    owner = msg.sender;
-}
-\`\`\`
+An \`address\` is a 20-byte value that represents an Ethereum account. Every wallet and every contract has one.
 
 ## Task
-Set \`owner\` to \`msg.sender\` in the constructor, and write a \`getOwner()\` view function.`,
+
+1. Declare \`address public owner\`
+2. In the constructor, set \`owner\` to \`msg.sender\`
+
+> You used \`msg.sender\` in the basics. Here the focus is on \`address\` as a data type.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
 contract AddressType {
-    address public owner;
+    // TODO: Declare address public owner
 
     constructor() {
         // TODO: Set owner to msg.sender
     }
-
-    // TODO: Write a getOwner() public view function (returns owner)
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
@@ -90,103 +134,53 @@ contract AddressType {
     constructor() {
         owner = msg.sender;
     }
-
-    function getOwner() public view returns (address) {
-        return owner;
-    }
 }`,
-    hints: ["In the constructor: owner = msg.sender; stores the deployer's address", "A view function reads state but does not modify it"],
-    testDescription: "Tests that owner is set to the deployer's address and getOwner() returns the same.",
-    expectedFunctions: ["owner", "getOwner"],
+    hints: [
+      "Declare address variables with: address public variableName;",
+      "In the constructor, assign using = just like you did in the basics.",
+    ],
+    testDescription: "Checks that owner() returns the deployer's address.",
+    expectedFunctions: ["owner"],
     testCases: [
       { fn: "owner", expected: "DEPLOYER", message: "owner() should return the deployer's address" },
-      { fn: "getOwner", expected: "DEPLOYER", message: "getOwner() should return the deployer's address" },
     ],
   },
   {
-    id: "address-payable",
-    title: "address payable",
-    category: "basic-types",
-    order: 3,
-    difficulty: "beginner",
-    description: `# address payable
-
-\`address payable\` is an address that can receive ETH. It supports \`.transfer()\` and \`.send()\`.
-
-\`\`\`solidity
-address payable public wallet = payable(msg.sender);
-uint256 bal = address(this).balance;
-\`\`\`
-
-## Task
-Set \`recipient\` to \`payable(msg.sender)\` in the constructor, and write a \`getBalance()\` function that returns the contract's balance.`,
-    starterCode: `// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
-
-contract AddressPayable {
-    address payable public recipient;
-
-    constructor() {
-        // TODO: Set recipient to payable(msg.sender)
-    }
-
-    // TODO: Write a getBalance() public view function (returns address(this).balance)
-}`,
-    solution: `// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
-
-contract AddressPayable {
-    address payable public recipient;
-
-    constructor() {
-        recipient = payable(msg.sender);
-    }
-
-    function getBalance() public view returns (uint256) {
-        return address(this).balance;
-    }
-}`,
-    hints: ["payable() converts a regular address to address payable", "address(this).balance is the contract's current ETH balance"],
-    testDescription: "Tests that recipient is set to the deployer's payable address and getBalance() returns the contract balance.",
-    expectedFunctions: ["recipient", "getBalance"],
-    testCases: [
-      { fn: "recipient", expected: "DEPLOYER", message: "recipient() should return the deployer's address" },
-      { fn: "getBalance", expected: "0", message: "Initial getBalance() should be 0" },
-    ],
-  },
-  {
-    id: "bytes1-type",
-    title: "bytes1 Fixed Bytes",
+    id: "fixed-bytes",
+    title: "Fixed-Size Bytes",
     category: "basic-types",
     order: 4,
     difficulty: "beginner",
-    description: `# bytes1 Fixed Bytes
+    description: `# Fixed-Size Bytes
 
-\`bytes1\` stores exactly 1 byte (0x00~0xff). There are also \`bytes2\`, \`bytes3\` ... up to \`bytes32\`.
+## What you'll learn
+How to use \`bytes1\`, \`bytes2\`, and other fixed-size byte types.
 
-\`\`\`solidity
-bytes1 public a = 0x41; // ASCII 'A'
-bytes2 public b = 0xffff;
-\`\`\`
+Solidity has fixed-size byte types from \`bytes1\` to \`bytes32\`. They store raw binary data of a specific size. Values are written in hexadecimal (starting with \`0x\`).
 
 ## Task
-Declare \`initial\` as \`0x41\` and \`flag\` as \`0xffff\`.`,
+
+1. Declare \`bytes1 public initial\` with value \`0x41\` (the letter "A" in ASCII)
+2. Declare \`bytes2 public flag\` with value \`0xffff\``,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-contract Bytes1Type {
+contract FixedBytes {
     // TODO: Declare bytes1 public initial with value 0x41
     // TODO: Declare bytes2 public flag with value 0xffff
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-contract Bytes1Type {
+contract FixedBytes {
     bytes1 public initial = 0x41;
     bytes2 public flag = 0xffff;
 }`,
-    hints: ["bytes1 stores 1 byte, bytes2 stores 2 bytes", "0x41 corresponds to ASCII character 'A'"],
-    testDescription: "Tests that initial is 0x41 and flag is 0xffff.",
+    hints: [
+      "The pattern is: bytesN public name = 0xHEX;",
+      "bytes1 stores 1 byte, bytes2 stores 2 bytes.",
+    ],
+    testDescription: "Checks that initial() returns 0x41 and flag() returns 0xffff.",
     expectedFunctions: ["initial", "flag"],
     testCases: [
       { fn: "initial", expected: "0x41", message: "initial() should return 0x41" },
@@ -194,83 +188,138 @@ contract Bytes1Type {
     ],
   },
   {
-    id: "bytes32-type",
-    title: "bytes32 Fixed Bytes",
+    id: "number-to-string-fix",
+    title: "Fix: Number Assigned to String",
     category: "basic-types",
     order: 5,
     difficulty: "beginner",
-    description: `# bytes32 Fixed Bytes
+    description: `# Fix: Number Assigned to String
 
-\`bytes32\` is commonly used for storing hashes and identifiers. It stores 32 bytes (256 bits).
+## What you'll learn
+That you cannot assign a number directly to a \`string\` variable.
 
-\`\`\`solidity
-bytes32 public myHash;
-myHash = keccak256("hello");
-\`\`\`
+A \`string\` variable can only hold text in double quotes. Assigning a bare number like \`100\` causes a type error.
 
 ## Task
-Declare \`bytes32 public hash\` and write a \`setHash(bytes32 _hash)\` function.`,
+
+1. **First, compile it as-is** to see the error message
+2. Fix the code so it compiles correctly
+
+> Think about what type is appropriate for the number \`100\`.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-contract Bytes32Type {
-    // TODO: Declare bytes32 public hash
-
-    // TODO: Write a setHash(bytes32 _hash) public function
+contract NumberStringFix {
+    // This code has an error. Try compiling first!
+    string public score = 100;
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-contract Bytes32Type {
-    bytes32 public hash;
-
-    function setHash(bytes32 _hash) public {
-        hash = _hash;
-    }
+contract NumberStringFix {
+    uint256 public score = 100;
 }`,
-    hints: ["bytes32 declared without an initial value defaults to 0x0...0", "The function receives bytes32 _hash as a parameter and stores it in the state variable"],
-    testDescription: "Tests that hash is declared and setHash() can set its value.",
-    expectedFunctions: ["hash", "setHash"],
+    hints: [
+      "100 is a number, not text. Which type stores numbers?",
+      "You only need to change the type keyword.",
+    ],
+    testDescription: "Checks that score() returns 100 after fixing the type.",
+    expectedFunctions: ["score"],
     testCases: [
-      { fn: "hash", expected: "0x0000000000000000000000000000000000000000000000000000000000000000", message: "Initial hash() should be 0x0...0" },
-      { fn: "hash", expected: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef", message: "After setHash(), hash() should return the set value", setup: [{ fn: "setHash", args: ["0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"] }] },
+      { fn: "score", expected: "100", message: "score() should return 100" },
     ],
   },
   {
-    id: "bytes-dynamic",
-    title: "bytes Dynamic Bytes",
+    id: "string-update",
+    title: "Update a String",
     category: "basic-types",
     order: 6,
     difficulty: "beginner",
-    description: `# bytes Dynamic Bytes
+    description: `# Update a String
 
-\`bytes\` is a dynamic-length byte array. It is more gas-efficient than \`byte[]\`.
+## What you'll learn
+How to change a string state variable through a function.
 
-\`\`\`solidity
-bytes public data;
-data = hex"cafebabe";
-uint256 len = data.length;
-\`\`\`
+In the basics, you declared a string with an initial value. Now let's write a function that changes it. String parameters need the \`memory\` keyword to tell Solidity where to temporarily store the data.
 
 ## Task
-Write the \`data\` variable, a \`setData()\` function, and a \`getLength()\` function that returns \`data.length\`.`,
+
+Inside the \`setMessage()\` function, update \`message\` to the new value:
+
+\`\`\`solidity
+message = _newMessage;
+\`\`\``,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-contract BytesDynamic {
-    // TODO: Declare bytes public data
+contract StringUpdate {
+    string public message = "Hello";
 
-    // TODO: Write a setData(bytes calldata _data) public function
-
-    // TODO: Write a getLength() public view function (returns data.length)
+    function setMessage(string memory _newMessage) public {
+        // TODO: Set message to _newMessage
+    }
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-contract BytesDynamic {
+contract StringUpdate {
+    string public message = "Hello";
+
+    function setMessage(string memory _newMessage) public {
+        message = _newMessage;
+    }
+}`,
+    hints: [
+      "Assign the parameter to the state variable using =.",
+      "The function parameter _newMessage holds the new text.",
+    ],
+    testDescription: "Checks that message starts as 'Hello' and changes after calling setMessage().",
+    expectedFunctions: ["message", "setMessage"],
+    testCases: [
+      { fn: "message", expected: "Hello", message: "Initial message() should return 'Hello'" },
+      { fn: "message", expected: "World", message: "After setMessage('World'), message() should return 'World'", setup: [{ fn: "setMessage", args: ["World"] }] },
+    ],
+  },
+  {
+    id: "dynamic-bytes",
+    title: "Dynamic Bytes",
+    category: "basic-types",
+    order: 7,
+    difficulty: "intermediate",
+    description: `# Dynamic Bytes
+
+## What you'll learn
+How to use \`bytes\` for variable-length binary data.
+
+Unlike \`bytes1\`\u2013\`bytes32\` (fixed size), \`bytes\` is a dynamic-length byte array. It can grow or shrink and has a \`.length\` property.
+
+## Task
+
+1. Declare \`bytes public data\`
+2. Inside \`getLength()\`, return the length of \`data\`
+
+> \`data.length\` returns the number of bytes stored.`,
+    starterCode: `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+contract DynamicBytes {
+    // TODO: Declare bytes public data
+
+    function setData(bytes memory _data) public {
+        data = _data;
+    }
+
+    function getLength() public view returns (uint256) {
+        // TODO: Return data.length
+    }
+}`,
+    solution: `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+contract DynamicBytes {
     bytes public data;
 
-    function setData(bytes calldata _data) public {
+    function setData(bytes memory _data) public {
         data = _data;
     }
 
@@ -278,55 +327,15 @@ contract BytesDynamic {
         return data.length;
     }
 }`,
-    hints: ["calldata is a read-only data location for external function parameters", "data.length gives the length of the byte array"],
-    testDescription: "Tests that getLength() returns the correct length after setting data.",
+    hints: [
+      "Declare with just: bytes public data; (no initial value needed).",
+      "Use .length to get the size of a bytes array.",
+    ],
+    testDescription: "Checks that data is declared and getLength() returns the correct byte count.",
     expectedFunctions: ["data", "setData", "getLength"],
     testCases: [
-      { fn: "getLength", expected: "0", message: "Initial getLength() should be 0" },
-      { fn: "getLength", expected: "4", message: "After setData(), getLength() should return the correct length", setup: [{ fn: "setData", args: ["0xcafebabe"] }] },
-    ],
-  },
-  {
-    id: "string-type",
-    title: "string Type",
-    category: "basic-types",
-    order: 7,
-    difficulty: "beginner",
-    description: `# string Type
-
-\`string\` is UTF-8 encoded text. Unlike other languages, you cannot directly use indexing or \`.length\`.
-
-\`\`\`solidity
-string public name = "Solidity";
-name = "New Value";
-\`\`\`
-
-## Task
-Initialize \`message\` to \`"Hello"\` and write a \`setMessage()\` function.`,
-    starterCode: `// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
-
-contract StringType {
-    // TODO: Declare string public message with value "Hello"
-
-    // TODO: Write a setMessage(string calldata _msg) public function
-}`,
-    solution: `// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
-
-contract StringType {
-    string public message = "Hello";
-
-    function setMessage(string calldata _msg) public {
-        message = _msg;
-    }
-}`,
-    hints: ["Strings are initialized with double quotes", "calldata is a read-only reference to externally passed data"],
-    testDescription: "Tests that message is initialized to 'Hello' and can be changed via setMessage().",
-    expectedFunctions: ["message", "setMessage"],
-    testCases: [
-      { fn: "message", expected: "Hello", message: "Initial message() should be 'Hello'" },
-      { fn: "message", expected: "World", message: "After setMessage('World'), message() should be 'World'", setup: [{ fn: "setMessage", args: ["World"] }] },
+      { fn: "getLength", expected: "0", message: "Initial getLength() should return 0" },
+      { fn: "getLength", expected: "4", message: "After setData(0xcafebabe), getLength() should return 4", setup: [{ fn: "setData", args: ["0xcafebabe"] }] },
     ],
   },
   {
@@ -334,24 +343,30 @@ contract StringType {
     title: "Enum",
     category: "basic-types",
     order: 8,
-    difficulty: "beginner",
+    difficulty: "intermediate",
     description: `# Enum
 
-\`enum\` is a custom type with a fixed set of choices. Internally it's stored as a \`uint\`.
+## What you'll learn
+How to define and use an \`enum\` for a fixed set of choices.
 
-\`\`\`solidity
+An \`enum\` creates a custom type with named values. Internally, each value is stored as a number starting from 0.
+
+\`\`\`
 enum Color { Red, Green, Blue }
-Color public selected = Color.Red;
-selected = Color.Blue;
+// Red = 0, Green = 1, Blue = 2
 \`\`\`
 
 ## Task
-Fill in the enum values, and write the bodies of \`ship()\` and \`deliver()\`.`,
+
+1. Fill in the enum values: \`None, Pending, Shipped, Delivered\`
+2. Inside \`ship()\`, set status to \`OrderStatus.Shipped\`
+
+> Access enum values with: \`EnumName.Value\``,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
 contract EnumType {
-    // TODO: Fill in the values: None, Pending, Shipped, Delivered, Cancelled
+    // TODO: Fill in the values: None, Pending, Shipped, Delivered
     enum OrderStatus { }
 
     OrderStatus public status;
@@ -359,34 +374,28 @@ contract EnumType {
     function ship() public {
         // TODO: Set status to OrderStatus.Shipped
     }
-
-    function deliver() public {
-        // TODO: Set status to OrderStatus.Delivered
-    }
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
 contract EnumType {
-    enum OrderStatus { None, Pending, Shipped, Delivered, Cancelled }
+    enum OrderStatus { None, Pending, Shipped, Delivered }
 
     OrderStatus public status;
 
     function ship() public {
         status = OrderStatus.Shipped;
     }
-
-    function deliver() public {
-        status = OrderStatus.Delivered;
-    }
 }`,
-    hints: ["Enum values are listed separated by commas", "Reference an enum value as: EnumName.Value"],
-    testDescription: "Tests that the enum is correctly defined and ship()/deliver() change the status.",
-    expectedFunctions: ["status", "ship", "deliver"],
+    hints: [
+      "List enum values separated by commas inside the braces.",
+      "Set an enum variable using: variable = EnumName.Value;",
+    ],
+    testDescription: "Checks that the enum is defined and ship() changes status to Shipped (2).",
+    expectedFunctions: ["status", "ship"],
     testCases: [
       { fn: "status", expected: "0", message: "Initial status() should be 0 (None)" },
       { fn: "status", expected: "2", message: "After ship(), status() should be 2 (Shipped)", setup: [{ fn: "ship" }] },
-      { fn: "status", expected: "3", message: "After deliver(), status() should be 3 (Delivered)", setup: [{ fn: "deliver" }] },
     ],
   },
 ];
