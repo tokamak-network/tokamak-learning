@@ -171,17 +171,47 @@ export default function DailyClient() {
   }
 
   function renderCodeWithBlank(code: string) {
-    const parts = code.split("___BLANK___");
-    if (parts.length < 2) return <code>{code}</code>;
+    const lines = code.split("\n");
+    const blankLineIdx = lines.findIndex((l) => l.includes("___BLANK___"));
 
     return (
-      <code>
-        {parts[0]}
-        <span className="inline-block px-3 py-0.5 mx-1 rounded-md bg-[var(--color-accent)]/20 text-[var(--color-accent)] border border-[var(--color-accent)]/30 font-bold min-w-[60px] text-center">
-          {selected ?? "?"}
-        </span>
-        {parts[1]}
-      </code>
+      <div className="space-y-0.5 font-mono text-[11px] leading-5">
+        {lines.map((line, i) => {
+          const isBlankLine = i === blankLineIdx;
+
+          if (isBlankLine) {
+            const parts = line.split("___BLANK___");
+            return (
+              <div
+                key={i}
+                className="relative -mx-1 px-1 py-1 rounded-lg bg-[var(--color-accent)]/8 border border-[var(--color-accent)]/20 overflow-x-auto whitespace-pre scrollbar-none"
+              >
+                <code className="text-[var(--color-foreground)]">
+                  {parts[0]}
+                  <span className="inline-block px-2 py-0.5 mx-0.5 rounded bg-[var(--color-accent)]/20 text-[var(--color-accent)] border border-[var(--color-accent)]/30 font-bold min-w-[40px] text-center text-xs">
+                    {selected ?? "?"}
+                  </span>
+                  {parts[1]}
+                </code>
+              </div>
+            );
+          }
+
+          // Context lines — show trimmed, muted
+          if (line.trim() === "") {
+            return <div key={i} className="h-2" />;
+          }
+
+          return (
+            <div
+              key={i}
+              className="overflow-hidden whitespace-pre text-[var(--color-muted)]/60 truncate"
+            >
+              <code>{line}</code>
+            </div>
+          );
+        })}
+      </div>
     );
   }
 
@@ -253,9 +283,9 @@ export default function DailyClient() {
             className="flex-1 flex flex-col"
           >
             {question.type === "code" ? (
-              <pre className="p-4 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] text-sm leading-relaxed overflow-x-auto mb-6 whitespace-pre-wrap font-mono">
+              <div className="p-3 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] mb-6">
                 {renderCodeWithBlank(question.code)}
-              </pre>
+              </div>
             ) : (
               <div className="p-4 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] mb-6">
                 <p className="text-[var(--color-foreground)] text-lg font-medium">
