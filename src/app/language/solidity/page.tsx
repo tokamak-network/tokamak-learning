@@ -7,9 +7,9 @@ import { categories, getProblemsByCategory } from "@/data/problems";
 import type { Category } from "@/data/problems";
 
 const difficultyColors = {
-  beginner: "text-emerald-400 bg-emerald-400/10 border-emerald-400/20",
-  intermediate: "text-amber-400 bg-amber-400/10 border-amber-400/20",
-  advanced: "text-rose-400 bg-rose-400/10 border-rose-400/20",
+  beginner: "text-[var(--color-success)] bg-[var(--color-success)]/10 border-[var(--color-success)]/20",
+  intermediate: "text-[var(--color-warning)] bg-[var(--color-warning)]/10 border-[var(--color-warning)]/20",
+  advanced: "text-[var(--color-danger)] bg-[var(--color-danger)]/10 border-[var(--color-danger)]/20",
 };
 
 const difficultyLabels = {

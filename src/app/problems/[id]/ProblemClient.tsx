@@ -390,8 +390,8 @@ export default function ProblemClient({ problem }: { problem: ClientProblem }) {
                       variants={fadeInUpVariant}
                       className={`p-4 rounded-lg border ${
                         allPassed
-                          ? "bg-green-500/5 border-green-500/20"
-                          : "bg-red-500/5 border-red-500/20"
+                          ? "bg-[var(--color-success)]/5 border-[var(--color-success)]/20"
+                          : "bg-[var(--color-danger)]/5 border-[var(--color-danger)]/20"
                       }`}
                     >
                       <div className="flex items-center gap-2 mb-1">
@@ -414,8 +414,8 @@ export default function ProblemClient({ problem }: { problem: ClientProblem }) {
                         variants={fadeInUpVariant}
                         className={`flex items-start gap-3 p-3 rounded-lg border ${
                           r.passed
-                            ? "border-green-500/20 bg-green-500/5"
-                            : "border-red-500/20 bg-red-500/5"
+                            ? "border-[var(--color-success)]/20 bg-[var(--color-success)]/5"
+                            : "border-[var(--color-danger)]/20 bg-[var(--color-danger)]/5"
                         }`}
                       >
                         <span
@@ -425,7 +425,15 @@ export default function ProblemClient({ problem }: { problem: ClientProblem }) {
                               : "bg-[var(--color-danger)] text-white"
                           }`}
                         >
-                          {r.passed ? "V" : "X"}
+                          {r.passed ? (
+                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                          ) : (
+                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          )}
                         </span>
                         <span className="text-sm text-[var(--color-foreground)]">
                           {r.message}
@@ -446,7 +454,7 @@ export default function ProblemClient({ problem }: { problem: ClientProblem }) {
                       >
                         <Link
                           href={`/problems/${nextProblem.id}`}
-                          className="mt-4 flex items-center justify-center gap-2 w-full py-3 bg-[var(--color-success)] hover:bg-green-600 text-white rounded-lg font-medium transition-colors"
+                          className="mt-4 flex items-center justify-center gap-2 w-full py-3 bg-[var(--color-success)] hover:brightness-90 text-white rounded-lg font-medium transition-all"
                         >
                           Next: {nextProblem.title}
                           <svg
@@ -550,7 +558,7 @@ export default function ProblemClient({ problem }: { problem: ClientProblem }) {
           <button
             onClick={handleCompile}
             disabled={isCompiling}
-            className="inline-flex items-center gap-1.5 text-sm px-4 py-1.5 rounded-full border border-green-500/40 text-green-400 hover:bg-green-500/10 font-medium transition-all duration-200 disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 text-sm px-4 py-1.5 rounded-full border border-[var(--color-success)]/40 text-[var(--color-success)] hover:bg-[var(--color-success)]/10 font-medium transition-all duration-200 disabled:opacity-50"
           >
             <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M8 5v14l11-7z" />
@@ -559,9 +567,9 @@ export default function ProblemClient({ problem }: { problem: ClientProblem }) {
               <span className="inline-flex items-center gap-1">
                 Compiling
                 <span className="inline-flex gap-0.5">
-                  <span className="w-1 h-1 rounded-full bg-green-400 animate-[dotPulse_1.4s_infinite_0s]" />
-                  <span className="w-1 h-1 rounded-full bg-green-400 animate-[dotPulse_1.4s_infinite_0.2s]" />
-                  <span className="w-1 h-1 rounded-full bg-green-400 animate-[dotPulse_1.4s_infinite_0.4s]" />
+                  <span className="w-1 h-1 rounded-full bg-[var(--color-success)] animate-[dotPulse_1.4s_infinite_0s]" />
+                  <span className="w-1 h-1 rounded-full bg-[var(--color-success)] animate-[dotPulse_1.4s_infinite_0.2s]" />
+                  <span className="w-1 h-1 rounded-full bg-[var(--color-success)] animate-[dotPulse_1.4s_infinite_0.4s]" />
                 </span>
               </span>
             ) : (
@@ -570,7 +578,7 @@ export default function ProblemClient({ problem }: { problem: ClientProblem }) {
           </button>
           <button
             onClick={handleReset}
-            className="inline-flex items-center gap-1.5 text-sm px-4 py-1.5 rounded-full border border-rose-500/40 text-rose-400 hover:bg-rose-500/10 font-medium transition-all duration-200"
+            className="inline-flex items-center gap-1.5 text-sm px-4 py-1.5 rounded-full border border-[var(--color-danger)]/40 text-[var(--color-danger)] hover:bg-[var(--color-danger)]/10 font-medium transition-all duration-200"
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
