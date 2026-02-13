@@ -15,7 +15,7 @@ const SolidityEditor = dynamic(() => import("@/components/SolidityEditor"), {
   ssr: false,
   loading: () => (
     <div className="flex items-center justify-center h-full text-[var(--color-muted)]">
-      에디터 로딩중...
+      Loading editor...
     </div>
   ),
 });
@@ -97,7 +97,7 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
       const data = await res.json();
       setResults(data.results);
     } catch {
-      setResults([{ passed: false, message: "서버 오류가 발생했습니다" }]);
+      setResults([{ passed: false, message: "A server error occurred" }]);
     } finally {
       setIsCompiling(false);
     }
@@ -162,7 +162,7 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
                 : "text-[var(--color-muted)] hover:text-[var(--color-foreground)]"
             }`}
           >
-            설명
+            Description
             {activeTab === "description" && (
               <motion.div
                 layoutId="tab-indicator"
@@ -179,7 +179,7 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
                 : "text-[var(--color-muted)] hover:text-[var(--color-foreground)]"
             }`}
           >
-            결과
+            Results
             {results && (
               <span
                 className={`w-2 h-2 rounded-full ${allPassed ? "bg-[var(--color-success)]" : "bg-[var(--color-danger)]"}`}
@@ -228,7 +228,7 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
                       onClick={() => setShowHints(!showHints)}
                       className="text-sm text-[var(--color-accent)] hover:text-[var(--color-accent-hover)] transition-colors"
                     >
-                      {showHints ? "힌트 숨기기" : "힌트 보기"}
+                      {showHints ? "Hide Hints" : "Show Hints"}
                       <span className="ml-1 text-xs opacity-50">&#8984;&#8679;H</span>
                     </button>
                     <AnimatePresence>
@@ -262,7 +262,7 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
                     onClick={() => setShowSolution(!showSolution)}
                     className="text-sm text-[var(--color-warning)] hover:text-yellow-300 transition-colors"
                   >
-                    {showSolution ? "정답 숨기기" : "정답 보기"}
+                    {showSolution ? "Hide Solution" : "Show Solution"}
                     <span className="ml-1 text-xs opacity-50">&#8984;&#8679;S</span>
                   </button>
                   <AnimatePresence>
@@ -287,7 +287,7 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
                             }}
                             className="mt-2 text-xs text-[var(--color-muted)] hover:text-[var(--color-foreground)] transition-colors"
                           >
-                            정답 코드 적용하기
+                            Apply solution code
                           </button>
                         </div>
                       </motion.div>
@@ -308,13 +308,13 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
               >
                 {!results && !isCompiling && (
                   <div className="text-[var(--color-muted)] text-sm">
-                    코드를 작성하고 &quot;테스트 실행&quot; 버튼을 클릭하세요.
+                    Write your code and click &quot;Run Tests&quot; to get started.
                   </div>
                 )}
                 {isCompiling && (
                   <div className="flex items-center gap-3 text-sm text-[var(--color-muted)]">
                     <div className="w-4 h-4 border-2 border-[var(--color-accent)] border-t-transparent rounded-full animate-spin" />
-                    컴파일 중
+                    Compiling
                     <span className="inline-flex gap-0.5">
                       <span className="w-1 h-1 rounded-full bg-[var(--color-muted)] animate-[dotPulse_1.4s_infinite_0s]" />
                       <span className="w-1 h-1 rounded-full bg-[var(--color-muted)] animate-[dotPulse_1.4s_infinite_0.2s]" />
@@ -347,7 +347,7 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
                       </div>
                       <p className="text-sm text-[var(--color-muted)]">
                         {results.filter((r) => r.passed).length} /{" "}
-                        {results.length} 테스트 통과
+                        {results.length} tests passed
                       </p>
                     </motion.div>
 
@@ -392,7 +392,7 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
                           href={`/problems/${nextProblem.id}`}
                           className="mt-4 flex items-center justify-center gap-2 w-full py-3 bg-[var(--color-success)] hover:bg-green-600 text-white rounded-lg font-medium transition-colors"
                         >
-                          다음 문제: {nextProblem.title}
+                          Next: {nextProblem.title}
                           <svg
                             className="w-4 h-4"
                             fill="none"
@@ -436,7 +436,7 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
                   d="M15 19l-7-7 7-7"
                 />
               </svg>
-              이전
+              Prev
             </Link>
           ) : (
             <div />
@@ -446,7 +446,7 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
               href={`/problems/${nextProblem.id}`}
               className="text-sm text-[var(--color-muted)] hover:text-[var(--color-foreground)] transition-colors flex items-center gap-1"
             >
-              다음
+              Next
               <svg
                 className="w-4 h-4"
                 fill="none"
@@ -469,7 +469,7 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
 
       {/* Right Panel - Editor */}
       <div className="flex-1 flex flex-col">
-        {/* Editor toolbar */}
+        {/* Editor toolbar - file info */}
         <div className="flex items-center justify-between px-4 py-2 border-b border-[var(--color-border)] bg-[var(--color-surface)]">
           <div className="flex items-center gap-3">
             <span className="text-sm text-[var(--color-muted)]">
@@ -486,36 +486,56 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
               VIM
             </button>
           </div>
+        </div>
+
+        {/* Action buttons row */}
+        <div className="flex items-center justify-between px-4 py-2 border-b border-[var(--color-border)] bg-[var(--color-surface)]">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-[var(--color-muted)] hidden sm:inline-flex items-center gap-1 opacity-60">
-              <kbd className="px-1 py-0.5 rounded bg-[var(--color-border)] text-[10px]">&#8984;Enter</kbd>
-              <span>실행</span>
-            </span>
-            <button
-              onClick={handleReset}
-              className="text-xs px-3 py-1.5 text-[var(--color-muted)] hover:text-[var(--color-foreground)] border border-[var(--color-border)] hover:border-[var(--color-muted)] rounded-md hover:scale-[1.02] transition-all duration-200"
-            >
-              초기화
-            </button>
-            <button
-              onClick={handleCompile}
-              disabled={isCompiling}
-              className="text-xs px-4 py-1.5 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white rounded-md font-medium hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:hover:scale-100"
-            >
-              {isCompiling ? (
-                <span className="inline-flex items-center gap-1">
-                  컴파일 중
-                  <span className="inline-flex gap-0.5">
-                    <span className="w-1 h-1 rounded-full bg-white animate-[dotPulse_1.4s_infinite_0s]" />
-                    <span className="w-1 h-1 rounded-full bg-white animate-[dotPulse_1.4s_infinite_0.2s]" />
-                    <span className="w-1 h-1 rounded-full bg-white animate-[dotPulse_1.4s_infinite_0.4s]" />
-                  </span>
+          <button
+            onClick={handleCompile}
+            disabled={isCompiling}
+            className="inline-flex items-center gap-1.5 text-sm px-4 py-1.5 rounded-full border border-blue-500/40 text-blue-400 hover:bg-blue-500/10 font-medium transition-all duration-200 disabled:opacity-50"
+          >
+            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+            {isCompiling ? (
+              <span className="inline-flex items-center gap-1">
+                Compiling
+                <span className="inline-flex gap-0.5">
+                  <span className="w-1 h-1 rounded-full bg-blue-400 animate-[dotPulse_1.4s_infinite_0s]" />
+                  <span className="w-1 h-1 rounded-full bg-blue-400 animate-[dotPulse_1.4s_infinite_0.2s]" />
+                  <span className="w-1 h-1 rounded-full bg-blue-400 animate-[dotPulse_1.4s_infinite_0.4s]" />
                 </span>
-              ) : (
-                "테스트 실행"
-              )}
-            </button>
+              </span>
+            ) : (
+              "Run"
+            )}
+          </button>
+          <button
+            onClick={() => { handleCompile(); }}
+            disabled={isCompiling}
+            className="inline-flex items-center gap-1.5 text-sm px-4 py-1.5 rounded-full border border-green-500/40 text-green-400 hover:bg-green-500/10 font-medium transition-all duration-200 disabled:opacity-50"
+          >
+            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+            Test
+          </button>
+          <button
+            onClick={handleReset}
+            className="inline-flex items-center gap-1.5 text-sm px-4 py-1.5 rounded-full border border-rose-500/40 text-rose-400 hover:bg-rose-500/10 font-medium transition-all duration-200"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Reset
+          </button>
           </div>
+          <span className="text-xs text-[var(--color-muted)] hidden sm:inline-flex items-center gap-1 opacity-60">
+            <kbd className="px-1 py-0.5 rounded bg-[var(--color-border)] text-[10px]">&#8984;Enter</kbd>
+            <span>Run</span>
+          </span>
         </div>
 
         {/* Editor */}
