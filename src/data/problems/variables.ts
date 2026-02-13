@@ -9,43 +9,46 @@ export const variables_problems: Problem[] = [
     difficulty: "beginner",
     description: `# Local Variables
 
-Local variables only exist inside a function and are not stored on the blockchain. They disappear when the function finishes.
+## What you'll learn
+How to use variables inside a function.
 
-\`\`\`solidity
-function example() public pure returns (uint) {
-    uint temp = 10;    // local variable
-    uint result = temp * 2;
-    return result;
-}
-\`\`\`
+Local variables are declared inside a function. They only exist while the function runs and are **not stored on the blockchain** — they disappear when the function finishes.
 
 ## Task
-Complete the calculate function using local variables. Return the sum plus the product.`,
+
+Inside the function, complete the two lines:
+
+1. Declare a local variable \`result\` equal to \`x * 2\`
+2. Return \`result\`
+
+> Local variables are cheap because they live in memory, not in storage.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
 contract LocalVariables {
-    function calculate(uint a, uint b) public pure returns (uint) {
-        // TODO: Declare local variables sum (a+b) and product (a*b)
-        // and return sum + product
+    function getDouble(uint x) public pure returns (uint) {
+        // TODO: Declare a local variable result equal to x * 2
+        // TODO: Return result
     }
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
 contract LocalVariables {
-    function calculate(uint a, uint b) public pure returns (uint) {
-        uint sum = a + b;
-        uint product = a * b;
-        return sum + product;
+    function getDouble(uint x) public pure returns (uint) {
+        uint result = x * 2;
+        return result;
     }
 }`,
-    hints: ["You can declare local variables using the uint keyword.", "Declare and assign at the same time: uint sum = a + b;"],
-    testDescription: "Checks that the calculate function correctly returns the sum of two numbers' addition and multiplication.",
-    expectedFunctions: ["calculate"],
+    hints: [
+      "Declare a local variable the same way as a state variable: uint result = x * 2;",
+      "Use the return keyword to send the value back to the caller.",
+    ],
+    testDescription: "Checks that getDouble() correctly doubles the input value.",
+    expectedFunctions: ["getDouble"],
     testCases: [
-      { fn: "calculate", args: ["3", "4"], expected: "19", message: "calculate(3, 4) should return 19 (3+4 + 3*4 = 19)" },
-      { fn: "calculate", args: ["5", "2"], expected: "17", message: "calculate(5, 2) should return 17 (5+2 + 5*2 = 17)" },
+      { fn: "getDouble", args: ["5"], expected: "10", message: "getDouble(5) should return 10" },
+      { fn: "getDouble", args: ["0"], expected: "0", message: "getDouble(0) should return 0" },
     ],
   },
   {
@@ -56,18 +59,17 @@ contract LocalVariables {
     difficulty: "beginner",
     description: `# Global Variables
 
-Solidity has global variables accessible from anywhere:
-- \`msg.sender\`: the address that called the function
-- \`block.timestamp\`: the current block's timestamp
-- \`block.number\`: the current block number
+## What you'll learn
+How to use Solidity's built-in global variables.
 
-\`\`\`solidity
-address caller = msg.sender;
-uint time = block.timestamp;
-\`\`\`
+Solidity provides special global variables you can use anywhere:
+- \`msg.sender\`: the address that called the function
+- \`block.timestamp\`: the current block's timestamp (in seconds)
 
 ## Task
-Complete the three functions that return each global variable.`,
+
+1. Inside \`getSender()\`, return \`msg.sender\`
+2. Inside \`getTimestamp()\`, return \`block.timestamp\``,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
@@ -77,11 +79,7 @@ contract GlobalVariables {
     }
 
     function getTimestamp() public view returns (uint) {
-        // TODO: Return the current block's timestamp
-    }
-
-    function getBlockNumber() public view returns (uint) {
-        // TODO: Return the current block number
+        // TODO: Return the current block timestamp
     }
 }`,
     solution: `// SPDX-License-Identifier: MIT
@@ -95,112 +93,49 @@ contract GlobalVariables {
     function getTimestamp() public view returns (uint) {
         return block.timestamp;
     }
-
-    function getBlockNumber() public view returns (uint) {
-        return block.number;
-    }
 }`,
-    hints: ["msg.sender is the wallet address that called the current function.", "block.timestamp and block.number contain current block information."],
-    testDescription: "Checks that getSender, getTimestamp, and getBlockNumber return the correct global variable values.",
-    expectedFunctions: ["getSender", "getTimestamp", "getBlockNumber"],
+    hints: [
+      "msg.sender gives you the address of whoever called the function.",
+      "block.timestamp gives the current block's time as a Unix timestamp.",
+    ],
+    testDescription: "Checks that getSender() and getTimestamp() return the correct global values.",
+    expectedFunctions: ["getSender", "getTimestamp"],
     testCases: [
       { fn: "getSender", expected: "DEPLOYER", message: "getSender() should return the caller's address" },
-      { fn: "getTimestamp", message: "getTimestamp() should return successfully" },
-      { fn: "getBlockNumber", message: "getBlockNumber() should return successfully" },
-    ],
-  },
-  {
-    id: "msg-value-payable",
-    title: "msg.value and payable",
-    category: "variables",
-    order: 3,
-    difficulty: "beginner",
-    description: `# msg.value and payable
-
-A \`payable\` function can receive ETH. \`msg.value\` is the amount of ETH sent (in wei).
-
-\`\`\`solidity
-function deposit() public payable {
-    totalDeposited += msg.value;
-}
-uint bal = address(this).balance; // contract balance
-\`\`\`
-
-## Task
-Complete the deposit and getBalance functions.`,
-    starterCode: `// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
-
-contract MsgValuePayable {
-    uint public totalDeposited;
-
-    function deposit() public payable {
-        // TODO: Add msg.value to totalDeposited
-    }
-
-    function getBalance() public view returns (uint) {
-        // TODO: Return this contract's ETH balance
-    }
-}`,
-    solution: `// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
-
-contract MsgValuePayable {
-    uint public totalDeposited;
-
-    function deposit() public payable {
-        totalDeposited += msg.value;
-    }
-
-    function getBalance() public view returns (uint) {
-        return address(this).balance;
-    }
-}`,
-    hints: ["msg.value is the amount of ETH (in wei) sent with the function call.", "Use address(this).balance to check the contract's current ETH balance."],
-    testDescription: "Checks that totalDeposited increases on deposit and getBalance returns the contract balance.",
-    expectedFunctions: ["totalDeposited", "deposit", "getBalance"],
-    testCases: [
-      { fn: "totalDeposited", expected: "0", message: "Initial totalDeposited() should be 0" },
-      { fn: "totalDeposited", expected: "1000", message: "totalDeposited() should be 1000 after deposit(1000 wei)", setup: [{ fn: "deposit", value: "1000" }] },
-      { fn: "getBalance", expected: "500", message: "getBalance() should be 500 after deposit(500 wei)", setup: [{ fn: "deposit", value: "500" }] },
+      { fn: "getTimestamp", message: "getTimestamp() should return a timestamp value" },
     ],
   },
   {
     id: "visibility-basics",
     title: "Visibility",
     category: "variables",
-    order: 4,
+    order: 3,
     difficulty: "beginner",
     description: `# Visibility
 
-Specify access levels for functions and variables:
-- \`public\`: accessible by anyone
-- \`private\`: only the current contract
-- \`internal\`: current + inherited contracts
-- \`external\`: callable only from outside
+## What you'll learn
+How to control who can access variables and functions.
 
-\`\`\`solidity
-uint private secret = 42;
-function getSecret() public view returns (uint) { return secret; }
-\`\`\`
+Solidity has visibility keywords that control access:
+- \`public\`: anyone can access
+- \`private\`: only the current contract
 
 ## Task
-Fill in the correct visibility keywords to complete the code.`,
+
+1. Add the \`private\` keyword to \`secretNumber\` to hide it from direct access
+2. Add the \`public\` keyword to \`getSecret()\` so anyone can call it
+
+> Even \`private\` variables are visible on the blockchain — \`private\` only prevents other contracts from reading them directly.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
 contract VisibilityBasics {
-    // TODO: Add the private keyword to prevent direct external access
+    // TODO: Add the private keyword
     uint secretNumber = 42;
 
-    // TODO: Add the public keyword so anyone can call this
+    // TODO: Add the public keyword
     function getSecret() view returns (uint) {
         return secretNumber;
-    }
-
-    // TODO: Add the internal keyword so only inherited contracts can access this
-    function _helper() pure returns (uint) {
-        return 1;
     }
 }`,
     solution: `// SPDX-License-Identifier: MIT
@@ -212,163 +147,193 @@ contract VisibilityBasics {
     function getSecret() public view returns (uint) {
         return secretNumber;
     }
-
-    function _helper() internal pure returns (uint) {
-        return 1;
-    }
 }`,
-    hints: ["Private variables cannot be read directly from outside.", "Public functions can be called by anyone, and internal functions can only be called within the contract and its child contracts."],
-    testDescription: "Checks that getSecret correctly returns secretNumber.",
+    hints: [
+      "Visibility keywords go after the type for variables: uint private name;",
+      "For functions, visibility goes after the parentheses: function name() public ...",
+    ],
+    testDescription: "Checks that getSecret() returns the secret number.",
     expectedFunctions: ["getSecret"],
     testCases: [
       { fn: "getSecret", expected: "42", message: "getSecret() should return 42" },
     ],
   },
   {
-    id: "view-pure",
-    title: "view and pure",
+    id: "view-functions",
+    title: "View Functions",
     category: "variables",
-    order: 5,
+    order: 4,
     difficulty: "beginner",
-    description: `# view and pure
+    description: `# View Functions
 
-- \`view\`: reads state but does not modify it
-- \`pure\`: neither reads nor modifies state
-- Neither: can modify state
+## What you'll learn
+What the \`view\` keyword means for functions.
 
-\`\`\`solidity
-uint public counter;
-function getCounter() public view returns (uint) { return counter; }
-function add(uint a, uint b) public pure returns (uint) { return a + b; }
-function increment() public { counter++; }
-\`\`\`
+A \`view\` function can **read** state variables but **cannot modify** them. It's like looking through a window — you can see inside, but you can't change anything.
 
 ## Task
-Complete the body of each of the three functions.`,
+
+Write the body of \`getCount()\` — return the value of \`count\`:
+
+\`\`\`solidity
+return count;
+\`\`\`
+
+> \`view\` tells the compiler: "This function only reads data, it doesn't change anything."`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-contract ViewPure {
-    uint public counter;
+contract ViewFunctions {
+    uint public count = 10;
 
-    function getCounter() public view returns (uint) {
-        // TODO: Return the counter value
-    }
-
-    function add(uint a, uint b) public pure returns (uint) {
-        // TODO: Return a + b
-    }
-
-    function increment() public {
-        // TODO: Increment counter by 1
+    function getCount() public view returns (uint) {
+        // TODO: Return count
     }
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-contract ViewPure {
-    uint public counter;
+contract ViewFunctions {
+    uint public count = 10;
 
-    function getCounter() public view returns (uint) {
-        return counter;
-    }
-
-    function add(uint a, uint b) public pure returns (uint) {
-        return a + b;
-    }
-
-    function increment() public {
-        counter++;
+    function getCount() public view returns (uint) {
+        return count;
     }
 }`,
-    hints: ["A view function can read state variables but cannot modify them.", "A pure function neither reads nor modifies state variables. You can increment a value with counter++."],
-    testDescription: "Checks that getCounter reads state, add does a pure calculation, and increment modifies state.",
-    expectedFunctions: ["counter", "getCounter", "add", "increment"],
+    hints: [
+      "A view function reads state but doesn't change it.",
+      "Use the return keyword followed by the variable name.",
+    ],
+    testDescription: "Checks that getCount() returns the stored count value.",
+    expectedFunctions: ["count", "getCount"],
     testCases: [
-      { fn: "getCounter", expected: "0", message: "Initial getCounter() should be 0" },
-      { fn: "add", args: ["3", "7"], expected: "10", message: "add(3, 7) should return 10" },
-      { fn: "getCounter", expected: "1", message: "getCounter() should be 1 after increment()", setup: [{ fn: "increment" }] },
+      { fn: "getCount", expected: "10", message: "getCount() should return 10" },
     ],
   },
   {
-    id: "type-conversion",
-    title: "Type Conversion",
+    id: "pure-functions",
+    title: "Pure Functions",
     category: "variables",
-    order: 6,
+    order: 5,
     difficulty: "beginner",
-    description: `# Type Conversion
+    description: `# Pure Functions
 
-Solidity requires explicit type conversions.
+## What you'll learn
+What the \`pure\` keyword means for functions.
 
-\`\`\`solidity
-uint256 big = 100;
-uint8 small = uint8(big);        // explicit conversion
-uint256 back = uint256(small);   // convert back
-address payable p = payable(addr); // convert to payable
-\`\`\`
+A \`pure\` function **cannot read or modify** any state. It only works with its parameters and local variables — like a calculator that doesn't need to look anything up.
+
+- \`view\`: can read state (like the previous problem)
+- \`pure\`: cannot even read state
 
 ## Task
-Complete the three type conversion functions.`,
+
+Write the body of \`add()\` — return the sum of \`a\` and \`b\`:
+
+\`\`\`solidity
+return a + b;
+\`\`\``,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-contract TypeConversion {
-    function toUint8(uint256 x) public pure returns (uint8) {
-        // TODO: Convert x to uint8 and return it
-    }
-
-    function toUint256(uint8 x) public pure returns (uint256) {
-        // TODO: Convert x to uint256 and return it
-    }
-
-    function toPayable(address addr) public pure returns (address payable) {
-        // TODO: Convert addr to address payable and return it
+contract PureFunctions {
+    function add(uint a, uint b) public pure returns (uint) {
+        // TODO: Return a + b
     }
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-contract TypeConversion {
-    function toUint8(uint256 x) public pure returns (uint8) {
-        return uint8(x);
-    }
-
-    function toUint256(uint8 x) public pure returns (uint256) {
-        return uint256(x);
-    }
-
-    function toPayable(address addr) public pure returns (address payable) {
-        return payable(addr);
+contract PureFunctions {
+    function add(uint a, uint b) public pure returns (uint) {
+        return a + b;
     }
 }`,
-    hints: ["Use uint8(x) for explicit type conversion.", "Use payable(addr) to convert address to address payable."],
-    testDescription: "Checks that toUint8, toUint256, and toPayable correctly convert types.",
-    expectedFunctions: ["toUint8", "toUint256", "toPayable"],
+    hints: [
+      "Pure functions only use parameters and local variables — no state access.",
+      "Return the result of the arithmetic operation.",
+    ],
+    testDescription: "Checks that add() returns the correct sum.",
+    expectedFunctions: ["add"],
     testCases: [
-      { fn: "toUint8", args: ["200"], expected: "200", message: "toUint8(200) should return 200" },
-      { fn: "toUint256", args: ["100"], expected: "100", message: "toUint256(100) should return 100" },
-      { fn: "toPayable", args: ["0x1000000000000000000000000000000000000001"], message: "toPayable() should return successfully" },
+      { fn: "add", args: ["3", "7"], expected: "10", message: "add(3, 7) should return 10" },
+      { fn: "add", args: ["0", "0"], expected: "0", message: "add(0, 0) should return 0" },
+    ],
+  },
+  {
+    id: "pure-state-error",
+    title: "Fix: State Access in Pure",
+    category: "variables",
+    order: 6,
+    difficulty: "intermediate",
+    description: `# Fix: State Access in Pure
+
+## What you'll learn
+That \`pure\` functions cannot read state variables.
+
+The code below has a \`pure\` function that tries to read a state variable. This is not allowed — \`pure\` means "no state access at all."
+
+## Task
+
+1. **First, compile it as-is** to see the error message
+2. Change the function keyword so it can read state
+
+> If a function needs to read state, it should be \`view\`, not \`pure\`.`,
+    starterCode: `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+contract PureStateError {
+    uint public value = 42;
+
+    // This code has an error. Try compiling first!
+    function getValue() public pure returns (uint) {
+        return value;
+    }
+}`,
+    solution: `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+contract PureStateError {
+    uint public value = 42;
+
+    function getValue() public view returns (uint) {
+        return value;
+    }
+}`,
+    hints: [
+      "The function reads the state variable 'value'. Can a pure function do that?",
+      "Change one keyword to allow reading state without modifying it.",
+    ],
+    testDescription: "Checks that getValue() returns 42 after fixing the function modifier.",
+    expectedFunctions: ["value", "getValue"],
+    testCases: [
+      { fn: "getValue", expected: "42", message: "getValue() should return 42" },
     ],
   },
   {
     id: "delete-keyword",
-    title: "delete Keyword",
+    title: "The delete Keyword",
     category: "variables",
     order: 7,
-    difficulty: "beginner",
-    description: `# delete Keyword
+    difficulty: "intermediate",
+    description: `# The delete Keyword
 
-\`delete\` resets a variable to its default value. uint becomes 0, bool becomes false, address becomes address(0).
+## What you'll learn
+How to reset variables to their default values using \`delete\`.
 
-\`\`\`solidity
-uint public value = 100;
-function reset() public {
-    delete value; // value = 0
-}
-\`\`\`
+\`delete\` resets a variable to its type's default value:
+- \`uint\` becomes \`0\`
+- \`bool\` becomes \`false\`
+- \`address\` becomes \`address(0)\`
 
 ## Task
-Use delete in the reset function to reset value and flag to their defaults.`,
+
+Inside the \`reset()\` function, use \`delete\` to reset both \`value\` and \`flag\`:
+
+\`\`\`solidity
+delete value;
+delete flag;
+\`\`\``,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
@@ -377,7 +342,7 @@ contract DeleteKeyword {
     bool public flag = true;
 
     function reset() public {
-        // TODO: Use delete to reset value and flag to their default values
+        // TODO: Use delete to reset value and flag
     }
 }`,
     solution: `// SPDX-License-Identifier: MIT
@@ -392,8 +357,11 @@ contract DeleteKeyword {
         delete flag;
     }
 }`,
-    hints: ["Use delete value; to reset a variable to its default.", "After delete, uint becomes 0 and bool becomes false."],
-    testDescription: "Checks that value is 0 and flag is false after calling reset.",
+    hints: [
+      "The syntax is: delete variableName;",
+      "Each variable needs its own delete statement.",
+    ],
+    testDescription: "Checks that value becomes 0 and flag becomes false after reset().",
     expectedFunctions: ["value", "flag", "reset"],
     testCases: [
       { fn: "value", expected: "100", message: "Initial value() should be 100" },
