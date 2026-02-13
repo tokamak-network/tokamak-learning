@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { categories, problems } from "@/data/problems";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
@@ -134,12 +135,27 @@ function CategoriesSection() {
 
 // -- Main --
 
+function isDailyCompleted(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const raw = localStorage.getItem("dailyChallenge");
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    const today = new Date().toISOString().slice(0, 10);
+    return data.date === today && data.completed === true;
+  } catch {
+    return false;
+  }
+}
+
 export default function Home() {
   const totalProblems = problems.length;
   const totalCategories = categories.length;
   const [wordIndex, setWordIndex] = useState(0);
+  const [dailyDone, setDailyDone] = useState(false);
 
   useEffect(() => {
+    setDailyDone(isDailyCompleted());
     const interval = setInterval(() => {
       setWordIndex((prev) => (prev + 1) % rotatingWords.length);
     }, 2500);
@@ -209,14 +225,24 @@ export default function Home() {
 
             <motion.div variants={fadeInUp} className="flex gap-3">
               <Link
+                href="/daily"
+                className={`md:hidden group relative px-6 py-3 rounded-lg font-medium transition-all ${
+                  dailyDone
+                    ? "bg-[var(--color-success)]/15 text-[var(--color-success)] border border-[var(--color-success)]/30"
+                    : "bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:shadow-[var(--shadow-glow-strong)] hover:scale-[1.02]"
+                }`}
+              >
+                {dailyDone ? "✓ Completed" : "Daily Challenge"}
+              </Link>
+              <Link
                 href="/language/solidity"
-                className="group relative bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-all hover:shadow-[var(--shadow-glow-strong)] hover:scale-[1.02]"
+                className="hidden md:inline-flex group relative bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-all hover:shadow-[var(--shadow-glow-strong)] hover:scale-[1.02]"
               >
                 Start Learning
               </Link>
               <Link
                 href="/problems/hello-solidity"
-                className="border border-[var(--color-border)] hover:border-[var(--color-accent)]/40 text-[var(--color-foreground)] px-6 py-3 rounded-lg font-medium transition-all hover:bg-[var(--color-surface)] hover:scale-[1.02]"
+                className="hidden md:inline-flex border border-[var(--color-border)] hover:border-[var(--color-accent)]/40 text-[var(--color-foreground)] px-6 py-3 rounded-lg font-medium transition-all hover:bg-[var(--color-surface)] hover:scale-[1.02]"
               >
                 Try First Problem
               </Link>
@@ -241,50 +267,53 @@ export default function Home() {
 
       {/* Stats */}
       <section className="border-y border-[var(--color-border)] bg-[var(--color-surface)]/50 backdrop-blur-sm">
-        <div className="max-w-6xl mx-auto px-6 py-12 grid grid-cols-3 gap-8 text-center">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 py-8 md:py-12 grid grid-cols-3 gap-3 md:gap-8 text-center">
           <div>
-            <div className="text-4xl font-bold text-[var(--color-foreground)] tabular-nums tracking-tight">
+            <div className="text-2xl md:text-4xl font-bold text-[var(--color-foreground)] tabular-nums tracking-tight">
               <CountUp target={totalProblems} />
             </div>
-            <div className="text-sm text-[var(--color-muted)] mt-1.5">
-              Practice Problems
+            <div className="text-xs md:text-sm text-[var(--color-muted)] mt-1.5">
+              Problems
             </div>
           </div>
           <div className="border-x border-[var(--color-border)]">
-            <div className="text-4xl font-bold text-[var(--color-foreground)] tabular-nums tracking-tight">
+            <div className="text-2xl md:text-4xl font-bold text-[var(--color-foreground)] tabular-nums tracking-tight">
               <CountUp target={totalCategories} />
             </div>
-            <div className="text-sm text-[var(--color-muted)] mt-1.5">
-              Learning Tracks
+            <div className="text-xs md:text-sm text-[var(--color-muted)] mt-1.5">
+              Tracks
             </div>
           </div>
           <div>
-            <div className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent tabular-nums tracking-tight">
+            <div className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent tabular-nums tracking-tight">
               <CountUp target={100} suffix="%" />
             </div>
-            <div className="text-sm text-[var(--color-muted)] mt-1.5">
+            <div className="text-xs md:text-sm text-[var(--color-muted)] mt-1.5">
               In-Browser
             </div>
           </div>
         </div>
       </section>
 
-      {/* Categories */}
-      <CategoriesSection />
+      {/* Categories — desktop only */}
+      <div className="hidden md:block">
+        <CategoriesSection />
+      </div>
 
       {/* Footer */}
       <footer className="border-t border-[var(--color-border)] py-8">
-        <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
-          <div className="text-sm text-[var(--color-muted)]">
-            &copy; {new Date().getFullYear()} TokamakLearn[:run]. All rights reserved.
+        <div className="max-w-6xl mx-auto px-4 md:px-6 flex items-center justify-between">
+          <div className="text-xs md:text-sm text-[var(--color-muted)]">
+            &copy; {new Date().getFullYear()} TokamakLearn[:run]
           </div>
           <a
             href="https://tokamak.network"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm text-[var(--color-muted)] hover:text-[var(--color-accent)] transition-colors"
+            className="text-[var(--color-muted)] hover:text-[var(--color-accent)] transition-colors flex items-center gap-1.5"
           >
-            Tokamak Network
+            <Image src="/tokamak-icon.png" alt="Tokamak Network" width={44} height={44} unoptimized className="w-[44px] h-auto" />
+            <span className="hidden md:inline text-sm">Tokamak Network</span>
           </a>
         </div>
       </footer>

@@ -1,32 +1,80 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useTheme } from "@/components/ThemeProvider";
 
+function isDailyCompleted(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const raw = localStorage.getItem("dailyChallenge");
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    const today = new Date().toISOString().slice(0, 10);
+    return data.date === today && data.completed === true;
+  } catch {
+    return false;
+  }
+}
+
 export default function Header() {
   const pathname = usePathname();
   const isProblemPage = pathname.startsWith("/problems/");
   const { theme, toggleTheme } = useTheme();
+  const [dailyDone, setDailyDone] = useState(false);
+
+  useEffect(() => {
+    setDailyDone(isDailyCompleted());
+    const handler = () => setDailyDone(isDailyCompleted());
+    window.addEventListener("dailyChallengeUpdate", handler);
+    return () => window.removeEventListener("dailyChallengeUpdate", handler);
+  }, []);
+
+  // Also re-check when navigating
+  useEffect(() => {
+    setDailyDone(isDailyCompleted());
+  }, [pathname]);
+
+  const dailyActive = pathname === "/daily";
 
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--color-border)] bg-[var(--color-background)]/80 backdrop-blur-xl">
       <div
-        className={`flex items-center justify-between h-14 px-6 ${isProblemPage ? "" : "max-w-6xl mx-auto"}`}
+        className={`flex items-center justify-between h-14 px-3 md:px-6 ${isProblemPage ? "" : "max-w-6xl mx-auto"}`}
       >
-        <Link href="/" className="relative flex items-center group">
-          <Image src="/logo.png" alt="TokamakLearn logo" width={290} height={160} unoptimized className="absolute -left-2 h-[36px] w-auto transition-all duration-300 group-hover:scale-105 group-hover:drop-shadow-[0_0_8px_rgba(56,189,248,0.4)]" />
+        <Link href="/" className="relative flex items-center group shrink-0">
+          <Image src="/logo.png" alt="TokamakLearn logo" width={290} height={160} unoptimized className={`absolute -left-2 h-[36px] w-auto transition-transform duration-300 group-hover:scale-105 group-hover:drop-shadow-[0_0_8px_rgba(56,189,248,0.4)] ${theme === "light" ? "brightness-200 contrast-125 saturate-150" : ""}`} />
           <span className="pl-[40px] font-semibold text-[var(--color-foreground)] text-lg tracking-tight">
             Tokamak<span className="text-[var(--color-accent)]">Learn</span>
             <span className="text-[var(--color-muted)] font-mono text-sm ml-0.5">[:run]</span>
           </span>
         </Link>
 
-        <nav className="flex items-center gap-1">
+        <nav className="flex items-center gap-0.5 md:gap-1">
+          <Link
+            href="/daily"
+            className={`text-sm px-2 md:px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 ${
+              dailyDone
+                ? dailyActive
+                  ? "text-[var(--color-success)] bg-[var(--color-success)]/10 font-medium"
+                  : "text-[var(--color-success)] hover:bg-[var(--color-success)]/5"
+                : dailyActive
+                  ? "text-[var(--color-accent)] bg-[var(--color-accent)]/10 font-medium"
+                  : "text-[var(--color-muted)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-surface)]"
+            }`}
+          >
+            {dailyDone && (
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+            Daily
+          </Link>
           <Link
             href="/language/solidity"
-            className={`text-sm px-3 py-1.5 rounded-md transition-all ${
+            className={`hidden md:inline-block text-sm px-3 py-1.5 rounded-md transition-all ${
               pathname.startsWith("/language")
                 ? "text-[var(--color-accent)] bg-[var(--color-accent)]/10 font-medium"
                 : "text-[var(--color-muted)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-surface)]"
@@ -38,11 +86,11 @@ export default function Header() {
             href="https://tokamak.network"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm px-3 py-1.5 rounded-md text-[var(--color-muted)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-surface)] transition-all"
+            className="hidden md:inline-block text-sm px-3 py-1.5 rounded-md text-[var(--color-muted)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-surface)] transition-all"
           >
             Tokamak Network
           </a>
-          <div className="w-px h-4 bg-[var(--color-border)] mx-1" />
+          <div className="hidden md:block w-px h-4 bg-[var(--color-border)] mx-1" />
           <button
             onClick={toggleTheme}
             className="w-8 h-8 flex items-center justify-center rounded-md text-[var(--color-muted)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-surface)] transition-all"
