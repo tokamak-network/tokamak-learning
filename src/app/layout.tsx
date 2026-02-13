@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
+import ShortcutHelp from "@/components/ShortcutHelp";
 import { ThemeProvider } from "@/components/ThemeProvider";
 
 const geistSans = Geist({
@@ -15,9 +16,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Tokamak Learning - Solidity 코딩 교육",
+  title: "TokamakLearn[:run] - Interactive Solidity Coding Platform",
   description:
-    "Tokamak Network에서 제공하는 Solidity 스마트 컨트랙트 학습 플랫폼. 단계별 실습으로 Solidity를 마스터하세요.",
+    "An interactive Solidity smart contract learning platform by Tokamak Network. Master Solidity through hands-on, step-by-step exercises.",
 };
 
 export default function RootLayout({
@@ -26,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -39,6 +40,7 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <Header />
+          <ShortcutHelp />
           {children}
         </ThemeProvider>
       </body>
