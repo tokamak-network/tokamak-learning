@@ -23,9 +23,10 @@ export default function Header() {
   const pathname = usePathname();
   const isProblemPage = pathname.startsWith("/problems/");
   const { theme, toggleTheme } = useTheme();
-  const [dailyDone, setDailyDone] = useState(() => isDailyCompleted());
+  const [dailyDone, setDailyDone] = useState(false);
 
   useEffect(() => {
+    setDailyDone(isDailyCompleted()); // eslint-disable-line react-hooks/set-state-in-effect
     const handler = () => setDailyDone(isDailyCompleted());
     window.addEventListener("dailyChallengeUpdate", handler);
     window.addEventListener("storage", handler);

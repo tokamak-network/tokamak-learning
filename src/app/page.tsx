@@ -152,9 +152,10 @@ export default function Home() {
   const totalProblems = problems.length;
   const totalCategories = categories.length;
   const [wordIndex, setWordIndex] = useState(0);
-  const [dailyDone] = useState(() => isDailyCompleted());
+  const [dailyDone, setDailyDone] = useState(false);
 
   useEffect(() => {
+    setDailyDone(isDailyCompleted()); // eslint-disable-line react-hooks/set-state-in-effect
     const interval = setInterval(() => {
       setWordIndex((prev) => (prev + 1) % rotatingWords.length);
     }, 2500);
@@ -303,7 +304,7 @@ export default function Home() {
       <footer className="border-t border-[var(--color-border)] py-8">
         <div className="max-w-6xl mx-auto px-4 md:px-6 flex items-center justify-between">
           <div className="text-xs md:text-sm text-[var(--color-muted)]">
-            &copy; {new Date().getFullYear()} TokamakLearn[:run]
+            &copy; 2025 TokamakLearn[:run]
           </div>
           <a
             href="https://tokamak.network"

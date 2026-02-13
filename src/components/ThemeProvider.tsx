@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { LazyMotion, domAnimation, MotionConfig } from "framer-motion";
 
 type Theme = "dark" | "light";
@@ -14,16 +14,16 @@ export function useTheme() {
   return useContext(ThemeContext);
 }
 
-function getInitialTheme(): Theme {
-  if (typeof window === "undefined") return "dark";
-  // Read from DOM attribute (set by inline script in <head> before hydration)
-  const attr = document.documentElement.getAttribute("data-theme");
-  if (attr === "light" || attr === "dark") return attr;
-  return "dark";
-}
-
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(getInitialTheme);
+  const [theme, setTheme] = useState<Theme>("dark");
+
+  // Sync with DOM attribute set by inline script in <head>
+  useEffect(() => {
+    const attr = document.documentElement.getAttribute("data-theme");
+    if (attr === "light" || attr === "dark") {
+      setTheme(attr); // eslint-disable-line react-hooks/set-state-in-effect
+    }
+  }, []);
 
   const toggleTheme = () => {
     const next = theme === "dark" ? "light" : "dark";
