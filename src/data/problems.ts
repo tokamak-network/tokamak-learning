@@ -23,6 +23,7 @@ export interface Problem {
   expectedEvents?: string[];
   testCases?: TestCase[];
   constructorArgs?: string[];
+  expectedContractName?: string;
 }
 
 export interface Category {
@@ -76,6 +77,7 @@ contract HelloSolidity {
     hints: ["contract 키워드 뒤에 컨트랙트 이름을 쓰고 중괄호로 감싸세요.", "contract HelloSolidity { }"],
     testDescription: "HelloSolidity 컨트랙트가 정상적으로 컴파일되는지 확인합니다.",
     expectedFunctions: [],
+    expectedContractName: "HelloSolidity",
     // compile-only: no testCases needed
   },
   {

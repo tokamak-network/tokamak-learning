@@ -9,6 +9,7 @@ interface CompileRequest {
   expectedEvents?: string[];
   testCases?: TestCase[];
   constructorArgs?: string[];
+  expectedContractName?: string;
 }
 
 interface TestResult {
@@ -19,7 +20,7 @@ interface TestResult {
 export async function POST(req: NextRequest) {
   try {
     const body: CompileRequest = await req.json();
-    const { source, expectedFunctions, expectedEvents, testCases, constructorArgs } = body;
+    const { source, expectedFunctions, expectedEvents, testCases, constructorArgs, expectedContractName } = body;
 
     if (!source) {
       return NextResponse.json(
@@ -89,8 +90,25 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ results });
     }
 
-    // Use the last contract
-    const mainContract = contracts[contractNames[contractNames.length - 1]];
+    // Check expected contract name
+    if (expectedContractName) {
+      const found = contractNames.includes(expectedContractName);
+      results.push({
+        passed: found,
+        message: found
+          ? `컨트랙트 '${expectedContractName}' 이름 확인`
+          : `컨트랙트 이름이 '${expectedContractName}'이(가) 아닙니다. 현재: ${contractNames.join(", ")}`,
+      });
+      if (!found) {
+        return NextResponse.json({ results });
+      }
+    }
+
+    // Use the expected contract or the last one
+    const mainContractName = expectedContractName && contractNames.includes(expectedContractName)
+      ? expectedContractName
+      : contractNames[contractNames.length - 1];
+    const mainContract = contracts[mainContractName];
     const abi = mainContract.abi as Array<{
       type: string;
       name: string;

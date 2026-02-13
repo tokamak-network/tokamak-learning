@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { motion, useInView } from "framer-motion";
 import { categories, getProblemsByCategory } from "@/data/problems";
 import type { Category } from "@/data/problems";
@@ -36,7 +36,7 @@ const fadeInUp = {
   },
 };
 
-function CategorySection({ cat }: { cat: Category }) {
+function CategorySection({ cat, completedProblems }: { cat: Category; completedProblems: Set<string> }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
   const catProblems = getProblemsByCategory(cat.id);
@@ -64,51 +64,77 @@ function CategorySection({ cat }: { cat: Category }) {
         initial="hidden"
         animate={isInView ? "visible" : "hidden"}
       >
-        {catProblems.map((problem, idx) => (
-          <motion.div key={problem.id} variants={fadeInUp}>
-            <Link
-              href={`/problems/${problem.id}`}
-              className="group flex items-center justify-between p-4 rounded-lg border border-[var(--color-border)] hover:border-[var(--color-accent)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-hover)] transition-all"
-            >
-              <div className="flex items-center gap-4">
-                <span className="w-8 h-8 rounded-full bg-[var(--color-border)] flex items-center justify-center text-sm font-medium text-[var(--color-muted)] group-hover:bg-[var(--color-accent)] group-hover:text-white transition-colors">
-                  {idx + 1}
-                </span>
-                <div>
-                  <span className="font-medium text-white group-hover:text-[var(--color-accent)] transition-colors">
-                    {problem.title}
+        {catProblems.map((problem, idx) => {
+          const isCompleted = completedProblems.has(problem.id);
+          return (
+            <motion.div key={problem.id} variants={fadeInUp}>
+              <Link
+                href={`/problems/${problem.id}`}
+                className="group flex items-center justify-between p-4 rounded-lg border border-[var(--color-border)] hover:border-[var(--color-accent)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-hover)] transition-all"
+              >
+                <div className="flex items-center gap-4">
+                  <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
+                    isCompleted
+                      ? "bg-[var(--color-success)] text-white"
+                      : "bg-[var(--color-border)] text-[var(--color-muted)] group-hover:bg-[var(--color-accent)] group-hover:text-white"
+                  }`}>
+                    {isCompleted ? (
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    ) : (
+                      idx + 1
+                    )}
                   </span>
+                  <div>
+                    <span className="font-medium text-white group-hover:text-[var(--color-accent)] transition-colors">
+                      {problem.title}
+                    </span>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <span
-                  className={`text-xs px-2 py-0.5 rounded ${difficultyColors[problem.difficulty]}`}
-                >
-                  {difficultyLabels[problem.difficulty]}
-                </span>
-                <svg
-                  className="w-4 h-4 text-[var(--color-muted)] group-hover:text-[var(--color-accent)] transition-colors"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
-              </div>
-            </Link>
-          </motion.div>
-        ))}
+                <div className="flex items-center gap-3">
+                  <span
+                    className={`text-xs px-2 py-0.5 rounded ${difficultyColors[problem.difficulty]}`}
+                  >
+                    {difficultyLabels[problem.difficulty]}
+                  </span>
+                  <svg
+                    className="w-4 h-4 text-[var(--color-muted)] group-hover:text-[var(--color-accent)] transition-colors"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </div>
+              </Link>
+            </motion.div>
+          );
+        })}
       </motion.div>
     </section>
   );
 }
 
 export default function SolidityCoursePage() {
+  const [completedProblems, setCompletedProblems] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("completedProblems");
+      if (stored) {
+        setCompletedProblems(new Set(JSON.parse(stored)));
+      }
+    } catch {
+      // ignore localStorage errors
+    }
+  }, []);
+
   return (
     <main className="max-w-4xl mx-auto px-6 py-8">
       {/* Course Header */}
@@ -139,7 +165,7 @@ export default function SolidityCoursePage() {
       {/* Categories & Problems */}
       <div className="space-y-10">
         {categories.map((cat) => (
-          <CategorySection key={cat.id} cat={cat} />
+          <CategorySection key={cat.id} cat={cat} completedProblems={completedProblems} />
         ))}
       </div>
     </main>

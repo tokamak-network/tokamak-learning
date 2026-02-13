@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
@@ -46,11 +46,35 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
   const [activeTab, setActiveTab] = useState<"description" | "results">(
     "description"
   );
+  const [vimMode, setVimMode] = useState(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      return localStorage.getItem("vimMode") === "true";
+    } catch {
+      return false;
+    }
+  });
 
   const nextProblem = getNextProblem(problem.id);
   const prevProblem = getPrevProblem(problem.id);
 
   const allPassed = results?.every((r) => r.passed) ?? false;
+
+  // Save completed problem to localStorage
+  useEffect(() => {
+    if (allPassed) {
+      try {
+        const stored = localStorage.getItem("completedProblems");
+        const completed: string[] = stored ? JSON.parse(stored) : [];
+        if (!completed.includes(problem.id)) {
+          completed.push(problem.id);
+          localStorage.setItem("completedProblems", JSON.stringify(completed));
+        }
+      } catch {
+        // ignore localStorage errors
+      }
+    }
+  }, [allPassed, problem.id]);
 
   const handleCompile = useCallback(async () => {
     setIsCompiling(true);
@@ -67,6 +91,7 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
           expectedEvents: problem.expectedEvents,
           testCases: problem.testCases,
           constructorArgs: problem.constructorArgs,
+          expectedContractName: problem.expectedContractName,
         }),
       });
       const data = await res.json();
@@ -82,6 +107,46 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
     setCode(problem.starterCode);
     setResults(null);
   }, [problem.starterCode]);
+
+  const toggleVimMode = useCallback(() => {
+    setVimMode((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem("vimMode", String(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  }, []);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const mod = e.metaKey || e.ctrlKey;
+
+      // Cmd/Ctrl + Enter → Run tests
+      if (mod && e.key === "Enter") {
+        e.preventDefault();
+        handleCompile();
+      }
+      // Cmd/Ctrl + Shift + H → Toggle hints
+      if (mod && e.shiftKey && e.key === "H") {
+        e.preventDefault();
+        setShowHints((prev) => !prev);
+        setActiveTab("description");
+      }
+      // Cmd/Ctrl + Shift + S → Toggle solution
+      if (mod && e.shiftKey && e.key === "S") {
+        e.preventDefault();
+        setShowSolution((prev) => !prev);
+        setActiveTab("description");
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleCompile]);
 
   return (
     <div className="h-[calc(100vh-56px)] flex">
@@ -164,6 +229,7 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
                       className="text-sm text-[var(--color-accent)] hover:text-[var(--color-accent-hover)] transition-colors"
                     >
                       {showHints ? "힌트 숨기기" : "힌트 보기"}
+                      <span className="ml-1 text-xs opacity-50">&#8984;&#8679;H</span>
                     </button>
                     <AnimatePresence>
                       {showHints && (
@@ -197,6 +263,7 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
                     className="text-sm text-[var(--color-warning)] hover:text-yellow-300 transition-colors"
                   >
                     {showSolution ? "정답 숨기기" : "정답 보기"}
+                    <span className="ml-1 text-xs opacity-50">&#8984;&#8679;S</span>
                   </button>
                   <AnimatePresence>
                     {showSolution && (
@@ -404,10 +471,26 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
       <div className="flex-1 flex flex-col">
         {/* Editor toolbar */}
         <div className="flex items-center justify-between px-4 py-2 border-b border-[var(--color-border)] bg-[var(--color-surface)]">
-          <span className="text-sm text-[var(--color-muted)]">
-            contract.sol
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-[var(--color-muted)]">
+              contract.sol
+            </span>
+            <button
+              onClick={toggleVimMode}
+              className={`text-xs px-2 py-1 rounded-md border transition-all duration-200 ${
+                vimMode
+                  ? "text-[var(--color-accent)] border-[var(--color-accent)] bg-blue-500/10"
+                  : "text-[var(--color-muted)] border-[var(--color-border)] hover:text-white hover:border-[var(--color-muted)]"
+              }`}
+            >
+              VIM
+            </button>
+          </div>
           <div className="flex items-center gap-2">
+            <span className="text-xs text-[var(--color-muted)] hidden sm:inline-flex items-center gap-1 opacity-60">
+              <kbd className="px-1 py-0.5 rounded bg-[var(--color-border)] text-[10px]">&#8984;Enter</kbd>
+              <span>실행</span>
+            </span>
             <button
               onClick={handleReset}
               className="text-xs px-3 py-1.5 text-[var(--color-muted)] hover:text-white border border-[var(--color-border)] hover:border-[var(--color-muted)] rounded-md hover:scale-[1.02] transition-all duration-200"
@@ -437,7 +520,7 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
 
         {/* Editor */}
         <div className="flex-1">
-          <SolidityEditor value={code} onChange={setCode} />
+          <SolidityEditor value={code} onChange={setCode} vimMode={vimMode} />
         </div>
       </div>
     </div>

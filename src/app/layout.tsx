@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Toka Learn - Solidity 코딩 교육",
+  title: "Tokamak Learning - Solidity 코딩 교육",
   description:
     "Tokamak Network에서 제공하는 Solidity 스마트 컨트랙트 학습 플랫폼. 단계별 실습으로 Solidity를 마스터하세요.",
 };

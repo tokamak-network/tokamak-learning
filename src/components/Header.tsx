@@ -16,7 +16,7 @@ export default function Header() {
           <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-lg flex items-center justify-center font-bold text-white text-sm transition-transform duration-200 hover:scale-105">
             T
           </div>
-          <span className="font-semibold text-white text-lg">Toka Learn</span>
+          <span className="font-semibold text-white text-lg">Tokamak Learning</span>
         </Link>
 
         <nav className="flex items-center gap-6">

@@ -1,16 +1,19 @@
 "use client";
 
-import { useRef, useCallback } from "react";
+import { useRef, useCallback, useEffect } from "react";
 import Editor, { OnMount } from "@monaco-editor/react";
 import type { editor } from "monaco-editor";
 
 interface SolidityEditorProps {
   value: string;
   onChange: (value: string) => void;
+  vimMode?: boolean;
 }
 
-export default function SolidityEditor({ value, onChange }: SolidityEditorProps) {
+export default function SolidityEditor({ value, onChange, vimMode = false }: SolidityEditorProps) {
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+  const vimModeRef = useRef<{ dispose: () => void } | null>(null);
+  const statusBarRef = useRef<HTMLDivElement | null>(null);
 
   const handleMount: OnMount = useCallback((editor, monaco) => {
     editorRef.current = editor;
@@ -120,30 +123,69 @@ export default function SolidityEditor({ value, onChange }: SolidityEditorProps)
     editor.focus();
   }, []);
 
+  // VIM mode toggle
+  useEffect(() => {
+    if (!editorRef.current) return;
+
+    if (vimMode) {
+      // Dynamically import monaco-vim
+      import("monaco-vim").then((MonacoVim) => {
+        if (!editorRef.current || !statusBarRef.current) return;
+        // Dispose existing if any
+        if (vimModeRef.current) {
+          vimModeRef.current.dispose();
+        }
+        vimModeRef.current = MonacoVim.initVimMode(editorRef.current, statusBarRef.current);
+      });
+    } else {
+      if (vimModeRef.current) {
+        vimModeRef.current.dispose();
+        vimModeRef.current = null;
+      }
+    }
+
+    return () => {
+      if (vimModeRef.current) {
+        vimModeRef.current.dispose();
+        vimModeRef.current = null;
+      }
+    };
+  }, [vimMode]);
+
   return (
-    <Editor
-      height="100%"
-      language="sol"
-      theme="solidity-dark"
-      value={value}
-      onChange={(v) => onChange(v || "")}
-      onMount={handleMount}
-      options={{
-        fontSize: 14,
-        fontFamily: "var(--font-geist-mono), monospace",
-        minimap: { enabled: false },
-        scrollBeyondLastLine: false,
-        wordWrap: "on",
-        tabSize: 4,
-        insertSpaces: true,
-        automaticLayout: true,
-        padding: { top: 16 },
-        lineNumbers: "on",
-        renderLineHighlight: "line",
-        folding: true,
-        bracketPairColorization: { enabled: true },
-        suggest: { showWords: false },
-      }}
-    />
+    <div className="h-full flex flex-col">
+      <div className="flex-1">
+        <Editor
+          height="100%"
+          language="sol"
+          theme="solidity-dark"
+          value={value}
+          onChange={(v) => onChange(v || "")}
+          onMount={handleMount}
+          options={{
+            fontSize: 14,
+            fontFamily: "var(--font-geist-mono), monospace",
+            minimap: { enabled: false },
+            scrollBeyondLastLine: false,
+            wordWrap: "on",
+            tabSize: 4,
+            insertSpaces: true,
+            automaticLayout: true,
+            padding: { top: 16 },
+            lineNumbers: "on",
+            renderLineHighlight: "line",
+            folding: true,
+            bracketPairColorization: { enabled: true },
+            suggest: { showWords: false },
+          }}
+        />
+      </div>
+      {vimMode && (
+        <div
+          ref={statusBarRef}
+          className="h-6 px-3 text-xs font-mono bg-[#161b22] border-t border-[var(--color-border)] text-[var(--color-muted)] flex items-center"
+        />
+      )}
+    </div>
   );
 }
