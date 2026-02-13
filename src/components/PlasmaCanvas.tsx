@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
+import { useTheme } from "@/components/ThemeProvider";
 
 const CANVAS_SIZE = 400;
 const PARTICLE_COUNT = 60;
@@ -39,6 +40,7 @@ function createParticle(): Particle {
 
 export default function PlasmaCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const { theme } = useTheme();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -127,7 +129,7 @@ export default function PlasmaCanvas() {
           width={300}
           height={300}
           priority
-          className="drop-shadow-[0_0_30px_rgba(6,182,212,0.3)]"
+          className={`drop-shadow-[0_0_30px_rgba(6,182,212,0.3)] ${theme === "light" ? "brightness-200 contrast-125 saturate-150" : ""}`}
         />
       </div>
     </div>

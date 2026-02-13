@@ -45,7 +45,7 @@ export default function Header() {
         className={`flex items-center justify-between h-14 px-3 md:px-6 ${isProblemPage ? "" : "max-w-6xl mx-auto"}`}
       >
         <Link href="/" className="relative flex items-center group shrink-0">
-          <Image src="/logo.png" alt="TokamakLearn logo" width={290} height={160} unoptimized className={`absolute -left-2 h-[36px] w-auto transition-transform duration-300 group-hover:scale-105 group-hover:drop-shadow-[0_0_8px_rgba(56,189,248,0.4)] ${theme === "light" ? "brightness-200 contrast-125 saturate-150" : ""}`} />
+          <Image src="/logo.png" alt="TokamakLearn logo" width={290} height={160} priority className={`absolute -left-2 h-[36px] w-auto transition-transform duration-300 group-hover:scale-105 group-hover:drop-shadow-[0_0_8px_rgba(56,189,248,0.4)] ${theme === "light" ? "brightness-200 contrast-125 saturate-150" : ""}`} />
           <span className="pl-[40px] font-semibold text-[var(--color-foreground)] text-lg tracking-tight">
             Tokamak<span className="text-[var(--color-accent)]">Learn</span>
             <span className="text-[var(--color-muted)] font-mono text-sm ml-0.5">[:run]</span>

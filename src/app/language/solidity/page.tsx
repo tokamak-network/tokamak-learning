@@ -131,14 +131,27 @@ export default function SolidityCoursePage() {
   const [completedProblems, setCompletedProblems] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem("completedProblems");
-      if (stored) {
-        setCompletedProblems(new Set(JSON.parse(stored)));
+    const load = () => {
+      try {
+        const stored = localStorage.getItem("completedProblems");
+        if (stored) {
+          setCompletedProblems(new Set(JSON.parse(stored)));
+        }
+      } catch {
+        // ignore localStorage errors
       }
-    } catch {
-      // ignore localStorage errors
-    }
+    };
+
+    load();
+
+    // Re-sync when returning from another tab or problem page
+    const handleFocus = () => load();
+    window.addEventListener("focus", handleFocus);
+    window.addEventListener("storage", load);
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("storage", load);
+    };
   }, []);
 
   const totalCompleted = completedProblems.size;

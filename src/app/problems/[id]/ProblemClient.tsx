@@ -150,9 +150,12 @@ export default function ProblemClient({ problem }: { problem: ClientProblem }) {
   }, [code, problem]);
 
   const handleReset = useCallback(() => {
+    if (code !== problem.starterCode) {
+      if (!window.confirm("Reset your code? Your changes will be lost.")) return;
+    }
     setCode(problem.starterCode);
     setResults(null);
-  }, [problem.starterCode]);
+  }, [code, problem.starterCode]);
 
   const toggleVimMode = useCallback(() => {
     setVimMode((prev) => {
