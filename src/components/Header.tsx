@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useTheme } from "@/components/ThemeProvider";
 
@@ -14,11 +15,9 @@ export default function Header() {
       <div
         className={`flex items-center justify-between h-14 px-6 ${isProblemPage ? "" : "max-w-6xl mx-auto"}`}
       >
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-lg flex items-center justify-center font-bold text-white text-sm transition-transform duration-200 hover:scale-105">
-            T
-          </div>
-          <span className="font-semibold text-[var(--color-foreground)] text-lg">Tokamak Learning</span>
+        <Link href="/" className="relative flex items-center group">
+          <Image src="/logo.png" alt="TokamakLearn logo" width={290} height={160} unoptimized className="absolute -left-2 h-[51px] w-auto transition-transform duration-200 group-hover:scale-105" />
+          <span className="pl-[65px] font-semibold text-[var(--color-foreground)] text-lg">TokamakLearn<span className="text-[var(--color-accent)]">[:run]</span></span>
         </Link>
 
         <nav className="flex items-center gap-6">
