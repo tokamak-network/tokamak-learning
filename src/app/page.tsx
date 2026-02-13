@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { categories, problems } from "@/data/problems";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import PlasmaCanvas from "@/components/PlasmaCanvas";
 
 // -- CountUp --
 
@@ -229,22 +229,12 @@ export default function Home() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.7, delay: 0.4, ease: "easeOut" }}
           >
-            <div className="relative">
-              <div className="absolute -inset-8 bg-gradient-to-br from-cyan-500/15 to-violet-500/15 rounded-full blur-3xl" />
-              <motion.div
-                animate={{ y: [0, -12, 0] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <Image
-                  src="/logo.png"
-                  alt="TokamakLearn[:run]"
-                  width={300}
-                  height={300}
-                  priority
-                  className="relative drop-shadow-[0_0_30px_rgba(6,182,212,0.3)]"
-                />
-              </motion.div>
-            </div>
+            <motion.div
+              animate={{ y: [0, -12, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <PlasmaCanvas />
+            </motion.div>
           </motion.div>
         </div>
       </section>
