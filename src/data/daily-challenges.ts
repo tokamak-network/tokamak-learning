@@ -23,7 +23,7 @@ export type ChallengeSet = {
   questions: ChallengeQuestion[];
 };
 
-const challengeSets: ChallengeSet[] = [
+export const challengeSets: ChallengeSet[] = [
   {
     id: "set-1",
     questions: [

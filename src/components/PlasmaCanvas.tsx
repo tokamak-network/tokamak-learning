@@ -48,6 +48,9 @@ export default function PlasmaCanvas() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    // Skip animation if user prefers reduced motion
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
     // Retina DPI
     const dpr = window.devicePixelRatio || 1;
     canvas.width = CANVAS_SIZE * dpr;
@@ -58,8 +61,14 @@ export default function PlasmaCanvas() {
     const particles: Particle[] = Array.from({ length: PARTICLE_COUNT }, createParticle);
     let pulsePhase = 0;
     let animId = 0;
+    let visible = true;
 
     function tick() {
+      if (!visible) {
+        animId = requestAnimationFrame(tick);
+        return;
+      }
+
       ctx!.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 
       // Center pulse glow
@@ -111,8 +120,18 @@ export default function PlasmaCanvas() {
       animId = requestAnimationFrame(tick);
     }
 
+    // Pause when not visible
+    const observer = new IntersectionObserver(
+      ([entry]) => { visible = entry.isIntersecting; },
+      { threshold: 0 }
+    );
+    observer.observe(canvas);
+
     animId = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(animId);
+    return () => {
+      cancelAnimationFrame(animId);
+      observer.disconnect();
+    };
   }, []);
 
   return (
