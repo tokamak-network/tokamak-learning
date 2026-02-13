@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import {
@@ -170,6 +170,18 @@ export default function DailyClient() {
     return "Don't give up! 📚";
   }
 
+  const blankPillRef = useRef<HTMLSpanElement>(null);
+  const blankScrollRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to center the blank pill when question changes
+  useEffect(() => {
+    const pill = blankPillRef.current;
+    const container = blankScrollRef.current;
+    if (!pill || !container) return;
+    const pillCenter = pill.offsetLeft + pill.offsetWidth / 2;
+    container.scrollLeft = pillCenter - container.clientWidth / 2;
+  }, [currentIndex, loaded]);
+
   function renderCodeWithBlank(code: string) {
     const lines = code.split("\n");
     const blankLineIdx = lines.findIndex((l) => l.includes("___BLANK___"));
@@ -184,15 +196,26 @@ export default function DailyClient() {
             return (
               <div
                 key={i}
-                className="relative -mx-1 px-1 py-1 rounded-lg bg-[var(--color-accent)]/8 border border-[var(--color-accent)]/20 overflow-x-auto whitespace-pre scrollbar-none"
+                className="relative -mx-1 rounded-lg bg-[#38bdf8]/10 border border-[#38bdf8]/25"
               >
-                <code className="text-[var(--color-foreground)]">
-                  {parts[0]}
-                  <span className="inline-block px-2 py-0.5 mx-0.5 rounded bg-[var(--color-accent)]/20 text-[var(--color-accent)] border border-[var(--color-accent)]/30 font-bold min-w-[40px] text-center text-xs">
-                    {selected ?? "?"}
-                  </span>
-                  {parts[1]}
-                </code>
+                <div
+                  ref={blankScrollRef}
+                  className="px-1 py-1 overflow-x-auto whitespace-pre scrollbar-none"
+                >
+                  <code className="text-[#e2e8f0]">
+                    {parts[0]}
+                    <span
+                      ref={blankPillRef}
+                      className="inline-block px-2 py-0.5 mx-0.5 rounded bg-[#38bdf8]/20 text-[#38bdf8] border border-[#38bdf8]/40 font-bold min-w-[40px] text-center text-xs"
+                    >
+                      {selected ?? "?"}
+                    </span>
+                    {parts[1]}
+                  </code>
+                </div>
+                {/* Scroll fade indicators */}
+                <div className="pointer-events-none absolute inset-y-0 left-0 w-4 rounded-l-lg bg-gradient-to-r from-[#38bdf8]/10 to-transparent" />
+                <div className="pointer-events-none absolute inset-y-0 right-0 w-4 rounded-r-lg bg-gradient-to-l from-[#38bdf8]/10 to-transparent" />
               </div>
             );
           }
@@ -205,7 +228,7 @@ export default function DailyClient() {
           return (
             <div
               key={i}
-              className="overflow-hidden whitespace-pre text-[var(--color-muted)]/60 truncate"
+              className="overflow-hidden whitespace-pre text-[#94a3b8] truncate"
             >
               <code>{line}</code>
             </div>
@@ -283,7 +306,7 @@ export default function DailyClient() {
             className="flex-1 flex flex-col"
           >
             {question.type === "code" ? (
-              <div className="p-3 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)] mb-6">
+              <div className="p-3 rounded-xl bg-[#0f1520] border border-[#1e2a3a] mb-6">
                 {renderCodeWithBlank(question.code)}
               </div>
             ) : (
