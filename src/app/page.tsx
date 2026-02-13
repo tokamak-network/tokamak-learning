@@ -204,7 +204,7 @@ export default function Home() {
               className="text-lg text-[var(--color-muted)] mb-10 leading-relaxed max-w-lg"
             >
               A hands-on learning platform by Tokamak Network.
-              Write and compile smart contracts directly in your browser.
+              Write, compile, repeat — build muscle memory for coding.
             </motion.p>
 
             <motion.div variants={fadeInUp} className="flex gap-3">
