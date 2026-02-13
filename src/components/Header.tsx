@@ -11,22 +11,25 @@ export default function Header() {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <header className="border-b border-[var(--color-border)] bg-[var(--color-background)]">
+    <header className="sticky top-0 z-50 border-b border-[var(--color-border)] bg-[var(--color-background)]/80 backdrop-blur-xl">
       <div
         className={`flex items-center justify-between h-14 px-6 ${isProblemPage ? "" : "max-w-6xl mx-auto"}`}
       >
         <Link href="/" className="relative flex items-center group">
-          <Image src="/logo.png" alt="TokamakLearn logo" width={290} height={160} unoptimized className="absolute -left-2 h-[36px] w-auto transition-transform duration-200 group-hover:scale-105" />
-          <span className="pl-[40px] font-semibold text-[var(--color-foreground)] text-lg">TokamakLearn<span className="text-[var(--color-accent)]">[:run]</span></span>
+          <Image src="/logo.png" alt="TokamakLearn logo" width={290} height={160} unoptimized className="absolute -left-2 h-[36px] w-auto transition-all duration-300 group-hover:scale-105 group-hover:drop-shadow-[0_0_8px_rgba(56,189,248,0.4)]" />
+          <span className="pl-[40px] font-semibold text-[var(--color-foreground)] text-lg tracking-tight">
+            Tokamak<span className="text-[var(--color-accent)]">Learn</span>
+            <span className="text-[var(--color-muted)] font-mono text-sm ml-0.5">[:run]</span>
+          </span>
         </Link>
 
-        <nav className="flex items-center gap-6">
+        <nav className="flex items-center gap-1">
           <Link
             href="/language/solidity"
-            className={`text-sm transition-colors relative ${
+            className={`text-sm px-3 py-1.5 rounded-md transition-all ${
               pathname.startsWith("/language")
-                ? "text-[var(--color-foreground)] after:absolute after:bottom-[-17px] after:left-0 after:right-0 after:h-0.5 after:bg-[var(--color-accent)]"
-                : "text-[var(--color-muted)] hover:text-[var(--color-foreground)]"
+                ? "text-[var(--color-accent)] bg-[var(--color-accent)]/10 font-medium"
+                : "text-[var(--color-muted)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-surface)]"
             }`}
           >
             Curriculum
@@ -35,13 +38,14 @@ export default function Header() {
             href="https://tokamak.network"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm text-[var(--color-muted)] hover:text-[var(--color-foreground)] transition-colors"
+            className="text-sm px-3 py-1.5 rounded-md text-[var(--color-muted)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-surface)] transition-all"
           >
             Tokamak Network
           </a>
+          <div className="w-px h-4 bg-[var(--color-border)] mx-1" />
           <button
             onClick={toggleTheme}
-            className="w-8 h-8 flex items-center justify-center rounded-md text-[var(--color-muted)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-surface)] transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-md text-[var(--color-muted)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-surface)] transition-all"
             aria-label="Toggle theme"
           >
             {theme === "dark" ? (

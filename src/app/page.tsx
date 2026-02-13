@@ -6,7 +6,7 @@ import { categories, problems } from "@/data/problems";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
-// -- CountUp component: animates a number from 0 to target when in viewport --
+// -- CountUp --
 
 function CountUp({ target, suffix = "" }: { target: number; suffix?: string }) {
   const [count, setCount] = useState(0);
@@ -15,7 +15,6 @@ function CountUp({ target, suffix = "" }: { target: number; suffix?: string }) {
 
   useEffect(() => {
     if (!inView) return;
-
     let start = 0;
     const duration = 1000;
     const increment = target / (duration / 16);
@@ -28,7 +27,6 @@ function CountUp({ target, suffix = "" }: { target: number; suffix?: string }) {
         setCount(Math.floor(start));
       }
     }, 16);
-
     return () => clearInterval(timer);
   }, [inView, target]);
 
@@ -40,9 +38,9 @@ function CountUp({ target, suffix = "" }: { target: number; suffix?: string }) {
   );
 }
 
-// -- Rotating words for hero --
+// -- Rotating words --
 
-const rotatingWords = ["Coding", "Solidity", "Rust", "DeFi", "Web3"];
+const rotatingWords = ["Solidity", "Rust", "DeFi", "Web3", "Coding"];
 
 // -- Animation variants --
 
@@ -54,24 +52,39 @@ const fadeInUp = {
 const staggerContainer = {
   hidden: {},
   visible: {
-    transition: {
-      staggerChildren: 0.1,
-    },
+    transition: { staggerChildren: 0.12 },
   },
 };
 
-// -- Categories section (needs its own component for useInView hook) --
+// -- Categories section --
 
 function CategoriesSection() {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section className="max-w-6xl mx-auto px-6 py-16">
-      <h2 className="text-2xl font-bold mb-2">Curriculum</h2>
-      <p className="text-[var(--color-muted)] mb-8">
-        A structured learning path from basics to real-world practice
-      </p>
+    <section className="max-w-6xl mx-auto px-6 py-20">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        className="mb-10"
+      >
+        <div className="flex items-center gap-3 mb-3">
+          <div className="h-px flex-1 bg-gradient-to-r from-[var(--color-accent)]/40 to-transparent" />
+          <span className="text-xs font-medium text-[var(--color-accent)] tracking-widest uppercase">
+            Curriculum
+          </span>
+          <div className="h-px flex-1 bg-gradient-to-l from-[var(--color-accent)]/40 to-transparent" />
+        </div>
+        <h2 className="text-3xl font-bold text-center mb-2 tracking-tight">
+          Structured Learning Path
+        </h2>
+        <p className="text-[var(--color-muted)] text-center max-w-xl mx-auto">
+          From basics to real-world practice, master smart contract development step by step
+        </p>
+      </motion.div>
       <div
         ref={ref}
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
@@ -84,26 +97,32 @@ function CategoriesSection() {
               variants={fadeInUp}
               initial="hidden"
               animate={inView ? "visible" : "hidden"}
-              transition={{ duration: 0.4, delay: i * 0.1 }}
+              transition={{ duration: 0.4, delay: i * 0.08 }}
             >
               <Link
                 href="/language/solidity"
-                className="group flex flex-col h-full border border-[var(--color-border)] rounded-lg p-6 hover:border-[var(--color-accent)] transition-all bg-[var(--color-surface)] hover:-translate-y-0.5 hover:shadow-[var(--shadow-card)]"
+                className="glow-card group flex flex-col h-full rounded-xl p-6 border border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-accent)]/50 transition-all hover:-translate-y-1 hover:shadow-[var(--shadow-glow)]"
               >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-medium text-[var(--color-accent)] bg-blue-500/10 px-2 py-1 rounded">
-                    Step {cat.order}
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-xs font-mono font-medium text-[var(--color-accent)] bg-[var(--color-accent)]/10 px-2.5 py-1 rounded-md">
+                    {String(cat.order).padStart(2, "0")}
                   </span>
                   <span className="text-xs text-[var(--color-muted)]">
                     {catProblems.length} problems
                   </span>
                 </div>
-                <h3 className="font-semibold text-[var(--color-foreground)] group-hover:text-[var(--color-accent)] transition-colors mb-2">
+                <h3 className="font-semibold text-[var(--color-foreground)] group-hover:text-[var(--color-accent)] transition-colors mb-2 tracking-tight">
                   {cat.title}
                 </h3>
-                <p className="text-sm text-[var(--color-muted)] flex-1">
+                <p className="text-sm text-[var(--color-muted)] flex-1 leading-relaxed">
                   {cat.description}
                 </p>
+                <div className="mt-4 flex items-center gap-1.5 text-xs text-[var(--color-muted)] group-hover:text-[var(--color-accent)] transition-colors">
+                  <span>Start learning</span>
+                  <svg className="w-3 h-3 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
               </Link>
             </motion.div>
           );
@@ -113,7 +132,7 @@ function CategoriesSection() {
   );
 }
 
-// -- Main page component --
+// -- Main --
 
 export default function Home() {
   const totalProblems = problems.length;
@@ -131,29 +150,36 @@ export default function Home() {
     <main className="min-h-screen">
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-blue-600/10 to-transparent" />
-        <div className="max-w-6xl mx-auto px-6 py-24 relative flex flex-col lg:flex-row items-center gap-12">
+        {/* Layered plasma background */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/8 via-blue-600/5 to-transparent" />
+          <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-cyan-500/5 rounded-full blur-[120px] animate-[plasma-drift_20s_ease-in-out_infinite]" />
+          <div className="absolute top-20 right-1/4 w-[400px] h-[400px] bg-violet-500/5 rounded-full blur-[100px] animate-[plasma-drift_15s_ease-in-out_infinite_reverse]" />
+        </div>
+
+        <div className="max-w-6xl mx-auto px-6 pt-20 pb-24 relative flex flex-col lg:flex-row items-center gap-16">
           <motion.div
-            className="max-w-3xl flex-1"
+            className="max-w-2xl flex-1"
             variants={staggerContainer}
             initial="hidden"
             animate="visible"
           >
             <motion.div
               variants={fadeInUp}
-              className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-4 py-1.5 mb-6"
+              className="inline-flex items-center gap-2 border border-[var(--color-accent)]/20 bg-[var(--color-accent)]/5 rounded-full px-4 py-1.5 mb-8"
             >
-              <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
-              <span className="text-sm text-blue-400">
+              <div className="w-1.5 h-1.5 bg-[var(--color-accent)] rounded-full animate-pulse" />
+              <span className="text-sm text-[var(--color-accent)] font-medium">
                 Powered by Tokamak Network
               </span>
             </motion.div>
+
             <motion.h1
               variants={fadeInUp}
-              className="text-5xl font-bold mb-6 leading-tight tracking-tight"
+              className="text-5xl lg:text-6xl font-bold mb-6 leading-[1.1] tracking-tight"
             >
               Master{" "}
-              <span className="relative inline-flex overflow-hidden align-bottom h-[1.2em] min-w-[280px]">
+              <span className="relative inline-flex overflow-hidden align-bottom h-[1.15em] min-w-[200px]">
                 <AnimatePresence mode="wait">
                   <motion.span
                     key={rotatingWords[wordIndex]}
@@ -161,90 +187,94 @@ export default function Home() {
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: "-100%", opacity: 0 }}
                     transition={{ duration: 0.35, ease: "easeInOut" }}
-                    className="absolute bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent"
+                    className="absolute bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent"
                   >
                     {rotatingWords[wordIndex]}
                   </motion.span>
                 </AnimatePresence>
               </span>
               <br />
-              with Plasma Energy.
-              <br />
-              <span className="text-[var(--color-muted)] text-4xl font-semibold">
-                Learn. Code. Evolve.
+              <span className="text-[var(--color-muted)]">
+                with Plasma Energy.
               </span>
             </motion.h1>
+
             <motion.p
               variants={fadeInUp}
-              className="text-xl text-[var(--color-muted)] mb-8 leading-relaxed"
+              className="text-lg text-[var(--color-muted)] mb-10 leading-relaxed max-w-lg"
             >
               A hands-on learning platform by Tokamak Network.
-              Write and compile code directly in your browser.
+              Write and compile smart contracts directly in your browser.
             </motion.p>
-            <motion.div variants={fadeInUp} className="flex gap-4">
+
+            <motion.div variants={fadeInUp} className="flex gap-3">
               <Link
                 href="/language/solidity"
-                className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-lg font-medium transition-all hover:scale-[1.02] hover:shadow-lg"
+                className="group relative bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-all hover:shadow-[var(--shadow-glow-strong)] hover:scale-[1.02]"
               >
                 Start Learning
               </Link>
               <Link
                 href="/problems/hello-solidity"
-                className="border border-[var(--color-border)] hover:border-[var(--color-muted)] text-[var(--color-foreground)] px-6 py-3 rounded-lg font-medium transition-all hover:scale-[1.02] hover:shadow-lg"
+                className="border border-[var(--color-border)] hover:border-[var(--color-accent)]/40 text-[var(--color-foreground)] px-6 py-3 rounded-lg font-medium transition-all hover:bg-[var(--color-surface)] hover:scale-[1.02]"
               >
                 Try First Problem
               </Link>
             </motion.div>
           </motion.div>
+
           <motion.div
             className="flex-shrink-0 hidden lg:block"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.4, ease: "easeOut" }}
           >
-            <Image
-              src="/main.png"
-              alt="TokamakLearn[:run]"
-              width={420}
-              height={280}
-              priority
-              className="rounded-2xl"
-            />
+            <div className="relative">
+              <div className="absolute -inset-4 bg-gradient-to-br from-cyan-500/10 to-violet-500/10 rounded-3xl blur-2xl" />
+              <Image
+                src="/main.png"
+                alt="TokamakLearn[:run]"
+                width={440}
+                height={300}
+                priority
+                className="relative rounded-2xl border border-[var(--color-border)]"
+              />
+            </div>
           </motion.div>
         </div>
       </section>
 
       {/* Stats */}
-      <section className="border-y border-[var(--color-border)] bg-[var(--color-surface)]">
+      <section className="border-y border-[var(--color-border)] bg-[var(--color-surface)]/50 backdrop-blur-sm">
         <div className="max-w-6xl mx-auto px-6 py-12 grid grid-cols-3 gap-8 text-center">
           <div>
-            <div className="text-3xl font-bold text-[var(--color-foreground)] tabular-nums">
+            <div className="text-4xl font-bold text-[var(--color-foreground)] tabular-nums tracking-tight">
               <CountUp target={totalProblems} />
             </div>
-            <div className="text-sm text-[var(--color-muted)] mt-1">
+            <div className="text-sm text-[var(--color-muted)] mt-1.5">
               Practice Problems
             </div>
           </div>
           <div className="border-x border-[var(--color-border)]">
-            <div className="text-3xl font-bold text-[var(--color-foreground)] tabular-nums">
+            <div className="text-4xl font-bold text-[var(--color-foreground)] tabular-nums tracking-tight">
               <CountUp target={totalCategories} />
             </div>
-            <div className="text-sm text-[var(--color-muted)] mt-1">
-              Categories
+            <div className="text-sm text-[var(--color-muted)] mt-1.5">
+              Learning Tracks
             </div>
           </div>
           <div>
-            <div className="text-3xl font-bold text-[var(--color-foreground)] tabular-nums">
+            <div className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent tabular-nums tracking-tight">
               <CountUp target={100} suffix="%" />
             </div>
-            <div className="text-sm text-[var(--color-muted)] mt-1">
+            <div className="text-sm text-[var(--color-muted)] mt-1.5">
               In-Browser
             </div>
           </div>
         </div>
       </section>
 
-      {/* Categories Preview */}
+      {/* Categories */}
       <CategoriesSection />
 
       {/* Footer */}
@@ -253,16 +283,14 @@ export default function Home() {
           <div className="text-sm text-[var(--color-muted)]">
             &copy; 2025 TokamakLearn[:run]. All rights reserved.
           </div>
-          <div className="flex gap-4">
-            <a
-              href="https://tokamak.network"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="relative text-sm text-[var(--color-muted)] hover:text-[var(--color-foreground)] transition-colors after:absolute after:left-0 after:bottom-0 after:h-px after:w-0 after:bg-[var(--color-foreground)] after:transition-all hover:after:w-full"
-            >
-              Tokamak Network
-            </a>
-          </div>
+          <a
+            href="https://tokamak.network"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-[var(--color-muted)] hover:text-[var(--color-accent)] transition-colors"
+          >
+            Tokamak Network
+          </a>
         </div>
       </footer>
     </main>
