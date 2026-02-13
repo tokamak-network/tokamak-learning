@@ -209,19 +209,19 @@ Replace the stats grid inner content:
     <div className="text-3xl font-bold text-white tabular-nums">
       <CountUp target={totalProblems} />
     </div>
-    <div className="text-sm text-[var(--color-muted)] mt-1">실습 문제</div>
+    <div className="text-sm text-[var(--color-muted)] mt-1">Practice Problems</div>
   </div>
   <div className="border-x border-[var(--color-border)]">
     <div className="text-3xl font-bold text-white tabular-nums">
       <CountUp target={totalCategories} />
     </div>
-    <div className="text-sm text-[var(--color-muted)] mt-1">학습 카테고리</div>
+    <div className="text-sm text-[var(--color-muted)] mt-1">Learning Categories</div>
   </div>
   <div>
     <div className="text-3xl font-bold text-white tabular-nums">
       <CountUp target={100} suffix="%" />
     </div>
-    <div className="text-sm text-[var(--color-muted)] mt-1">브라우저 실행</div>
+    <div className="text-sm text-[var(--color-muted)] mt-1">Browser-Based</div>
   </div>
 </div>
 ```
@@ -317,10 +317,10 @@ function CategorySection({ cat, catProblems }: { cat: { id: string; order: numbe
     <section key={cat.id}>
       <div className="flex items-center gap-3 mb-4">
         <span className="text-xs font-medium text-[var(--color-accent)] bg-blue-500/10 px-2.5 py-1 rounded-full">
-          {cat.order}단계
+          Stage {cat.order}
         </span>
         <h2 className="text-lg font-semibold tracking-tight">{cat.title}</h2>
-        <span className="text-xs text-[var(--color-muted)]">{catProblems.length}문제</span>
+        <span className="text-xs text-[var(--color-muted)]">{catProblems.length} problems</span>
       </div>
       <p className="text-sm text-[var(--color-muted)] mb-3">{cat.description}</p>
 
@@ -416,7 +416,7 @@ Replace the tab buttons area. Instead of `border-b-2` on active tab, use a layou
       activeTab === "description" ? "text-white" : "text-[var(--color-muted)] hover:text-white"
     }`}
   >
-    설명
+    Description
     {activeTab === "description" && (
       <motion.div
         layoutId="tab-indicator"
@@ -431,7 +431,7 @@ Replace the tab buttons area. Instead of `border-b-2` on active tab, use a layou
       activeTab === "results" ? "text-white" : "text-[var(--color-muted)] hover:text-white"
     }`}
   >
-    결과
+    Results
     {results && (
       <span className={`w-2 h-2 rounded-full ${allPassed ? "bg-[var(--color-success)]" : "bg-[var(--color-danger)]"}`} />
     )}
@@ -545,7 +545,7 @@ Replace the results map with staggered motion:
         transition={{ delay: 0.3, type: "spring", stiffness: 300 }}
       >
         <Link href={`/problems/${nextProblem.id}`} className="mt-4 flex items-center justify-center gap-2 w-full py-3 bg-[var(--color-success)] hover:bg-green-600 text-white rounded-lg font-medium transition-colors">
-          다음 문제: {nextProblem.title}
+          Next Problem: {nextProblem.title}
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
@@ -558,12 +558,12 @@ Replace the results map with staggered motion:
 
 **Step 6: Improve compile loading state**
 
-Replace "컴파일 중..." text with animated dots:
+Replace "Compiling..." text with animated dots:
 ```tsx
 {isCompiling && (
   <div className="flex items-center gap-3 text-sm text-[var(--color-muted)]">
     <div className="w-4 h-4 border-2 border-[var(--color-accent)] border-t-transparent rounded-full animate-spin" />
-    <span>컴파일 중<span className="inline-flex w-6"><span className="animate-[dotPulse_1.4s_infinite_0s]">.</span><span className="animate-[dotPulse_1.4s_infinite_0.2s]">.</span><span className="animate-[dotPulse_1.4s_infinite_0.4s]">.</span></span></span>
+    <span>Compiling<span className="inline-flex w-6"><span className="animate-[dotPulse_1.4s_infinite_0s]">.</span><span className="animate-[dotPulse_1.4s_infinite_0.2s]">.</span><span className="animate-[dotPulse_1.4s_infinite_0.4s]">.</span></span></span>
   </div>
 )}
 ```
