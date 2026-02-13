@@ -48,23 +48,30 @@ export const categories: Category[] = [
 ];
 
 export const problems: Problem[] = [
+  // ==========================================
+  // BASICS (기초) — 10 problems
+  // ==========================================
   {
     id: "hello-solidity",
     title: "첫 번째 컨트랙트",
     category: "basics",
     order: 1,
     difficulty: "beginner",
-    description: `# 첫 번째 컨트랙트
+    description: `# 첫 번째 컨트랙트 만들기
 
-Solidity 파일은 \`pragma\` 지시문으로 컴파일러 버전을 지정하고, \`contract\` 키워드로 컨트랙트를 선언합니다.
+Solidity에서 모든 코드는 \`contract\` 안에 들어갑니다.
+집을 짓기 전에 빈 방부터 만드는 것처럼, 빈 컨트랙트부터 시작합니다.
+
+## 할 일
+
+아래 코드를 입력하세요:
 
 \`\`\`solidity
-contract MyContract {
+contract HelloSolidity {
 }
 \`\`\`
 
-## 과제
-\`HelloSolidity\`라는 이름의 빈 컨트랙트를 작성하세요.`,
+> \`contract\` — 스마트 컨트랙트를 선언하는 키워드입니다.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
@@ -74,28 +81,135 @@ pragma solidity ^0.8.24;
 
 contract HelloSolidity {
 }`,
-    hints: ["contract 키워드 뒤에 컨트랙트 이름을 쓰고 중괄호로 감싸세요.", "contract HelloSolidity { }"],
+    hints: ["contract 키워드 뒤에 이름을 쓰고 { }로 감싸세요.", "contract HelloSolidity { }"],
     testDescription: "HelloSolidity 컨트랙트가 정상적으로 컴파일되는지 확인합니다.",
     expectedFunctions: [],
     expectedContractName: "HelloSolidity",
-    // compile-only: no testCases needed
   },
   {
-    id: "state-variables",
-    title: "상태 변수",
+    id: "contract-rename",
+    title: "컨트랙트 이름 바꾸기",
     category: "basics",
     order: 2,
     difficulty: "beginner",
-    description: `# 상태 변수
+    description: `# 컨트랙트 이름 바꾸기
 
-\`public\` 키워드를 붙인 상태 변수는 자동으로 getter 함수가 생성됩니다. 선언 시 초기값을 지정할 수 있습니다.
+컨트랙트 이름은 **대문자로 시작**하는 것이 규칙입니다.
+단어가 여러 개면 각 단어의 첫 글자를 대문자로 씁니다.
+
+예: \`MyToken\`, \`SimpleStorage\`, \`HelloWorld\`
+
+## 할 일
+
+아래 컨트랙트의 이름 \`MyContract\`를 \`MyStorage\`로 바꾸세요.`,
+    starterCode: `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+contract MyContract {
+}`,
+    solution: `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+contract MyStorage {
+}`,
+    hints: ["contract 뒤의 이름 부분만 수정하면 됩니다.", "MyContract → MyStorage"],
+    testDescription: "컨트랙트 이름이 MyStorage인지 확인합니다.",
+    expectedFunctions: [],
+    expectedContractName: "MyStorage",
+  },
+  {
+    id: "first-variable",
+    title: "숫자 저장하기",
+    category: "basics",
+    order: 3,
+    difficulty: "beginner",
+    description: `# 숫자 저장하기
+
+컨트랙트 안에 데이터를 저장할 수 있습니다. 이것을 **상태 변수**라고 합니다.
+
+\`uint\`는 양의 정수(0, 1, 2, 3...)를 저장하는 타입입니다.
+
+## 할 일
+
+컨트랙트 안에 아래 코드를 입력하세요:
 
 \`\`\`solidity
 uint public myNumber = 42;
 \`\`\`
 
-## 과제
-\`greeting\` (string, 값: "Hello Tokamak")과 \`version\` (uint, 값: 1) 상태 변수를 선언하세요.`,
+> \`public\`을 붙이면 이 값을 외부에서 읽을 수 있습니다.`,
+    starterCode: `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+contract FirstVariable {
+    // TODO: uint public myNumber를 선언하고 42로 초기화하세요
+}`,
+    solution: `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+contract FirstVariable {
+    uint public myNumber = 42;
+}`,
+    hints: ["uint public 변수명 = 값; 형태로 선언합니다.", "uint public myNumber = 42;"],
+    testDescription: "myNumber()가 42를 반환하는지 확인합니다.",
+    expectedFunctions: ["myNumber"],
+    testCases: [
+      { fn: "myNumber", expected: "42", message: "myNumber()가 42를 반환해야 합니다" },
+    ],
+  },
+  {
+    id: "string-variable",
+    title: "문자열 저장하기",
+    category: "basics",
+    order: 4,
+    difficulty: "beginner",
+    description: `# 문자열 저장하기
+
+숫자뿐만 아니라 텍스트도 저장할 수 있습니다.
+
+\`string\`은 문자열을 저장하는 타입입니다. 값은 큰따옴표(\`""\`)로 감쌉니다.
+
+## 할 일
+
+컨트랙트 안에 아래 코드를 입력하세요:
+
+\`\`\`solidity
+string public greeting = "Hello Tokamak";
+\`\`\``,
+    starterCode: `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+contract StringVariable {
+    // TODO: string public greeting을 선언하고 "Hello Tokamak"으로 초기화하세요
+}`,
+    solution: `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+contract StringVariable {
+    string public greeting = "Hello Tokamak";
+}`,
+    hints: ["string public 변수명 = \"값\"; 형태로 선언합니다.", "string public greeting = \"Hello Tokamak\";"],
+    testDescription: "greeting()이 'Hello Tokamak'을 반환하는지 확인합니다.",
+    expectedFunctions: ["greeting"],
+    testCases: [
+      { fn: "greeting", expected: "Hello Tokamak", message: "greeting()이 'Hello Tokamak'을 반환해야 합니다" },
+    ],
+  },
+  {
+    id: "state-variables",
+    title: "두 개의 상태 변수",
+    category: "basics",
+    order: 5,
+    difficulty: "beginner",
+    description: `# 두 개의 상태 변수
+
+이전 문제에서 \`uint\`와 \`string\`을 각각 선언해봤습니다.
+이번에는 하나의 컨트랙트에 두 변수를 함께 선언해봅시다.
+
+## 할 일
+
+1. \`string public greeting\`을 \`"Hello Tokamak"\`으로 선언하세요
+2. \`uint public version\`을 \`1\`로 선언하세요`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
@@ -110,7 +224,7 @@ contract StateVariables {
     string public greeting = "Hello Tokamak";
     uint public version = 1;
 }`,
-    hints: ["string public 변수명 = \"값\"; 형태로 선언합니다.", "uint public 변수명 = 숫자; 형태로 선언합니다."],
+    hints: ["이전 문제에서 배운 것과 같은 방식으로 두 줄을 작성하면 됩니다.", "string public greeting = \"Hello Tokamak\";\nuint public version = 1;"],
     testDescription: "greeting()이 'Hello Tokamak'을, version()이 1을 반환하는지 확인합니다.",
     expectedFunctions: ["greeting", "version"],
     testCases: [
@@ -119,23 +233,61 @@ contract StateVariables {
     ],
   },
   {
+    id: "type-error-fix",
+    title: "타입 에러 수정하기",
+    category: "basics",
+    order: 6,
+    difficulty: "beginner",
+    description: `# 타입 에러 수정하기
+
+아래 코드에는 **타입 오류**가 있습니다.
+
+## 할 일
+
+1. **먼저 그대로 컴파일 버튼을 눌러보세요** — 에러 메시지를 확인합니다
+2. 에러를 확인했으면, 올바른 타입으로 수정하세요
+
+> 힌트: \`uint\`는 숫자만 저장할 수 있습니다. 문자열 \`"Alice"\`는 저장할 수 없어요.`,
+    starterCode: `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+contract TypeErrorFix {
+    // 이 코드는 에러가 있습니다. 먼저 컴파일해보세요!
+    uint public name = "Alice";
+}`,
+    solution: `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+contract TypeErrorFix {
+    string public name = "Alice";
+}`,
+    hints: ["\"Alice\"는 문자열입니다. 문자열을 저장하는 타입은 무엇이었나요?", "uint를 string으로 바꾸세요."],
+    testDescription: "name()이 'Alice'를 반환하는지 확인합니다.",
+    expectedFunctions: ["name"],
+    testCases: [
+      { fn: "name", expected: "Alice", message: "name()이 'Alice'를 반환해야 합니다" },
+    ],
+  },
+  {
     id: "constructor-basics",
     title: "생성자 (Constructor)",
     category: "basics",
-    order: 3,
+    order: 7,
     difficulty: "beginner",
     description: `# 생성자 (Constructor)
 
-\`constructor\`는 컨트랙트 배포 시 한 번만 실행됩니다. \`msg.sender\`는 현재 함수를 호출한 주소입니다.
+\`constructor\`는 컨트랙트가 배포될 때 **딱 한 번만** 실행되는 특별한 함수입니다.
+앱을 처음 설치할 때 초기 설정을 하는 것과 비슷합니다.
+
+\`msg.sender\`는 이 컨트랙트를 배포한 사람의 주소입니다.
+
+## 할 일
+
+생성자 안에 아래 코드를 입력하세요:
 
 \`\`\`solidity
-constructor() {
-    owner = msg.sender;
-}
-\`\`\`
-
-## 과제
-생성자에서 \`owner\`를 \`msg.sender\`로 설정하세요.`,
+owner = msg.sender;
+\`\`\``,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
@@ -156,7 +308,7 @@ contract ConstructorBasics {
         owner = msg.sender;
     }
 }`,
-    hints: ["msg.sender는 컨트랙트를 배포한 주소입니다.", "owner = msg.sender;"],
+    hints: ["msg.sender는 컨트랙트를 배포한 사람의 주소입니다.", "owner = msg.sender;"],
     testDescription: "배포자의 주소가 owner에 저장되는지 확인합니다.",
     expectedFunctions: ["owner"],
     testCases: [
@@ -167,18 +319,22 @@ contract ConstructorBasics {
     id: "constant-keyword",
     title: "상수 (Constant)",
     category: "basics",
-    order: 4,
+    order: 8,
     difficulty: "beginner",
     description: `# 상수 (Constant)
 
-\`constant\`로 선언한 변수는 컴파일 시 값이 고정되며 가스를 절약합니다. 변경할 수 없습니다.
+\`constant\`로 선언한 변수는 **값을 절대 바꿀 수 없습니다.**
+변하지 않는 설정값에 사용하며, 이름은 보통 \`대문자\`로 씁니다.
+
+## 할 일
+
+아래 코드를 입력하세요:
 
 \`\`\`solidity
-uint256 public constant MY_VALUE = 100;
+uint256 public constant MAX_SUPPLY = 10000;
 \`\`\`
 
-## 과제
-\`MAX_SUPPLY\`를 10000으로 설정한 상수를 선언하세요.`,
+> \`constant\`는 \`public\`과 변수명 사이에 위치합니다.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
@@ -191,7 +347,7 @@ pragma solidity ^0.8.24;
 contract ConstantKeyword {
     uint256 public constant MAX_SUPPLY = 10000;
 }`,
-    hints: ["constant 키워드는 타입과 변수명 사이에 위치합니다.", "uint256 public constant 변수명 = 값;"],
+    hints: ["uint256 public constant 변수명 = 값; 형태입니다.", "uint256 public constant MAX_SUPPLY = 10000;"],
     testDescription: "MAX_SUPPLY()가 10000을 반환하는지 확인합니다.",
     expectedFunctions: ["MAX_SUPPLY"],
     testCases: [
@@ -202,19 +358,19 @@ contract ConstantKeyword {
     id: "immutable-keyword",
     title: "불변 변수 (Immutable)",
     category: "basics",
-    order: 5,
+    order: 9,
     difficulty: "beginner",
     description: `# 불변 변수 (Immutable)
 
-\`immutable\` 변수는 생성자에서 한 번만 값을 설정할 수 있습니다. constant와 달리 배포 시 동적 값을 저장할 수 있습니다.
+\`immutable\`은 \`constant\`와 비슷하지만, **생성자에서 한 번 값을 정할 수 있습니다.**
 
-\`\`\`solidity
-address public immutable OWNER;
-constructor() { OWNER = msg.sender; }
-\`\`\`
+- \`constant\`: 코드에 값을 직접 적어야 함 (예: \`= 10000\`)
+- \`immutable\`: 배포할 때 값을 정할 수 있음 (예: \`msg.sender\`)
 
-## 과제
-\`DEPLOYER\`를 immutable로 선언하고 생성자에서 \`msg.sender\`를 할당하세요.`,
+## 할 일
+
+1. \`DEPLOYER\`를 \`immutable\`로 선언하세요
+2. 생성자에서 \`msg.sender\`를 할당하세요`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
@@ -235,7 +391,7 @@ contract ImmutableKeyword {
         DEPLOYER = msg.sender;
     }
 }`,
-    hints: ["immutable 키워드는 타입과 변수명 사이에 위치합니다.", "생성자 안에서 DEPLOYER = msg.sender;로 할당합니다."],
+    hints: ["immutable은 public과 변수명 사이에 위치합니다: address public immutable DEPLOYER;", "생성자 안에서 DEPLOYER = msg.sender;"],
     testDescription: "DEPLOYER()가 배포자 주소를 반환하는지 확인합니다.",
     expectedFunctions: ["DEPLOYER"],
     testCases: [
@@ -244,47 +400,45 @@ contract ImmutableKeyword {
   },
   {
     id: "multiple-state-vars",
-    title: "여러 상태 변수",
+    title: "종합: 여러 상태 변수",
     category: "basics",
-    order: 6,
+    order: 10,
     difficulty: "beginner",
-    description: `# 여러 상태 변수
+    description: `# 종합: 여러 상태 변수
 
-Solidity는 다양한 타입을 지원합니다: \`string\`, \`uint256\`, \`bool\`, \`address\` 등.
+지금까지 배운 것을 조합해봅시다.
+하나의 컨트랙트에 \`string\`, \`uint256\`, \`bool\` 세 가지 타입의 변수를 선언합니다.
 
-\`\`\`solidity
-string public name = "Alice";
-bool public isActive = true;
-\`\`\`
+## 할 일
 
-## 과제
-\`name\`(string), \`age\`(uint256), \`isActive\`(bool), \`wallet\`(address) 4개의 public 상태 변수를 초기값과 함께 선언하세요.`,
+1. \`string public name\`을 \`"Tokamak"\`으로 선언하세요
+2. \`uint256 public level\`을 \`1\`로 선언하세요
+3. \`bool public isActive\`를 \`true\`로 선언하세요
+
+> \`bool\`은 \`true\` 또는 \`false\` 두 가지 값만 가지는 타입입니다.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
 contract MultipleStateVars {
-    // TODO: string public name 선언 (원하는 값)
-    // TODO: uint256 public age 선언 (원하는 값)
-    // TODO: bool public isActive 선언 (true 또는 false)
-    // TODO: address public wallet 선언 (아무 주소 값)
+    // TODO: string public name 을 "Tokamak"으로 선언하세요
+    // TODO: uint256 public level 을 1로 선언하세요
+    // TODO: bool public isActive 를 true로 선언하세요
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
 contract MultipleStateVars {
     string public name = "Tokamak";
-    uint256 public age = 25;
+    uint256 public level = 1;
     bool public isActive = true;
-    address public wallet = 0x1234567890AbcdEF1234567890aBcdef12345678;
 }`,
-    hints: ["각 변수를 public으로 선언하고 초기값을 지정하세요.", "address 타입은 0x로 시작하는 20바이트 주소입니다."],
-    testDescription: "name, age, isActive, wallet 4개의 getter 함수가 존재하는지 확인합니다.",
-    expectedFunctions: ["name", "age", "isActive", "wallet"],
+    hints: ["모두 같은 패턴입니다: 타입 public 변수명 = 값;", "bool public isActive = true;"],
+    testDescription: "name, level, isActive가 올바른 값을 반환하는지 확인합니다.",
+    expectedFunctions: ["name", "level", "isActive"],
     testCases: [
-      { fn: "name", message: "name()이 정상적으로 반환되어야 합니다" },
-      { fn: "age", message: "age()가 정상적으로 반환되어야 합니다" },
-      { fn: "isActive", message: "isActive()가 정상적으로 반환되어야 합니다" },
-      { fn: "wallet", message: "wallet()이 정상적으로 반환되어야 합니다" },
+      { fn: "name", expected: "Tokamak", message: "name()이 'Tokamak'을 반환해야 합니다" },
+      { fn: "level", expected: "1", message: "level()이 1을 반환해야 합니다" },
+      { fn: "isActive", expected: "true", message: "isActive()가 true를 반환해야 합니다" },
     ],
   },
   {
