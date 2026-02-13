@@ -9,29 +9,34 @@ export const basics_problems: Problem[] = [
     difficulty: "beginner",
     description: `# Your First Contract
 
-In Solidity, all code lives inside a \`contract\`.
-Just like building a house starts with an empty room, let's start with an empty contract.
+## What you'll learn
+How to create a basic Solidity contract.
+
+In Solidity, all code lives inside a \`contract\`. Think of it like a container — everything your smart contract does goes between its curly braces.
 
 ## Task
 
-Type the following code:
+Type the following code below the pragma line:
 
 \`\`\`solidity
 contract HelloSolidity {
 }
 \`\`\`
 
-> \`contract\` — the keyword used to declare a smart contract.`,
+> \`contract\` is the keyword used to declare a smart contract. The curly braces \`{ }\` define where its code goes.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-// TODO: Declare a HelloSolidity contract`,
+// TODO: Declare a contract named HelloSolidity`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
 contract HelloSolidity {
 }`,
-    hints: ["Write the name after the contract keyword and wrap it with { }.", "contract HelloSolidity { }"],
+    hints: [
+      "Use the contract keyword followed by a name and curly braces.",
+      "The syntax pattern is: contract ContractName { }",
+    ],
     testDescription: "Checks that the HelloSolidity contract compiles successfully.",
     expectedFunctions: [],
     expectedContractName: "HelloSolidity",
@@ -44,8 +49,10 @@ contract HelloSolidity {
     difficulty: "beginner",
     description: `# Rename a Contract
 
-Contract names should **start with an uppercase letter**.
-If there are multiple words, capitalize the first letter of each word.
+## What you'll learn
+Solidity naming conventions for contracts.
+
+Contract names use **PascalCase** — capitalize the first letter of each word, with no spaces or underscores.
 
 Examples: \`MyToken\`, \`SimpleStorage\`, \`HelloWorld\`
 
@@ -62,8 +69,11 @@ pragma solidity ^0.8.24;
 
 contract MyStorage {
 }`,
-    hints: ["Just change the name after the contract keyword.", "MyContract → MyStorage"],
-    testDescription: "Checks that the contract name is MyStorage.",
+    hints: [
+      "Change the name that comes right after the contract keyword.",
+      "Only the contract name needs to change — nothing else.",
+    ],
+    testDescription: "Checks that the contract is named MyStorage.",
     expectedFunctions: [],
     expectedContractName: "MyStorage",
   },
@@ -75,9 +85,12 @@ contract MyStorage {
     difficulty: "beginner",
     description: `# Store a Number
 
-You can store data inside a contract. These are called **state variables**.
+## What you'll learn
+How to declare a state variable that stores a number.
 
-\`uint\` is a type that stores unsigned integers (0, 1, 2, 3...).
+Contracts can store data in **state variables**. Think of them like writing in a notebook — data persists even after the transaction ends.
+
+\`uint\` is a type for storing positive integers (0, 1, 2, 3...).
 
 ## Task
 
@@ -87,12 +100,12 @@ Type the following code inside the contract:
 uint public myNumber = 42;
 \`\`\`
 
-> Adding \`public\` makes this value readable from outside the contract.`,
+> Adding \`public\` automatically creates a getter function so the value can be read from outside.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
 contract FirstVariable {
-    // TODO: Declare uint public myNumber and initialize it to 42
+    // TODO: Declare a public uint variable named myNumber with value 42
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
@@ -100,7 +113,10 @@ pragma solidity ^0.8.24;
 contract FirstVariable {
     uint public myNumber = 42;
 }`,
-    hints: ["Declare it as: uint public variableName = value;", "uint public myNumber = 42;"],
+    hints: [
+      "The pattern is: type public variableName = value;",
+      "Use uint as the type and don't forget the semicolon at the end.",
+    ],
     testDescription: "Checks that myNumber() returns 42.",
     expectedFunctions: ["myNumber"],
     testCases: [
@@ -115,9 +131,10 @@ contract FirstVariable {
     difficulty: "beginner",
     description: `# Store a String
 
-You can store not only numbers but also text.
+## What you'll learn
+How to store text using the \`string\` type.
 
-\`string\` is a type that stores text. Values are wrapped in double quotes (\`""\`).
+In the previous problem, you stored a number with \`uint\`. Contracts can also store text using the \`string\` type. Text values are wrapped in double quotes (\`""\`).
 
 ## Task
 
@@ -130,7 +147,7 @@ string public greeting = "Hello Tokamak";
 pragma solidity ^0.8.24;
 
 contract StringVariable {
-    // TODO: Declare string public greeting and initialize it to "Hello Tokamak"
+    // TODO: Declare a public string variable named greeting with value "Hello Tokamak"
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
@@ -138,7 +155,10 @@ pragma solidity ^0.8.24;
 contract StringVariable {
     string public greeting = "Hello Tokamak";
 }`,
-    hints: ["Declare it as: string public variableName = \"value\";", "string public greeting = \"Hello Tokamak\";"],
+    hints: [
+      "Use the same pattern as before, but with string instead of uint.",
+      "Text values must be wrapped in double quotes.",
+    ],
     testDescription: "Checks that greeting() returns 'Hello Tokamak'.",
     expectedFunctions: ["greeting"],
     testCases: [
@@ -153,8 +173,10 @@ contract StringVariable {
     difficulty: "beginner",
     description: `# Two State Variables
 
-In the previous problems, you declared \`uint\` and \`string\` separately.
-Now let's declare both variables together in a single contract.
+## What you'll learn
+How to declare multiple state variables in one contract.
+
+In the previous problems, you declared \`uint\` and \`string\` in separate contracts. Now let's put both in a single contract. A contract can hold as many variables as you need.
 
 ## Task
 
@@ -164,8 +186,8 @@ Now let's declare both variables together in a single contract.
 pragma solidity ^0.8.24;
 
 contract StateVariables {
-    // TODO: Declare string public greeting and initialize it to "Hello Tokamak"
-    // TODO: Declare uint public version and initialize it to 1
+    // TODO: Declare a public string variable named greeting with value "Hello Tokamak"
+    // TODO: Declare a public uint variable named version with value 1
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
@@ -174,7 +196,10 @@ contract StateVariables {
     string public greeting = "Hello Tokamak";
     uint public version = 1;
 }`,
-    hints: ["Write two lines using the same pattern you learned before.", "string public greeting = \"Hello Tokamak\";\nuint public version = 1;"],
+    hints: [
+      "Use the same pattern from the previous problems, one line per variable.",
+      "Each variable declaration ends with a semicolon.",
+    ],
     testDescription: "Checks that greeting() returns 'Hello Tokamak' and version() returns 1.",
     expectedFunctions: ["greeting", "version"],
     testCases: [
@@ -190,19 +215,22 @@ contract StateVariables {
     difficulty: "beginner",
     description: `# Fix a Type Error
 
-The code below has a **type error**.
+## What you'll learn
+How to read and fix a type mismatch error.
+
+The code below has a **type error**. A \`uint\` variable can only hold numbers, not text.
 
 ## Task
 
-1. **First, try compiling it as-is** — check the error message
-2. Once you see the error, fix it with the correct type
+1. **First, compile it as-is** to see the error message
+2. Fix the variable type so it can store the text \`"Alice"\`
 
-> Hint: \`uint\` can only store numbers. It cannot store the string \`"Alice"\`.`,
+> Think about which type you learned that stores text.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
 contract TypeErrorFix {
-    // This code has an error. Try compiling it first!
+    // This code has an error. Try compiling first!
     uint public name = "Alice";
 }`,
     solution: `// SPDX-License-Identifier: MIT
@@ -211,25 +239,72 @@ pragma solidity ^0.8.24;
 contract TypeErrorFix {
     string public name = "Alice";
 }`,
-    hints: ["\"Alice\" is a string. What type stores strings?", "Change uint to string."],
-    testDescription: "Checks that name() returns 'Alice'.",
+    hints: [
+      "\"Alice\" is text, not a number. Which type stores text?",
+      "You only need to change one word in the declaration.",
+    ],
+    testDescription: "Checks that name() returns 'Alice' after fixing the type.",
     expectedFunctions: ["name"],
     testCases: [
       { fn: "name", expected: "Alice", message: "name() should return 'Alice'" },
     ],
   },
   {
-    id: "constructor-basics",
-    title: "Constructor",
+    id: "missing-semicolon-fix",
+    title: "Fix a Missing Semicolon",
     category: "basics",
     order: 7,
     difficulty: "beginner",
+    description: `# Fix a Missing Semicolon
+
+## What you'll learn
+How to spot and fix a missing semicolon error.
+
+In Solidity, every statement must end with a semicolon (\`;\`). Forgetting one is one of the most common syntax errors — even experienced developers make this mistake!
+
+## Task
+
+1. **First, compile it as-is** to see the error message
+2. Find the missing semicolon and add it
+
+> The compiler error will point you to the line with the problem.`,
+    starterCode: `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+contract SemicolonFix {
+    // This code has an error. Try compiling first!
+    uint public count = 10
+}`,
+    solution: `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+contract SemicolonFix {
+    uint public count = 10;
+}`,
+    hints: [
+      "Look at the end of each statement — something is missing.",
+      "Check the variable declaration line carefully.",
+    ],
+    testDescription: "Checks that count() returns 10 after fixing the syntax error.",
+    expectedFunctions: ["count"],
+    testCases: [
+      { fn: "count", expected: "10", message: "count() should return 10" },
+    ],
+  },
+  {
+    id: "constructor-basics",
+    title: "Constructor",
+    category: "basics",
+    order: 8,
+    difficulty: "beginner",
     description: `# Constructor
 
-The \`constructor\` is a special function that runs **only once** when the contract is deployed.
-It's like setting up initial configurations when you first install an app.
+## What you'll learn
+How to use a constructor to set initial values at deployment.
 
-\`msg.sender\` is the address of the person who deployed this contract.
+The \`constructor\` is a special function that runs **only once** — when the contract is first deployed. It's like setting up initial configurations when you install an app.
+
+\`msg.sender\` is a built-in value that holds the address of whoever deployed the contract.
 
 ## Task
 
@@ -258,8 +333,11 @@ contract ConstructorBasics {
         owner = msg.sender;
     }
 }`,
-    hints: ["msg.sender is the address of the person who deployed the contract.", "owner = msg.sender;"],
-    testDescription: "Checks that the deployer's address is stored in owner.",
+    hints: [
+      "Assign a value using the = operator, just like initializing a variable.",
+      "The left side is the variable name, the right side is msg.sender.",
+    ],
+    testDescription: "Checks that owner() returns the deployer's address.",
     expectedFunctions: ["owner"],
     testCases: [
       { fn: "owner", expected: "DEPLOYER", message: "owner() should return the deployer's address" },
@@ -269,16 +347,18 @@ contract ConstructorBasics {
     id: "constant-keyword",
     title: "Constant",
     category: "basics",
-    order: 8,
+    order: 9,
     difficulty: "beginner",
     description: `# Constant
 
-A variable declared with \`constant\` **can never be changed**.
-It's used for fixed configuration values, and by convention the name is written in \`UPPERCASE\`.
+## What you'll learn
+How to declare a variable that can never change.
+
+A \`constant\` variable's value is fixed at compile time and **can never be modified**. By convention, constant names use \`UPPER_SNAKE_CASE\`.
 
 ## Task
 
-Type the following code:
+Type the following code inside the contract:
 
 \`\`\`solidity
 uint256 public constant MAX_SUPPLY = 10000;
@@ -289,7 +369,7 @@ uint256 public constant MAX_SUPPLY = 10000;
 pragma solidity ^0.8.24;
 
 contract ConstantKeyword {
-    // TODO: Declare uint256 public constant MAX_SUPPLY with value 10000
+    // TODO: Declare a public constant uint256 named MAX_SUPPLY with value 10000
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
@@ -297,7 +377,10 @@ pragma solidity ^0.8.24;
 contract ConstantKeyword {
     uint256 public constant MAX_SUPPLY = 10000;
 }`,
-    hints: ["The pattern is: uint256 public constant NAME = value;", "uint256 public constant MAX_SUPPLY = 10000;"],
+    hints: [
+      "The pattern is: type public constant NAME = value;",
+      "constant goes between public and the variable name.",
+    ],
     testDescription: "Checks that MAX_SUPPLY() returns 10000.",
     expectedFunctions: ["MAX_SUPPLY"],
     testCases: [
@@ -308,19 +391,22 @@ contract ConstantKeyword {
     id: "immutable-keyword",
     title: "Immutable",
     category: "basics",
-    order: 9,
+    order: 10,
     difficulty: "beginner",
     description: `# Immutable
 
-\`immutable\` is similar to \`constant\`, but **its value can be set once in the constructor**.
+## What you'll learn
+How to use \`immutable\` for values set once at deployment.
 
-- \`constant\`: value must be hardcoded (e.g., \`= 10000\`)
-- \`immutable\`: value can be set at deployment (e.g., \`msg.sender\`)
+\`immutable\` is similar to \`constant\`, but its value **can be set in the constructor** instead of being hardcoded.
+
+- \`constant\`: value must be known at compile time (e.g., \`= 10000\`)
+- \`immutable\`: value is set once at deployment (e.g., from \`msg.sender\`)
 
 ## Task
 
-1. Declare \`DEPLOYER\` as \`immutable\`
-2. Assign \`msg.sender\` to it in the constructor`,
+1. Declare \`DEPLOYER\` as an \`address public immutable\` variable
+2. Assign \`msg.sender\` to it inside the constructor`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
@@ -341,54 +427,14 @@ contract ImmutableKeyword {
         DEPLOYER = msg.sender;
     }
 }`,
-    hints: ["immutable goes between public and the variable name: address public immutable DEPLOYER;", "Inside the constructor: DEPLOYER = msg.sender;"],
+    hints: [
+      "immutable goes in the same position as constant: type public immutable NAME;",
+      "In the constructor, assign the value using = just like a regular variable.",
+    ],
     testDescription: "Checks that DEPLOYER() returns the deployer's address.",
     expectedFunctions: ["DEPLOYER"],
     testCases: [
       { fn: "DEPLOYER", expected: "DEPLOYER", message: "DEPLOYER() should return the deployer's address" },
-    ],
-  },
-  {
-    id: "multiple-state-vars",
-    title: "Putting It Together: Multiple State Variables",
-    category: "basics",
-    order: 10,
-    difficulty: "beginner",
-    description: `# Putting It Together: Multiple State Variables
-
-Let's combine what you've learned so far.
-Declare three variables of types \`string\`, \`uint256\`, and \`bool\` in a single contract.
-
-## Task
-
-1. Declare \`string public name\` with the value \`"Tokamak"\`
-2. Declare \`uint256 public level\` with the value \`1\`
-3. Declare \`bool public isActive\` with the value \`true\`
-
-> \`bool\` is a type that can only hold \`true\` or \`false\`.`,
-    starterCode: `// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
-
-contract MultipleStateVars {
-    // TODO: Declare string public name with value "Tokamak"
-    // TODO: Declare uint256 public level with value 1
-    // TODO: Declare bool public isActive with value true
-}`,
-    solution: `// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
-
-contract MultipleStateVars {
-    string public name = "Tokamak";
-    uint256 public level = 1;
-    bool public isActive = true;
-}`,
-    hints: ["They all follow the same pattern: type public name = value;", "bool public isActive = true;"],
-    testDescription: "Checks that name, level, and isActive return the correct values.",
-    expectedFunctions: ["name", "level", "isActive"],
-    testCases: [
-      { fn: "name", expected: "Tokamak", message: "name() should return 'Tokamak'" },
-      { fn: "level", expected: "1", message: "level() should return 1" },
-      { fn: "isActive", expected: "true", message: "isActive() should return true" },
     ],
   },
 ];
