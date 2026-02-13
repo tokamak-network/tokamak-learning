@@ -83,4 +83,5 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
+// eslint-disable-next-line no-console
 console.log(`\n✓  All ${problems.length} problems and ${challengeSets.length} challenge sets validated.\n`);

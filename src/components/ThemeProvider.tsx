@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import { LazyMotion, domAnimation, MotionConfig } from "framer-motion";
 
 type Theme = "dark" | "light";
@@ -14,20 +14,16 @@ export function useTheme() {
   return useContext(ThemeContext);
 }
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("dark");
+function getInitialTheme(): Theme {
+  if (typeof window === "undefined") return "dark";
+  // Read from DOM attribute (set by inline script in <head> before hydration)
+  const attr = document.documentElement.getAttribute("data-theme");
+  if (attr === "light" || attr === "dark") return attr;
+  return "dark";
+}
 
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem("theme") as Theme | null;
-      if (stored) {
-        setTheme(stored);
-        document.documentElement.setAttribute("data-theme", stored);
-      }
-    } catch {
-      // ignore - private browsing or storage disabled
-    }
-  }, []);
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [theme, setTheme] = useState<Theme>(getInitialTheme);
 
   const toggleTheme = () => {
     const next = theme === "dark" ? "light" : "dark";

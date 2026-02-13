@@ -152,10 +152,9 @@ export default function Home() {
   const totalProblems = problems.length;
   const totalCategories = categories.length;
   const [wordIndex, setWordIndex] = useState(0);
-  const [dailyDone, setDailyDone] = useState(false);
+  const [dailyDone] = useState(() => isDailyCompleted());
 
   useEffect(() => {
-    setDailyDone(isDailyCompleted());
     const interval = setInterval(() => {
       setWordIndex((prev) => (prev + 1) % rotatingWords.length);
     }, 2500);

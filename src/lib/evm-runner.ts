@@ -4,7 +4,6 @@ import {
   createAddressFromString,
   createAccount,
   hexToBytes,
-  bytesToHex,
 } from "@ethereumjs/util";
 import { ethers } from "ethers";
 import type { TestCase } from "@/data/problems";

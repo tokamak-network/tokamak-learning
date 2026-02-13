@@ -23,19 +23,17 @@ export default function Header() {
   const pathname = usePathname();
   const isProblemPage = pathname.startsWith("/problems/");
   const { theme, toggleTheme } = useTheme();
-  const [dailyDone, setDailyDone] = useState(false);
+  const [dailyDone, setDailyDone] = useState(() => isDailyCompleted());
 
   useEffect(() => {
-    setDailyDone(isDailyCompleted());
     const handler = () => setDailyDone(isDailyCompleted());
     window.addEventListener("dailyChallengeUpdate", handler);
-    return () => window.removeEventListener("dailyChallengeUpdate", handler);
+    window.addEventListener("storage", handler);
+    return () => {
+      window.removeEventListener("dailyChallengeUpdate", handler);
+      window.removeEventListener("storage", handler);
+    };
   }, []);
-
-  // Also re-check when navigating
-  useEffect(() => {
-    setDailyDone(isDailyCompleted());
-  }, [pathname]);
 
   const dailyActive = pathname === "/daily";
 
@@ -52,9 +50,10 @@ export default function Header() {
           </span>
         </Link>
 
-        <nav className="flex items-center gap-0.5 md:gap-1">
+        <nav aria-label="Main navigation" className="flex items-center gap-0.5 md:gap-1">
           <Link
             href="/daily"
+            aria-current={dailyActive ? "page" : undefined}
             className={`text-sm px-2 md:px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 ${
               dailyDone
                 ? dailyActive
@@ -66,14 +65,15 @@ export default function Header() {
             }`}
           >
             {dailyDone && (
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <svg aria-hidden="true" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
             )}
-            Daily
+            Daily{dailyDone && <span className="sr-only"> (completed)</span>}
           </Link>
           <Link
             href="/language/solidity"
+            aria-current={pathname.startsWith("/language") ? "page" : undefined}
             className={`hidden md:inline-block text-sm px-3 py-1.5 rounded-md transition-all ${
               pathname.startsWith("/language")
                 ? "text-[var(--color-accent)] bg-[var(--color-accent)]/10 font-medium"
@@ -86,6 +86,7 @@ export default function Header() {
             href="https://tokamak.network"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="Tokamak Network (opens in new tab)"
             className="hidden md:inline-block text-sm px-3 py-1.5 rounded-md text-[var(--color-muted)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-surface)] transition-all"
           >
             Tokamak Network

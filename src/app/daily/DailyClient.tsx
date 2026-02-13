@@ -269,6 +269,7 @@ export default function DailyClient() {
 
           <button
             onClick={handleStart}
+            aria-label="Start daily challenge"
             className="w-full py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-[var(--color-accent)] to-[#8b5cf6] hover:opacity-90 transition-opacity text-lg"
           >
             Start
@@ -310,7 +311,7 @@ export default function DailyClient() {
             className="flex-1 flex flex-col"
           >
             {question.type === "code" ? (
-              <div className="p-3 rounded-xl bg-[#0f1520] border border-[#1e2a3a] mb-6">
+              <div className="p-3 rounded-xl bg-[var(--color-code-bg)] border border-[var(--color-code-border)] mb-6">
                 {renderCodeWithBlank(question.code)}
               </div>
             ) : (
@@ -346,6 +347,7 @@ export default function DailyClient() {
                     key={option}
                     onClick={() => handleSelect(option)}
                     disabled={!!selected}
+                    aria-label={`Select answer: ${option}`}
                     className={`p-3 rounded-xl border-2 text-sm font-medium transition-all ${style}`}
                   >
                     {option}
@@ -360,6 +362,7 @@ export default function DailyClient() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="mt-auto"
+                aria-live="polite"
               >
                 <div
                   className={`p-4 rounded-xl mb-4 ${
