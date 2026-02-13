@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  serverExternalPackages: ["solc", "@ethereumjs/vm", "@ethereumjs/evm", "@ethereumjs/common", "@ethereumjs/statemanager", "@ethereumjs/util", "@ethereumjs/tx"],
 };
 
 export default nextConfig;

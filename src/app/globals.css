@@ -1,26 +1,113 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: #0d1117;
+  --color-foreground: #e6edf3;
+  --color-surface: #161b22;
+  --color-border: #30363d;
+  --color-accent: #58a6ff;
+  --color-accent-hover: #79c0ff;
+  --color-success: #3fb950;
+  --color-danger: #f85149;
+  --color-warning: #d29922;
+  --color-muted: #8b949e;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted);
+}
+
+/* Markdown styles for problem descriptions */
+.prose-dark {
+  line-height: 1.7;
+}
+.prose-dark h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--color-foreground);
+}
+.prose-dark h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: var(--color-foreground);
+}
+.prose-dark h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-foreground);
+}
+.prose-dark p {
+  margin-bottom: 0.75rem;
+  color: var(--color-muted);
+}
+.prose-dark code {
+  background: rgba(110, 118, 129, 0.15);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-family: var(--font-mono);
+  color: var(--color-accent);
+}
+.prose-dark pre {
+  background: #0d1117;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+.prose-dark pre code {
+  background: none;
+  padding: 0;
+  color: var(--color-foreground);
+  font-size: 0.875rem;
+}
+.prose-dark ul,
+.prose-dark ol {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+  color: var(--color-muted);
+}
+.prose-dark li {
+  margin-bottom: 0.25rem;
+}
+.prose-dark ol {
+  list-style-type: decimal;
+}
+.prose-dark ul {
+  list-style-type: disc;
+}
+.prose-dark strong {
+  color: var(--color-foreground);
+  font-weight: 600;
+}
+.prose-dark blockquote {
+  border-left: 3px solid var(--color-accent);
+  padding-left: 1rem;
+  margin: 1rem 0;
+  color: var(--color-muted);
 }

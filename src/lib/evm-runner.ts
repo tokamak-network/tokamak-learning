@@ -1,0 +1,165 @@
+import { createVM } from "@ethereumjs/vm";
+import { Common, Hardfork, Mainnet } from "@ethereumjs/common";
+import {
+  createAddressFromString,
+  createAccount,
+  hexToBytes,
+  bytesToHex,
+} from "@ethereumjs/util";
+import { ethers } from "ethers";
+import type { TestCase } from "@/data/problems";
+
+export interface TestResult {
+  passed: boolean;
+  message: string;
+}
+
+const DEPLOYER = "0x1000000000000000000000000000000000000001";
+
+export async function runTests(
+  bytecode: string,
+  abi: ethers.InterfaceAbi,
+  testCases: TestCase[],
+  constructorArgs?: string[]
+): Promise<TestResult[]> {
+  const results: TestResult[] = [];
+
+  // Create VM
+  const common = new Common({ chain: Mainnet, hardfork: Hardfork.Osaka });
+  const vm = await createVM({ common });
+
+  // Fund deployer
+  const deployerAddr = createAddressFromString(DEPLOYER);
+  await vm.stateManager.putAccount(
+    deployerAddr,
+    createAccount({ balance: BigInt(10) * BigInt(10) ** BigInt(18) })
+  );
+
+  // Build deploy data
+  const iface = new ethers.Interface(abi);
+  let deployHex = "0x" + bytecode;
+  if (constructorArgs && constructorArgs.length > 0) {
+    const encodedArgs = iface.encodeDeploy(constructorArgs);
+    deployHex += encodedArgs.slice(2);
+  }
+
+  // Deploy
+  const deployResult = await vm.evm.runCall({
+    caller: deployerAddr,
+    data: hexToBytes(deployHex as `0x${string}`),
+    gasLimit: BigInt(5_000_000),
+    value: BigInt(0),
+  });
+
+  if (deployResult.execResult.exceptionError || !deployResult.createdAddress) {
+    results.push({
+      passed: false,
+      message: `컨트랙트 배포 실패: ${deployResult.execResult.exceptionError?.error || "주소 생성 실패"}`,
+    });
+    return results;
+  }
+
+  const contractAddr = deployResult.createdAddress;
+
+  // Run each test case
+  for (const tc of testCases) {
+    try {
+      // Run setup calls if any
+      if (tc.setup) {
+        for (const s of tc.setup) {
+          const setupData = iface.encodeFunctionData(s.fn, resolveArgs(s.args));
+          await vm.evm.runCall({
+            caller: deployerAddr,
+            to: contractAddr,
+            data: hexToBytes(setupData as `0x${string}`),
+            gasLimit: BigInt(1_000_000),
+            value: s.value ? BigInt(s.value) : BigInt(0),
+          });
+        }
+      }
+
+      // Encode and execute the test call
+      const calldata = iface.encodeFunctionData(tc.fn, resolveArgs(tc.args));
+      const callResult = await vm.evm.runCall({
+        caller: deployerAddr,
+        to: contractAddr,
+        data: hexToBytes(calldata as `0x${string}`),
+        gasLimit: BigInt(1_000_000),
+        value: tc.value ? BigInt(tc.value) : BigInt(0),
+      });
+
+      const reverted = !!callResult.execResult.exceptionError;
+
+      if (tc.expectRevert) {
+        results.push({
+          passed: reverted,
+          message: reverted
+            ? tc.message
+            : `${tc.message} - revert가 예상되었지만 성공했습니다`,
+        });
+        continue;
+      }
+
+      if (reverted) {
+        results.push({
+          passed: false,
+          message: `${tc.message} - 실행 중 revert 발생`,
+        });
+        continue;
+      }
+
+      // No expected value = just check it didn't revert
+      if (tc.expected === undefined) {
+        results.push({ passed: true, message: tc.message });
+        continue;
+      }
+
+      // Decode and compare
+      const decoded = iface.decodeFunctionResult(
+        tc.fn,
+        callResult.execResult.returnValue
+      );
+      const actual = formatResult(decoded[0]);
+      const expected = tc.expected;
+
+      const passed = compareValues(actual, expected);
+      results.push({
+        passed,
+        message: passed
+          ? tc.message
+          : `${tc.message} - 예상: ${expected}, 실제: ${actual}`,
+      });
+    } catch (err) {
+      results.push({
+        passed: false,
+        message: `${tc.message} - 오류: ${err instanceof Error ? err.message : String(err)}`,
+      });
+    }
+  }
+
+  return results;
+}
+
+function resolveArgs(args?: string[]): string[] {
+  if (!args) return [];
+  return args.map((a) => (a === "DEPLOYER" ? DEPLOYER : a));
+}
+
+function formatResult(value: unknown): string {
+  if (typeof value === "bigint") return value.toString();
+  if (typeof value === "boolean") return value.toString();
+  if (typeof value === "string") return value;
+  if (Array.isArray(value)) return JSON.stringify(value.map(formatResult));
+  return String(value);
+}
+
+function compareValues(actual: string, expected: string): boolean {
+  // Direct match
+  if (actual === expected) return true;
+  // Case-insensitive for addresses
+  if (actual.toLowerCase() === expected.toLowerCase()) return true;
+  // Handle DEPLOYER placeholder
+  if (expected === "DEPLOYER" && actual.toLowerCase() === DEPLOYER.toLowerCase())
+    return true;
+  return false;
+}
