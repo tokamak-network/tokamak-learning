@@ -16,8 +16,8 @@ export default function Header() {
         className={`flex items-center justify-between h-14 px-6 ${isProblemPage ? "" : "max-w-6xl mx-auto"}`}
       >
         <Link href="/" className="relative flex items-center group">
-          <Image src="/logo.png" alt="TokamakLearn logo" width={290} height={160} unoptimized className="absolute -left-2 h-[51px] w-auto transition-transform duration-200 group-hover:scale-105" />
-          <span className="pl-[65px] font-semibold text-[var(--color-foreground)] text-lg">TokamakLearn<span className="text-[var(--color-accent)]">[:run]</span></span>
+          <Image src="/logo.png" alt="TokamakLearn logo" width={290} height={160} unoptimized className="absolute -left-2 h-[36px] w-auto transition-transform duration-200 group-hover:scale-105" />
+          <span className="pl-[40px] font-semibold text-[var(--color-foreground)] text-lg">TokamakLearn<span className="text-[var(--color-accent)]">[:run]</span></span>
         </Link>
 
         <nav className="flex items-center gap-6">
