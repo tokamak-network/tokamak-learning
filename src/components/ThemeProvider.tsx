@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
+import { LazyMotion, domAnimation, MotionConfig } from "framer-motion";
 
 type Theme = "dark" | "light";
 
@@ -41,7 +42,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      {children}
+      <MotionConfig reducedMotion="user">
+        <LazyMotion features={domAnimation}>
+          {children}
+        </LazyMotion>
+      </MotionConfig>
     </ThemeContext.Provider>
   );
 }

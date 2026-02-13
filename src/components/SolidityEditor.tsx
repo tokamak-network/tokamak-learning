@@ -217,12 +217,10 @@ export default function SolidityEditor({ value, onChange, vimMode = false }: Sol
           }}
         />
       </div>
-      {vimMode && (
-        <div
-          ref={statusBarRef}
-          className="h-6 px-3 text-xs font-mono bg-[var(--color-surface)] border-t border-[var(--color-border)] text-[var(--color-muted)] flex items-center"
-        />
-      )}
+      <div
+        ref={statusBarRef}
+        className={`px-3 text-xs font-mono bg-[var(--color-surface)] border-t border-[var(--color-border)] text-[var(--color-muted)] flex items-center flex-shrink-0 transition-[height] duration-150 overflow-hidden ${vimMode ? "h-6" : "h-0 border-t-0"}`}
+      />
     </div>
   );
 }
