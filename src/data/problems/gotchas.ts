@@ -2,84 +2,136 @@ import type { Problem } from "../problems";
 
 export const gotchas_problems: Problem[] = [
   {
-    id: "no-float",
-    title: "No Decimals!",
+    id: "integer-division",
+    title: "Integer Division Truncates",
     category: "gotchas",
     order: 1,
     difficulty: "beginner",
-    description: `# No Decimals!
+    description: `# Integer Division Truncates
 
-Solidity has **no** floating point numbers (float/double). Integer division truncates the decimal part.
+## What you'll learn
+How division works differently in Solidity compared to most languages.
+
+Solidity has **no floating point numbers**. When you divide integers, the decimal part is simply thrown away (truncated, not rounded).
 
 \`\`\`solidity
-uint result = 5 / 2; // 2 (not 2.5!)
-uint scaled = (5 * 1e18) / 2; // 2500000000000000000 (preserves precision)
+7 / 2  // returns 3, not 3.5
+5 / 3  // returns 1, not 1.666...
 \`\`\`
 
 ## Task
-Complete both the regular division and scaled division functions.`,
+
+1. In \`divide\`, return \`a / b\`
+
+> Try calling divide(7, 2) — you'll get 3, not 3.5. The .5 is silently lost!`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-contract NoFloat {
-    function wrongDivide(uint a, uint b) public pure returns (uint) {
-        // TODO: Simply return a / b (decimals will be truncated)
-    }
-
-    function scaledDivide(uint a, uint b) public pure returns (uint) {
-        // TODO: Return (a * 1e18) / b to preserve precision
+contract IntegerDivision {
+    function divide(uint a, uint b) public pure returns (uint) {
+        // TODO: Return a / b (the decimal part will be truncated!)
     }
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-contract NoFloat {
-    function wrongDivide(uint a, uint b) public pure returns (uint) {
+contract IntegerDivision {
+    function divide(uint a, uint b) public pure returns (uint) {
         return a / b;
     }
-
-    function scaledDivide(uint a, uint b) public pure returns (uint) {
-        return (a * 1e18) / b;
-    }
 }`,
-    hints: ["Solidity integer division always rounds down.", "Multiplying by 1e18 before dividing preserves up to 18 decimal places of precision."],
-    testDescription: "Checks that wrongDivide(5,2) returns 2 and scaledDivide(5,2) returns 2.5*1e18.",
-    expectedFunctions: ["wrongDivide", "scaledDivide"],
+    hints: [
+      "Simply return a / b — Solidity automatically truncates the decimal.",
+      "7 / 2 gives 3, not 4. Solidity truncates (rounds down), never rounds up.",
+    ],
+    testDescription: "Checks that divide(7, 2) returns 3 and divide(5, 3) returns 1.",
+    expectedFunctions: ["divide"],
     testCases: [
-      { fn: "wrongDivide", args: ["5", "2"], expected: "2", message: "wrongDivide(5, 2) should return 2 (decimal truncated)" },
-      { fn: "scaledDivide", args: ["5", "2"], expected: "2500000000000000000", message: "scaledDivide(5, 2) should return 2.5e18" },
+      { fn: "divide", args: ["7", "2"], expected: "3", message: "divide(7, 2) should return 3 (not 3.5 — decimals are truncated)" },
+      { fn: "divide", args: ["5", "3"], expected: "1", message: "divide(5, 3) should return 1 (not 1.666...)" },
+    ],
+  },
+  {
+    id: "no-decimal-literal",
+    title: "Fix: No Decimal Numbers",
+    category: "gotchas",
+    order: 2,
+    difficulty: "beginner",
+    description: `# Fix: No Decimal Numbers
+
+## What you'll learn
+Why you cannot use decimal numbers like \`1.5\` in Solidity.
+
+Since Solidity has no floating point types, you **cannot assign decimal values** to integer variables. The code below tries to do exactly that.
+
+## Task
+
+1. **First, compile the code as-is** to see the error message
+2. Fix the error by changing the decimal value to a whole number (use \`2\`)
+
+> In real contracts, developers represent decimals by scaling up: 1.5 ETH is stored as 1500000000000000000 wei (1.5 * 10^18).`,
+    starterCode: `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+contract DecimalError {
+    // This code has an error. Try compiling first!
+    uint public ratio = 1.5;
+}`,
+    solution: `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+contract DecimalError {
+    uint public ratio = 2;
+}`,
+    hints: [
+      "Solidity integer types cannot hold decimal values like 1.5.",
+      "Replace 1.5 with a whole number, such as 2.",
+    ],
+    testDescription: "Checks that ratio() returns 2 after fixing the decimal literal.",
+    expectedFunctions: ["ratio"],
+    testCases: [
+      { fn: "ratio", expected: "2", message: "ratio() should return 2" },
     ],
   },
   {
     id: "default-values",
     title: "Default Values",
     category: "gotchas",
-    order: 2,
+    order: 3,
     difficulty: "beginner",
     description: `# Default Values
 
-Solidity variables are automatically assigned default values when declared. There is **no** null or undefined.
-- \`uint\` → 0, \`bool\` → false, \`address\` → address(0), \`string\` → ""
+## What you'll learn
+How Solidity initializes variables — there is no \`null\` or \`undefined\`.
 
-\`\`\`solidity
-uint x;     // 0
-bool b;     // false
-address a;  // 0x0000...0000
-\`\`\`
+In Solidity, every variable has a **default value** when declared without an initial value:
+
+| Type | Default |
+|------|---------|
+| uint | 0 |
+| bool | false |
+| address | 0x000...000 |
+| string | "" |
 
 ## Task
-Write a condition in isDefault that checks whether all variables are at their default values.`,
+
+1. In \`getDefaultUint\`, return \`num\` (declared but not initialized)
+2. In \`getDefaultBool\`, return \`flag\` (declared but not initialized)
+
+> Unlike JavaScript or Python, Solidity never has "undefined" — everything starts with a default value.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
 contract DefaultValues {
     uint public num;
     bool public flag;
-    address public addr;
-    string public text;
 
-    function isDefault() public view returns (bool) {
-        // TODO: Check that num == 0, flag == false, and addr == address(0), then return the result
+    function getDefaultUint() public view returns (uint) {
+        // TODO: Return num (it will be 0 by default)
+    }
+
+    function getDefaultBool() public view returns (bool) {
+        // TODO: Return flag (it will be false by default)
     }
 }`,
     solution: `// SPDX-License-Identifier: MIT
@@ -88,57 +140,248 @@ pragma solidity ^0.8.24;
 contract DefaultValues {
     uint public num;
     bool public flag;
-    address public addr;
-    string public text;
 
-    function isDefault() public view returns (bool) {
-        return num == 0 && !flag && addr == address(0);
+    function getDefaultUint() public view returns (uint) {
+        return num;
+    }
+
+    function getDefaultBool() public view returns (bool) {
+        return flag;
     }
 }`,
-    hints: ["The default value of bool (false) can be checked with !flag.", "The default value of address is address(0)."],
-    testDescription: "Checks that isDefault() returns true in the initial state.",
-    expectedFunctions: ["num", "flag", "addr", "text", "isDefault"],
+    hints: [
+      "Simply return the state variable — it already has a default value.",
+      "return num; will return 0, return flag; will return false.",
+    ],
+    testDescription: "Checks that uninitialized uint returns 0 and bool returns false.",
+    expectedFunctions: ["num", "flag", "getDefaultUint", "getDefaultBool"],
     testCases: [
-      { fn: "num", expected: "0", message: "Initial num() should be 0" },
-      { fn: "flag", expected: "false", message: "Initial flag() should be false" },
-      { fn: "isDefault", expected: "true", message: "isDefault() should return true in the initial state" },
+      { fn: "getDefaultUint", expected: "0", message: "getDefaultUint() should return 0 (default value of uint)" },
+      { fn: "getDefaultBool", expected: "false", message: "getDefaultBool() should return false (default value of bool)" },
+    ],
+  },
+  {
+    id: "delete-keyword",
+    title: "The delete Keyword",
+    category: "gotchas",
+    order: 4,
+    difficulty: "beginner",
+    description: `# The delete Keyword
+
+## What you'll learn
+What \`delete\` actually does in Solidity — it's not what you might expect!
+
+In most languages, \`delete\` removes something. In Solidity, \`delete\` **resets a variable to its default value**. It doesn't remove anything.
+
+\`\`\`solidity
+uint x = 42;
+delete x;    // x is now 0 (not removed!)
+\`\`\`
+
+## Task
+
+1. In \`resetCounter\`, use \`delete\` to reset \`counter\` to its default value (0)
+
+> After \`delete counter\`, the variable still exists — it just holds 0 again.`,
+    starterCode: `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+contract DeleteKeyword {
+    uint public counter = 100;
+
+    function resetCounter() public {
+        // TODO: Use delete to reset counter to its default value
+    }
+}`,
+    solution: `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+contract DeleteKeyword {
+    uint public counter = 100;
+
+    function resetCounter() public {
+        delete counter;
+    }
+}`,
+    hints: [
+      "The syntax is: delete variableName;",
+      "delete counter; resets counter to 0.",
+    ],
+    testDescription: "Checks that counter starts at 100 and becomes 0 after resetCounter().",
+    expectedFunctions: ["counter", "resetCounter"],
+    testCases: [
+      { fn: "counter", expected: "100", message: "Initial counter() should be 100" },
+      { fn: "counter", expected: "0", message: "After resetCounter(), counter() should be 0", setup: [{ fn: "resetCounter" }] },
+    ],
+  },
+  {
+    id: "ether-units",
+    title: "Ether Units",
+    category: "gotchas",
+    order: 5,
+    difficulty: "intermediate",
+    description: `# Ether Units
+
+## What you'll learn
+Built-in keywords for converting between ether, gwei, and wei.
+
+Solidity has built-in unit suffixes that convert to wei (the smallest unit):
+
+| Unit | Value in wei |
+|------|-------------|
+| 1 wei | 1 |
+| 1 gwei | 10^9 (1,000,000,000) |
+| 1 ether | 10^18 (1,000,000,000,000,000,000) |
+
+\`\`\`solidity
+uint oneEth = 1 ether;  // 1000000000000000000
+\`\`\`
+
+## Task
+
+1. In \`oneEtherInWei\`, return \`1 ether\`
+2. In \`oneGweiInWei\`, return \`1 gwei\`
+
+> All values in Solidity are stored in wei. These keywords are just convenient multipliers.`,
+    starterCode: `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+contract EtherUnits {
+    function oneEtherInWei() public pure returns (uint) {
+        // TODO: Return 1 ether
+    }
+
+    function oneGweiInWei() public pure returns (uint) {
+        // TODO: Return 1 gwei
+    }
+}`,
+    solution: `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+contract EtherUnits {
+    function oneEtherInWei() public pure returns (uint) {
+        return 1 ether;
+    }
+
+    function oneGweiInWei() public pure returns (uint) {
+        return 1 gwei;
+    }
+}`,
+    hints: [
+      "Just write the number followed by the unit: return 1 ether;",
+      "The unit keyword automatically converts to wei.",
+    ],
+    testDescription: "Checks that oneEtherInWei() returns 10^18 and oneGweiInWei() returns 10^9.",
+    expectedFunctions: ["oneEtherInWei", "oneGweiInWei"],
+    testCases: [
+      { fn: "oneEtherInWei", expected: "1000000000000000000", message: "oneEtherInWei() should return 10^18" },
+      { fn: "oneGweiInWei", expected: "1000000000", message: "oneGweiInWei() should return 10^9" },
+    ],
+  },
+  {
+    id: "time-units",
+    title: "Time Units",
+    category: "gotchas",
+    order: 6,
+    difficulty: "intermediate",
+    description: `# Time Units
+
+## What you'll learn
+Built-in keywords for working with time durations.
+
+Just like ether units, Solidity has time units that convert to seconds:
+
+| Unit | Value in seconds |
+|------|-----------------|
+| 1 seconds | 1 |
+| 1 minutes | 60 |
+| 1 hours | 3,600 |
+| 1 days | 86,400 |
+| 1 weeks | 604,800 |
+
+## Task
+
+1. In \`oneDayInSeconds\`, return \`1 days\`
+2. In \`oneWeekInSeconds\`, return \`1 weeks\`
+
+> These are useful for setting deadlines, lock periods, and time-based conditions.`,
+    starterCode: `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+contract TimeUnits {
+    function oneDayInSeconds() public pure returns (uint) {
+        // TODO: Return 1 days
+    }
+
+    function oneWeekInSeconds() public pure returns (uint) {
+        // TODO: Return 1 weeks
+    }
+}`,
+    solution: `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+contract TimeUnits {
+    function oneDayInSeconds() public pure returns (uint) {
+        return 1 days;
+    }
+
+    function oneWeekInSeconds() public pure returns (uint) {
+        return 1 weeks;
+    }
+}`,
+    hints: [
+      "Just write the number followed by the unit: return 1 days;",
+      "1 days = 86400 seconds, 1 weeks = 604800 seconds.",
+    ],
+    testDescription: "Checks that oneDayInSeconds() returns 86400 and oneWeekInSeconds() returns 604800.",
+    expectedFunctions: ["oneDayInSeconds", "oneWeekInSeconds"],
+    testCases: [
+      { fn: "oneDayInSeconds", expected: "86400", message: "oneDayInSeconds() should return 86400" },
+      { fn: "oneWeekInSeconds", expected: "604800", message: "oneWeekInSeconds() should return 604800" },
     ],
   },
   {
     id: "string-comparison",
-    title: "String Comparison",
+    title: "String Comparison Gotcha",
     category: "gotchas",
-    order: 3,
-    difficulty: "beginner",
-    description: `# String Comparison
+    order: 7,
+    difficulty: "intermediate",
+    description: `# String Comparison Gotcha
 
-In Solidity, strings **cannot** be compared directly with \`==\`. You must compare their \`keccak256\` hashes.
+## What you'll learn
+Why you cannot compare strings with \`==\` in Solidity.
+
+In most languages, \`"hello" == "hello"\` works. In Solidity, strings **cannot be compared directly** with \`==\`. You must compare their hashes using \`keccak256\`:
 
 \`\`\`solidity
-// Wrong: "hello" == "hello" (compile error!)
-// Correct:
 keccak256(abi.encodePacked("hello")) == keccak256(abi.encodePacked("hello"))
 \`\`\`
 
 ## Task
-Complete the isEqual function that compares two strings using keccak256 hashes.`,
+
+1. In \`isEqual\`, compare \`a\` and \`b\` using their \`keccak256\` hashes
+
+> \`abi.encodePacked()\` converts the string to bytes, and \`keccak256()\` hashes them for comparison.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-contract StringComparison {
+contract StringCompare {
     function isEqual(string memory a, string memory b) public pure returns (bool) {
-        // TODO: Compare a and b using keccak256 and abi.encodePacked
+        // TODO: Compare a and b using keccak256(abi.encodePacked(...))
     }
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-contract StringComparison {
+contract StringCompare {
     function isEqual(string memory a, string memory b) public pure returns (bool) {
         return keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b));
     }
 }`,
-    hints: ["keccak256() takes bytes and returns a bytes32 hash.", "Use abi.encodePacked(str) to convert a string to bytes."],
+    hints: [
+      "Hash each string: keccak256(abi.encodePacked(a))",
+      "Compare the two hashes with ==.",
+    ],
     testDescription: "Checks that isEqual returns true for identical strings and false for different ones.",
     expectedFunctions: ["isEqual"],
     testCases: [
@@ -147,261 +390,57 @@ contract StringComparison {
     ],
   },
   {
-    id: "string-concat",
-    title: "String Concatenation",
-    category: "gotchas",
-    order: 4,
-    difficulty: "beginner",
-    description: `# String Concatenation
-
-Since Solidity 0.8.12, you can concatenate strings with \`string.concat()\`.
-
-\`\`\`solidity
-string memory result = string.concat("Hello", " ", "World");
-// result = "Hello World"
-\`\`\`
-
-## Task
-Complete the concat function that joins two strings using string.concat.`,
-    starterCode: `// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
-
-contract StringConcat {
-    function concat(string memory a, string memory b) public pure returns (string memory) {
-        // TODO: Use string.concat to join a and b, then return the result
-    }
-}`,
-    solution: `// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
-
-contract StringConcat {
-    function concat(string memory a, string memory b) public pure returns (string memory) {
-        return string.concat(a, b);
-    }
-}`,
-    hints: ["Use string.concat(a, b) format.", "You can also concatenate multiple strings at once: string.concat(a, b, c)"],
-    testDescription: "Checks that the concat function correctly joins two strings.",
-    expectedFunctions: ["concat"],
-    testCases: [
-      { fn: "concat", args: ["Hello", " World"], expected: "Hello World", message: "concat('Hello', ' World') should return 'Hello World'" },
-      { fn: "concat", args: ["a", "b"], expected: "ab", message: "concat('a', 'b') should return 'ab'" },
-    ],
-  },
-  {
-    id: "address-vs-payable-diff",
-    title: "address vs address payable",
-    category: "gotchas",
-    order: 5,
-    difficulty: "beginner",
-    description: `# address vs address payable
-
-\`address\` cannot send ETH. Only \`address payable\` can use \`.transfer()\` and \`.send()\`.
-
-\`\`\`solidity
-address payable to = payable(0x123...);
-to.transfer(1 ether); // send ETH
-address payable converted = payable(someAddress);
-\`\`\`
-
-## Task
-Complete the sendETH and makePayable functions.`,
-    starterCode: `// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
-
-contract AddressPayableDiff {
-    receive() external payable {}
-
-    function sendETH(address payable to, uint amount) public {
-        // TODO: Send amount of ETH to the address using transfer
-    }
-
-    function makePayable(address addr) public pure returns (address payable) {
-        // TODO: Convert addr to address payable and return it
-    }
-}`,
-    solution: `// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
-
-contract AddressPayableDiff {
-    receive() external payable {}
-
-    function sendETH(address payable to, uint amount) public {
-        to.transfer(amount);
-    }
-
-    function makePayable(address addr) public pure returns (address payable) {
-        return payable(addr);
-    }
-}`,
-    hints: ["Call .transfer(amount) on an address payable variable to send ETH.", "Use payable(addr) to convert a regular address to address payable."],
-    testDescription: "Checks that sendETH transfers ETH and makePayable correctly converts the address.",
-    expectedFunctions: ["sendETH", "makePayable"],
-    testCases: [
-      { fn: "makePayable", args: ["0x1000000000000000000000000000000000000001"], message: "makePayable() should return successfully" },
-    ],
-  },
-  {
-    id: "ether-units",
-    title: "Ether Units",
-    category: "gotchas",
-    order: 6,
-    difficulty: "beginner",
-    description: `# Ether Units
-
-Solidity has built-in ether units:
-- \`1 ether\` = 10^18 wei
-- \`1 gwei\` = 10^9 wei
-- \`1 wei\` = 1
-
-\`\`\`solidity
-uint oneEth = 1 ether;  // 1000000000000000000
-uint oneG = 1 gwei;     // 1000000000
-\`\`\`
-
-## Task
-Complete the three functions that return each unit.`,
-    starterCode: `// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
-
-contract EtherUnits {
-    function oneEther() public pure returns (uint) {
-        // TODO: Return 1 ether
-    }
-
-    function oneGwei() public pure returns (uint) {
-        // TODO: Return 1 gwei
-    }
-
-    function tenWei() public pure returns (uint) {
-        // TODO: Return 10 wei
-    }
-}`,
-    solution: `// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
-
-contract EtherUnits {
-    function oneEther() public pure returns (uint) {
-        return 1 ether;
-    }
-
-    function oneGwei() public pure returns (uint) {
-        return 1 gwei;
-    }
-
-    function tenWei() public pure returns (uint) {
-        return 10 wei;
-    }
-}`,
-    hints: ["Appending ether, gwei, or wei after a number automatically converts it.", "1 ether = 1e18, 1 gwei = 1e9."],
-    testDescription: "Checks that oneEther, oneGwei, and tenWei return the correct wei values.",
-    expectedFunctions: ["oneEther", "oneGwei", "tenWei"],
-    testCases: [
-      { fn: "oneEther", expected: "1000000000000000000", message: "oneEther() should return 10^18" },
-      { fn: "oneGwei", expected: "1000000000", message: "oneGwei() should return 10^9" },
-      { fn: "tenWei", expected: "10", message: "tenWei() should return 10" },
-    ],
-  },
-  {
-    id: "time-units",
-    title: "Time Units",
-    category: "gotchas",
-    order: 7,
-    difficulty: "beginner",
-    description: `# Time Units
-
-Solidity has built-in time units:
-- \`1 seconds\`, \`1 minutes\` (60), \`1 hours\` (3600), \`1 days\` (86400), \`1 weeks\` (604800)
-
-\`\`\`solidity
-uint oneDay = 1 days;   // 86400
-uint deadline = block.timestamp + 7 days;
-\`\`\`
-
-## Task
-Complete the three functions that use time units.`,
-    starterCode: `// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
-
-contract TimeUnits {
-    function oneDay() public pure returns (uint) {
-        // TODO: Return 1 days
-    }
-
-    function oneWeek() public pure returns (uint) {
-        // TODO: Return 1 weeks
-    }
-
-    function futureTimestamp(uint daysFromNow) public view returns (uint) {
-        // TODO: Return the timestamp daysFromNow days from the current timestamp
-    }
-}`,
-    solution: `// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
-
-contract TimeUnits {
-    function oneDay() public pure returns (uint) {
-        return 1 days;
-    }
-
-    function oneWeek() public pure returns (uint) {
-        return 1 weeks;
-    }
-
-    function futureTimestamp(uint daysFromNow) public view returns (uint) {
-        return block.timestamp + daysFromNow * 1 days;
-    }
-}`,
-    hints: ["Appending days, weeks, etc. after a number automatically converts to seconds.", "Use block.timestamp + n * 1 days to calculate a future timestamp."],
-    testDescription: "Checks that oneDay, oneWeek, and futureTimestamp return the correct time values.",
-    expectedFunctions: ["oneDay", "oneWeek", "futureTimestamp"],
-    testCases: [
-      { fn: "oneDay", expected: "86400", message: "oneDay() should return 86400" },
-      { fn: "oneWeek", expected: "604800", message: "oneWeek() should return 604800" },
-      { fn: "futureTimestamp", args: ["1"], message: "futureTimestamp(1) should return successfully" },
-    ],
-  },
-  {
-    id: "type-casting-danger",
-    title: "Downcasting Caution",
+    id: "safe-downcast",
+    title: "Safe Downcasting",
     category: "gotchas",
     order: 8,
-    difficulty: "beginner",
-    description: `# Downcasting Caution
+    difficulty: "intermediate",
+    description: `# Safe Downcasting
 
-When converting \`uint256\` to \`uint8\`, if the value exceeds 255, Solidity 0.8+ will revert. Use \`require\` to check for safe casting.
+## What you'll learn
+How to safely convert a larger integer type to a smaller one.
+
+Converting \`uint256\` to \`uint8\` can lose data if the value is too large. In Solidity 0.8+, this automatically reverts, but it's good practice to check explicitly with \`require\`.
 
 \`\`\`solidity
-require(x <= type(uint8).max, "Overflow");
+require(x <= type(uint8).max, "Value too large");
 return uint8(x);
 \`\`\`
 
 ## Task
-Complete the safeCast function that checks for overflow with require before casting.`,
+
+1. In \`toUint8\`, first check that \`x\` fits in uint8 using \`require\`
+2. Then cast and return \`uint8(x)\`
+
+> \`type(uint8).max\` is 255. Values above 255 cannot fit in a uint8.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-contract TypeCastingDanger {
-    function safeCast(uint256 x) public pure returns (uint8) {
-        // TODO: Use require to check that x is within uint8 max value
-        // then convert to uint8 and return
+contract SafeDowncast {
+    function toUint8(uint256 x) public pure returns (uint8) {
+        // TODO: Use require to check x <= type(uint8).max with message "Value too large"
+        // TODO: Return uint8(x)
     }
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-contract TypeCastingDanger {
-    function safeCast(uint256 x) public pure returns (uint8) {
-        require(x <= type(uint8).max, "Overflow");
+contract SafeDowncast {
+    function toUint8(uint256 x) public pure returns (uint8) {
+        require(x <= type(uint8).max, "Value too large");
         return uint8(x);
     }
 }`,
-    hints: ["type(uint8).max is the maximum value of uint8, which is 255.", "require(condition, errorMessage) reverts the transaction if the condition is false."],
-    testDescription: "Checks that safeCast converts values <= 255 and reverts for values > 255.",
-    expectedFunctions: ["safeCast"],
+    hints: [
+      "require(condition, message) reverts if the condition is false.",
+      "type(uint8).max returns 255 — the maximum value for uint8.",
+    ],
+    testDescription: "Checks that toUint8(100) returns 100 and toUint8(256) reverts.",
+    expectedFunctions: ["toUint8"],
     testCases: [
-      { fn: "safeCast", args: ["100"], expected: "100", message: "safeCast(100) should return 100" },
-      { fn: "safeCast", args: ["255"], expected: "255", message: "safeCast(255) should return 255" },
-      { fn: "safeCast", args: ["256"], expectRevert: true, message: "safeCast(256) should revert" },
+      { fn: "toUint8", args: ["100"], expected: "100", message: "toUint8(100) should return 100" },
+      { fn: "toUint8", args: ["255"], expected: "255", message: "toUint8(255) should return 255" },
+      { fn: "toUint8", args: ["256"], expectRevert: true, message: "toUint8(256) should revert (value too large for uint8)" },
     ],
   },
 ];
