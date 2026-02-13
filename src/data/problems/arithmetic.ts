@@ -328,8 +328,8 @@ contract CompoundAssign {
     ],
   },
   {
-    id: "integer-division",
-    title: "Integer Division Pitfalls",
+    id: "multiply-before-divide",
+    title: "Multiply Before Divide",
     category: "arithmetic",
     order: 8,
     difficulty: "beginner",

@@ -91,7 +91,11 @@ export default function DailyClient() {
         answers: current?.answers ?? answers,
         ...overrides,
       };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      } catch {
+        // ignore - private browsing or storage disabled
+      }
     },
     [challengeSet, score, currentIndex, answers]
   );

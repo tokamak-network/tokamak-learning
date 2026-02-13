@@ -161,8 +161,8 @@ contract DefaultValues {
     ],
   },
   {
-    id: "delete-keyword",
-    title: "The delete Keyword",
+    id: "delete-resets-value",
+    title: "delete Resets, Not Removes",
     category: "gotchas",
     order: 4,
     difficulty: "beginner",

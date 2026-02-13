@@ -16,9 +16,36 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TokamakLearn[:run] - Interactive Solidity Coding Platform",
+  title: {
+    default: "TokamakLearn[:run] - Interactive Solidity Coding Platform",
+    template: "%s | TokamakLearn",
+  },
   description:
     "An interactive Solidity smart contract learning platform by Tokamak Network. Master Solidity through hands-on, step-by-step exercises.",
+  keywords: [
+    "Solidity",
+    "Smart Contracts",
+    "Ethereum",
+    "Blockchain",
+    "Web3",
+    "Tokamak Network",
+    "Learn Solidity",
+  ],
+  authors: [{ name: "Tokamak Network" }],
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    siteName: "TokamakLearn",
+    title: "TokamakLearn[:run] - Interactive Solidity Coding Platform",
+    description:
+      "Master Solidity through hands-on, step-by-step exercises. 80+ problems from basics to advanced patterns.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "TokamakLearn[:run]",
+    description:
+      "Master Solidity through hands-on, step-by-step exercises.",
+  },
 };
 
 export default function RootLayout({

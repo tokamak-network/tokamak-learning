@@ -71,7 +71,7 @@ const challengeSets: ChallengeSet[] = [
         answer: "transfer",
         distractors: ["send", "call", "delegatecall"],
         explanation:
-          "transfer() sends Ether and automatically reverts on failure. It's the simplest way to send ETH to an address.",
+          "transfer() sends Ether and automatically reverts on failure. Note: modern Solidity often prefers call{value: ...}('') for flexibility, but transfer() matches this code pattern.",
       },
       // Concept questions (5)
       {
@@ -91,7 +91,7 @@ const challengeSets: ChallengeSet[] = [
         type: "concept",
         id: "s1-q2",
         question:
-          "Which keyword makes a Solidity function unable to modify state?",
+          "Which keyword allows a Solidity function to read state but NOT modify it?",
         answer: "view",
         distractors: ["pure", "constant", "static"],
         explanation:
@@ -293,7 +293,7 @@ const challengeSets: ChallengeSet[] = [
         answer: "Closed",
         distractors: ["Ended", "Done", "Stopped"],
         explanation:
-          "While any name works syntactically, Pending/Active/Closed is a common enum pattern for lifecycle states in smart contracts.",
+          "Pending/Active/Closed is a widely used enum pattern for lifecycle states in smart contracts (e.g., OpenZeppelin Governor). Any valid identifier works, but this is the conventional choice.",
       },
       {
         type: "concept",

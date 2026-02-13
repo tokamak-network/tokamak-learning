@@ -112,6 +112,9 @@ export default function ProblemClient({ problem }: { problem: ClientProblem }) {
     setResults(null);
     setActiveTab("results");
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30_000);
+
     try {
       const res = await fetch("/api/compile", {
         method: "POST",
@@ -124,12 +127,24 @@ export default function ProblemClient({ problem }: { problem: ClientProblem }) {
           constructorArgs: problem.constructorArgs,
           expectedContractName: problem.expectedContractName,
         }),
+        signal: controller.signal,
       });
+
+      if (res.status === 429) {
+        setResults([{ passed: false, message: "Too many requests. Please wait a moment and try again." }]);
+        return;
+      }
+
       const data = await res.json();
       setResults(data.results);
-    } catch {
-      setResults([{ passed: false, message: "A server error occurred" }]);
+    } catch (err) {
+      if (err instanceof Error && err.name === "AbortError") {
+        setResults([{ passed: false, message: "Request timed out. The server might be busy — please try again." }]);
+      } else {
+        setResults([{ passed: false, message: "Network error. Please check your connection and try again." }]);
+      }
     } finally {
+      clearTimeout(timeoutId);
       setIsCompiling(false);
     }
   }, [code, problem]);
@@ -182,7 +197,7 @@ export default function ProblemClient({ problem }: { problem: ClientProblem }) {
   }, [handleCompile, fetchSolutionData]);
 
   return (
-    <div className="h-[calc(100vh-56px)] flex flex-col lg:flex-row">
+    <div className="h-[calc(100dvh-56px)] flex flex-col lg:flex-row">
       {/* Mobile panel toggle */}
       <div className="flex lg:hidden border-b border-[var(--color-border)] bg-[var(--color-surface)]">
         <button

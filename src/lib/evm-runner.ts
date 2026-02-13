@@ -24,42 +24,54 @@ export async function runTests(
 ): Promise<TestResult[]> {
   const results: TestResult[] = [];
 
-  // Create VM
-  const common = new Common({ chain: Mainnet, hardfork: Hardfork.Osaka });
-  const vm = await createVM({ common });
-
-  // Fund deployer
+  let vm;
+  let iface: ethers.Interface;
+  let contractAddr;
   const deployerAddr = createAddressFromString(DEPLOYER);
-  await vm.stateManager.putAccount(
-    deployerAddr,
-    createAccount({ balance: BigInt(10) * BigInt(10) ** BigInt(18) })
-  );
 
-  // Build deploy data
-  const iface = new ethers.Interface(abi);
-  let deployHex = "0x" + bytecode;
-  if (constructorArgs && constructorArgs.length > 0) {
-    const encodedArgs = iface.encodeDeploy(constructorArgs);
-    deployHex += encodedArgs.slice(2);
-  }
+  try {
+    // Create VM
+    const common = new Common({ chain: Mainnet, hardfork: Hardfork.Osaka });
+    vm = await createVM({ common });
 
-  // Deploy
-  const deployResult = await vm.evm.runCall({
-    caller: deployerAddr,
-    data: hexToBytes(deployHex as `0x${string}`),
-    gasLimit: BigInt(5_000_000),
-    value: BigInt(0),
-  });
+    // Fund deployer
+    await vm.stateManager.putAccount(
+      deployerAddr,
+      createAccount({ balance: BigInt(10) * BigInt(10) ** BigInt(18) })
+    );
 
-  if (deployResult.execResult.exceptionError || !deployResult.createdAddress) {
+    // Build deploy data
+    iface = new ethers.Interface(abi);
+    let deployHex = "0x" + bytecode;
+    if (constructorArgs && constructorArgs.length > 0) {
+      const encodedArgs = iface.encodeDeploy(constructorArgs);
+      deployHex += encodedArgs.slice(2);
+    }
+
+    // Deploy
+    const deployResult = await vm.evm.runCall({
+      caller: deployerAddr,
+      data: hexToBytes(deployHex as `0x${string}`),
+      gasLimit: BigInt(5_000_000),
+      value: BigInt(0),
+    });
+
+    if (deployResult.execResult.exceptionError || !deployResult.createdAddress) {
+      results.push({
+        passed: false,
+        message: `Contract deployment failed: ${deployResult.execResult.exceptionError?.error || "Address creation failed"}`,
+      });
+      return results;
+    }
+
+    contractAddr = deployResult.createdAddress;
+  } catch (err) {
     results.push({
       passed: false,
-      message: `Contract deployment failed: ${deployResult.execResult.exceptionError?.error || "Address creation failed"}`,
+      message: `Test setup failed: ${err instanceof Error ? err.message : String(err)}`,
     });
     return results;
   }
-
-  const contractAddr = deployResult.createdAddress;
 
   // Run each test case
   for (const tc of testCases) {

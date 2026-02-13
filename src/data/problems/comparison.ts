@@ -262,12 +262,14 @@ The difference between \`=\` (assignment) and \`==\` (comparison).
 
 The code below uses \`=\` inside an \`if\` condition. In Solidity, \`=\` is for assignment — it sets a value. \`==\` is for comparison — it checks equality.
 
+Unlike languages like C or JavaScript, Solidity **catches this mistake at compile time** because \`if\` requires a \`bool\`, but \`=\` returns the assigned value (a \`uint\`).
+
 ## Task
 
 1. **First, compile the code as-is** to see the error message
 2. Fix the error by changing \`=\` to \`==\`
 
-> This is one of the most common mistakes in programming: using \`=\` when you mean \`==\`.`,
+> This is one of the most common mistakes in programming: using \`=\` when you mean \`==\`. Solidity's type system catches it for you!`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 

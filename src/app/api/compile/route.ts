@@ -7,6 +7,17 @@ import type { TestCase } from "@/data/problems";
 const rateMap = new Map<string, { count: number; resetAt: number }>();
 const RATE_LIMIT = 10;
 const RATE_WINDOW = 60_000;
+const MAX_SOURCE_SIZE = 50_000; // 50KB max
+
+function getClientIP(req: NextRequest): string {
+  const realIP = req.headers.get("x-real-ip");
+  if (realIP) return realIP.trim();
+
+  const forwarded = req.headers.get("x-forwarded-for");
+  if (forwarded) return forwarded.split(",")[0].trim();
+
+  return "unknown";
+}
 
 function isRateLimited(ip: string): boolean {
   const now = Date.now();
@@ -30,7 +41,7 @@ interface CompileRequest {
 
 export async function POST(req: NextRequest) {
   try {
-    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    const ip = getClientIP(req);
     if (isRateLimited(ip)) {
       return NextResponse.json(
         { results: [{ passed: false, message: "Too many requests. Please wait a moment." }] },
@@ -45,6 +56,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { results: [{ passed: false, message: "Code is empty" }] },
         { status: 400 }
+      );
+    }
+
+    if (source.length > MAX_SOURCE_SIZE) {
+      return NextResponse.json(
+        { results: [{ passed: false, message: `Code too large (max ${MAX_SOURCE_SIZE} characters)` }] },
+        { status: 413 }
       );
     }
 
