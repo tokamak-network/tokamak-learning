@@ -312,7 +312,7 @@ export default function Home() {
             rel="noopener noreferrer"
             className="text-[var(--color-muted)] hover:text-[var(--color-accent)] transition-colors flex items-center gap-1.5"
           >
-            <Image src="/tokamak-icon.png" alt="Tokamak Network" width={44} height={44} className="w-[44px] h-auto" />
+            <Image src="/tokamak-icon.png" alt="Tokamak Network" width={20} height={20} className="w-5 h-5" />
             <span className="hidden md:inline text-sm">Tokamak Network</span>
           </a>
         </div>
