@@ -93,7 +93,7 @@ function CategoriesSection() {
                     {catProblems.length}문제
                   </span>
                 </div>
-                <h3 className="font-semibold text-white group-hover:text-[var(--color-accent)] transition-colors mb-2">
+                <h3 className="font-semibold text-[var(--color-foreground)] group-hover:text-[var(--color-accent)] transition-colors mb-2">
                   {cat.title}
                 </h3>
                 <p className="text-sm text-[var(--color-muted)]">
@@ -162,7 +162,7 @@ export default function Home() {
               </Link>
               <Link
                 href="/problems/hello-solidity"
-                className="border border-[var(--color-border)] hover:border-[var(--color-muted)] text-white px-6 py-3 rounded-lg font-medium transition-all hover:scale-[1.02] hover:shadow-lg"
+                className="border border-[var(--color-border)] hover:border-[var(--color-muted)] text-[var(--color-foreground)] px-6 py-3 rounded-lg font-medium transition-all hover:scale-[1.02] hover:shadow-lg"
               >
                 첫 번째 문제 풀기
               </Link>
@@ -175,7 +175,7 @@ export default function Home() {
       <section className="border-y border-[var(--color-border)] bg-[var(--color-surface)]">
         <div className="max-w-6xl mx-auto px-6 py-12 grid grid-cols-3 gap-8 text-center">
           <div>
-            <div className="text-3xl font-bold text-white tabular-nums">
+            <div className="text-3xl font-bold text-[var(--color-foreground)] tabular-nums">
               <CountUp target={totalProblems} />
             </div>
             <div className="text-sm text-[var(--color-muted)] mt-1">
@@ -183,7 +183,7 @@ export default function Home() {
             </div>
           </div>
           <div className="border-x border-[var(--color-border)]">
-            <div className="text-3xl font-bold text-white tabular-nums">
+            <div className="text-3xl font-bold text-[var(--color-foreground)] tabular-nums">
               <CountUp target={totalCategories} />
             </div>
             <div className="text-sm text-[var(--color-muted)] mt-1">
@@ -191,7 +191,7 @@ export default function Home() {
             </div>
           </div>
           <div>
-            <div className="text-3xl font-bold text-white tabular-nums">
+            <div className="text-3xl font-bold text-[var(--color-foreground)] tabular-nums">
               <CountUp target={100} suffix="%" />
             </div>
             <div className="text-sm text-[var(--color-muted)] mt-1">
@@ -215,7 +215,7 @@ export default function Home() {
               href="https://tokamak.network"
               target="_blank"
               rel="noopener noreferrer"
-              className="relative text-sm text-[var(--color-muted)] hover:text-white transition-colors after:absolute after:left-0 after:bottom-0 after:h-px after:w-0 after:bg-white after:transition-all hover:after:w-full"
+              className="relative text-sm text-[var(--color-muted)] hover:text-[var(--color-foreground)] transition-colors after:absolute after:left-0 after:bottom-0 after:h-px after:w-0 after:bg-[var(--color-foreground)] after:transition-all hover:after:w-full"
             >
               Tokamak Network
             </a>

@@ -158,8 +158,8 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
             onClick={() => setActiveTab("description")}
             className={`relative px-4 py-2.5 text-sm font-medium transition-colors ${
               activeTab === "description"
-                ? "text-white"
-                : "text-[var(--color-muted)] hover:text-white"
+                ? "text-[var(--color-foreground)]"
+                : "text-[var(--color-muted)] hover:text-[var(--color-foreground)]"
             }`}
           >
             설명
@@ -175,8 +175,8 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
             onClick={() => setActiveTab("results")}
             className={`relative px-4 py-2.5 text-sm font-medium transition-colors flex items-center gap-2 ${
               activeTab === "results"
-                ? "text-white"
-                : "text-[var(--color-muted)] hover:text-white"
+                ? "text-[var(--color-foreground)]"
+                : "text-[var(--color-muted)] hover:text-[var(--color-foreground)]"
             }`}
           >
             결과
@@ -211,12 +211,12 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
                 <div className="flex items-center gap-2 mb-4 text-xs text-[var(--color-muted)]">
                   <Link
                     href="/language/solidity"
-                    className="hover:text-white transition-colors"
+                    className="hover:text-[var(--color-foreground)] transition-colors"
                   >
                     Solidity
                   </Link>
                   <span>/</span>
-                  <span className="text-white">{problem.title}</span>
+                  <span className="text-[var(--color-foreground)]">{problem.title}</span>
                 </div>
 
                 <Markdown content={problem.description} />
@@ -285,7 +285,7 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
                               setCode(problem.solution);
                               setShowSolution(false);
                             }}
-                            className="mt-2 text-xs text-[var(--color-muted)] hover:text-white transition-colors"
+                            className="mt-2 text-xs text-[var(--color-muted)] hover:text-[var(--color-foreground)] transition-colors"
                           >
                             정답 코드 적용하기
                           </button>
@@ -421,7 +421,7 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
           {prevProblem ? (
             <Link
               href={`/problems/${prevProblem.id}`}
-              className="text-sm text-[var(--color-muted)] hover:text-white transition-colors flex items-center gap-1"
+              className="text-sm text-[var(--color-muted)] hover:text-[var(--color-foreground)] transition-colors flex items-center gap-1"
             >
               <svg
                 className="w-4 h-4"
@@ -444,7 +444,7 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
           {nextProblem ? (
             <Link
               href={`/problems/${nextProblem.id}`}
-              className="text-sm text-[var(--color-muted)] hover:text-white transition-colors flex items-center gap-1"
+              className="text-sm text-[var(--color-muted)] hover:text-[var(--color-foreground)] transition-colors flex items-center gap-1"
             >
               다음
               <svg
@@ -480,7 +480,7 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
               className={`text-xs px-2 py-1 rounded-md border transition-all duration-200 ${
                 vimMode
                   ? "text-[var(--color-accent)] border-[var(--color-accent)] bg-blue-500/10"
-                  : "text-[var(--color-muted)] border-[var(--color-border)] hover:text-white hover:border-[var(--color-muted)]"
+                  : "text-[var(--color-muted)] border-[var(--color-border)] hover:text-[var(--color-foreground)] hover:border-[var(--color-muted)]"
               }`}
             >
               VIM
@@ -493,7 +493,7 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
             </span>
             <button
               onClick={handleReset}
-              className="text-xs px-3 py-1.5 text-[var(--color-muted)] hover:text-white border border-[var(--color-border)] hover:border-[var(--color-muted)] rounded-md hover:scale-[1.02] transition-all duration-200"
+              className="text-xs px-3 py-1.5 text-[var(--color-muted)] hover:text-[var(--color-foreground)] border border-[var(--color-border)] hover:border-[var(--color-muted)] rounded-md hover:scale-[1.02] transition-all duration-200"
             >
               초기화
             </button>

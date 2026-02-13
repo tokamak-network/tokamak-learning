@@ -3,6 +3,7 @@
 import { useRef, useCallback, useEffect } from "react";
 import Editor, { OnMount } from "@monaco-editor/react";
 import type { editor } from "monaco-editor";
+import { useTheme } from "@/components/ThemeProvider";
 
 interface SolidityEditorProps {
   value: string;
@@ -14,6 +15,7 @@ export default function SolidityEditor({ value, onChange, vimMode = false }: Sol
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const vimModeRef = useRef<{ dispose: () => void } | null>(null);
   const statusBarRef = useRef<HTMLDivElement | null>(null);
+  const { theme } = useTheme();
 
   const handleMount: OnMount = useCallback((editor, monaco) => {
     editorRef.current = editor;
@@ -119,9 +121,44 @@ export default function SolidityEditor({ value, onChange, vimMode = false }: Sol
       },
     });
 
-    monaco.editor.setTheme("solidity-dark");
+    // Light theme — warm gray
+    monaco.editor.defineTheme("solidity-light", {
+      base: "vs",
+      inherit: true,
+      rules: [
+        { token: "keyword", foreground: "0000ff", fontStyle: "bold" },
+        { token: "type", foreground: "267f99" },
+        { token: "comment", foreground: "6a9955" },
+        { token: "string", foreground: "a31515" },
+        { token: "number", foreground: "098658" },
+        { token: "number.hex", foreground: "098658" },
+        { token: "operator", foreground: "383838" },
+        { token: "identifier", foreground: "001080" },
+      ],
+      colors: {
+        "editor.background": "#f5f3f0",
+        "editor.foreground": "#1a1a1a",
+        "editorLineNumber.foreground": "#a8a29e",
+        "editorLineNumber.activeForeground": "#1a1a1a",
+        "editor.selectionBackground": "#b4d7ff",
+        "editor.lineHighlightBackground": "#eae8e4",
+        "editorCursor.foreground": "#2563eb",
+        "editorWidget.background": "#eae8e4",
+      },
+    });
+
+    const currentTheme = document.documentElement.getAttribute("data-theme");
+    monaco.editor.setTheme(currentTheme === "light" ? "solidity-light" : "solidity-dark");
     editor.focus();
   }, []);
+
+  // Switch Monaco theme when app theme changes
+  useEffect(() => {
+    if (!editorRef.current) return;
+    import("monaco-editor").then((monaco) => {
+      monaco.editor.setTheme(theme === "light" ? "solidity-light" : "solidity-dark");
+    });
+  }, [theme]);
 
   // VIM mode toggle
   useEffect(() => {
@@ -158,7 +195,7 @@ export default function SolidityEditor({ value, onChange, vimMode = false }: Sol
         <Editor
           height="100%"
           language="sol"
-          theme="solidity-dark"
+          theme={theme === "light" ? "solidity-light" : "solidity-dark"}
           value={value}
           onChange={(v) => onChange(v || "")}
           onMount={handleMount}
@@ -183,7 +220,7 @@ export default function SolidityEditor({ value, onChange, vimMode = false }: Sol
       {vimMode && (
         <div
           ref={statusBarRef}
-          className="h-6 px-3 text-xs font-mono bg-[#161b22] border-t border-[var(--color-border)] text-[var(--color-muted)] flex items-center"
+          className="h-6 px-3 text-xs font-mono bg-[var(--color-surface)] border-t border-[var(--color-border)] text-[var(--color-muted)] flex items-center"
         />
       )}
     </div>

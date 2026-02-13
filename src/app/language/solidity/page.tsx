@@ -87,7 +87,7 @@ function CategorySection({ cat, completedProblems }: { cat: Category; completedP
                     )}
                   </span>
                   <div>
-                    <span className="font-medium text-white group-hover:text-[var(--color-accent)] transition-colors">
+                    <span className="font-medium text-[var(--color-foreground)] group-hover:text-[var(--color-accent)] transition-colors">
                       {problem.title}
                     </span>
                   </div>
