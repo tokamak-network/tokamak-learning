@@ -207,11 +207,6 @@ input:focus-visible {
   }
 }
 
-/* Brighten brand logos in light mode */
-[data-theme="light"] .brand-logo-light {
-  filter: brightness(2) contrast(1.25) saturate(1.5);
-}
-
 .scrollbar-none {
   -ms-overflow-style: none;
   scrollbar-width: none;
