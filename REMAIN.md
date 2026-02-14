@@ -11,7 +11,7 @@
 | 5 | Type Conversion problems | Explicit casting, address payable conversion (+3) | Medium |
 | 6 | Gas Optimization category | Storage packing, calldata vs memory (+2) | Medium |
 | ~~7~~ | ~~Daily Challenge set expansion~~ | ~~3 → 7 sets (weekly cycle, 70 questions total)~~ | ~~Done~~ |
-| 8 | Description format unification | Apply consistent "What you'll learn" section to all problems | Small |
+| ~~8~~ | ~~Description format unification~~ | ~~Added "What you'll learn" to all 8 arithmetic problems~~ | ~~Done~~ |
 | 9 | Hint quality standardization | Remove answer-revealing hints, provide pattern/direction instead | Small |
 | 10 | Test case strengthening | Add edge cases (max values, zero, boundary) | Medium |
 

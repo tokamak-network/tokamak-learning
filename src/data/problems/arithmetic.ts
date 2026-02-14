@@ -9,6 +9,9 @@ export const arithmetic_problems: Problem[] = [
     difficulty: "beginner",
     description: `# Addition (+)
 
+## What you'll learn
+How to use the \`+\` operator to add two numbers in Solidity.
+
 The \`+\` operator adds two numbers. In Solidity 0.8+, overflow automatically reverts the transaction.
 
 \`\`\`solidity
@@ -48,6 +51,9 @@ contract Addition {
     order: 2,
     difficulty: "beginner",
     description: `# Subtraction (-)
+
+## What you'll learn
+How to use the \`-\` operator and understand underflow protection in Solidity 0.8+.
 
 The \`-\` operator subtracts. In 0.8+, uint underflow (e.g., 3 - 5) automatically reverts.
 
@@ -90,6 +96,9 @@ contract Subtraction {
     difficulty: "beginner",
     description: `# Multiplication (*)
 
+## What you'll learn
+How to use the \`*\` operator and be aware of overflow with large numbers.
+
 The \`*\` operator multiplies. Watch out for overflow when multiplying large numbers.
 
 \`\`\`solidity
@@ -130,6 +139,9 @@ contract Multiplication {
     difficulty: "beginner",
     description: `# Division (/)
 
+## What you'll learn
+How to use the \`/\` operator and understand that Solidity truncates (no decimals).
+
 The \`/\` operator divides. Division by zero reverts. The result is truncated (no rounding).
 
 \`\`\`solidity
@@ -169,6 +181,9 @@ contract Division {
     order: 5,
     difficulty: "beginner",
     description: `# Modulo (%)
+
+## What you'll learn
+How to use the \`%\` operator for remainders and even/odd checks.
 
 The \`%\` operator returns the remainder. Useful for even/odd checks: \`x % 2 == 0\` means even.
 
@@ -220,6 +235,9 @@ contract Modulo {
     difficulty: "beginner",
     description: `# Exponentiation (**)
 
+## What you'll learn
+How to use the \`**\` operator for powers and the \`10 ** 18\` token unit convention.
+
 The \`**\` operator computes powers. \`10 ** 18\` is commonly used for token units.
 
 \`\`\`solidity
@@ -269,6 +287,9 @@ contract Exponent {
     order: 7,
     difficulty: "beginner",
     description: `# Compound Assignment Operators
+
+## What you'll learn
+How to use shorthand operators (\`+=\`, \`-=\`, \`*=\`) for concise state updates.
 
 \`+=\`, \`-=\`, \`*=\`, \`/=\`, \`%=\` are shorthand operators that combine an operation with assignment.
 
@@ -334,6 +355,9 @@ contract CompoundAssign {
     order: 8,
     difficulty: "beginner",
     description: `# Integer Division Pitfalls
+
+## What you'll learn
+Why operation order matters in Solidity and how to minimize precision loss.
 
 Solidity has no decimals. \`5/2 = 2\`, and operation order affects precision.
 
