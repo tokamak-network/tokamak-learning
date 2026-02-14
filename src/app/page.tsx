@@ -220,7 +220,7 @@ export default function Home() {
               className="text-lg text-[var(--color-muted)] mb-10 leading-relaxed max-w-lg"
             >
               A hands-on learning platform by Tokamak Network.
-              Write, compile, repeat — build muscle memory for coding.
+              Write, compile, repeat — improve your &lsquo;Context&rsquo;.
             </motion.p>
 
             <motion.div variants={fadeInUp} className="flex gap-3">
