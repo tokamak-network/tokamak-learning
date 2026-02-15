@@ -21,12 +21,14 @@ In the Basics category, you used \`uint\` to store numbers. \`uint\` is actually
 > Both \`uint\` and \`uint256\` work exactly the same way. Using \`uint256\` makes the size explicit.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract IntegerBasics {
     // TODO: Declare uint256 public totalSupply with value 1000000
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract IntegerBasics {
     uint256 public totalSupply = 1000000;
@@ -61,12 +63,14 @@ A smaller integer type that holds values from 0 to 255.
 > The number after \`uint\` indicates the bit size: uint8 (0–255), uint16 (0–65535), uint256 (0–2^256-1).`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract SmallInteger {
     // TODO: Declare uint8 public decimals with value 18
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract SmallInteger {
     uint8 public decimals = 18;
@@ -102,6 +106,7 @@ An integer type that can hold both positive and negative numbers.
 > Just like \`uint\` is short for \`uint256\`, \`int\` is short for \`int256\`.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract SignedInteger {
     // TODO: Declare int256 public temperature with value -10
@@ -109,6 +114,7 @@ contract SignedInteger {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract SignedInteger {
     int256 public temperature = -10;
@@ -146,6 +152,7 @@ The code below tries to assign \`-10\` to a \`uint256\` variable. Since \`uint\`
 > Remember: \`uint\` = unsigned (0 and positive only), \`int\` = signed (negative and positive).`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract NegativeFix {
     // This code has an error. Try compiling first!
@@ -153,6 +160,7 @@ contract NegativeFix {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract NegativeFix {
     int256 public temperature = -10;
@@ -193,6 +201,7 @@ int8 minVal = type(int8).min;    // -128
 > These are useful for checking boundaries before performing arithmetic.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract TypeMinMax {
     function getMaxUint8() public pure returns (uint8) {
@@ -205,6 +214,7 @@ contract TypeMinMax {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract TypeMinMax {
     function getMaxUint8() public pure returns (uint8) {
@@ -255,6 +265,7 @@ Solidity offers uint in multiples of 8, from \`uint8\` to \`uint256\`. Each size
 > In practice, \`uint256\` is the most common. Smaller types are used in struct packing for gas optimization.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract IntegerSizes {
     // TODO: Declare uint8 public small with value 255
@@ -263,6 +274,7 @@ contract IntegerSizes {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract IntegerSizes {
     uint8 public small = 255;
@@ -306,6 +318,7 @@ What happens when you add 1 to the maximum value of uint8 (255)? In Solidity 0.8
 > The overflow check happens automatically. Try imagining what happens when add(255, 1) is called!`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract OverflowProtection {
     function add(uint8 a, uint8 b) public pure returns (uint8) {
@@ -314,6 +327,7 @@ contract OverflowProtection {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract OverflowProtection {
     function add(uint8 a, uint8 b) public pure returns (uint8) {
@@ -358,6 +372,7 @@ unchecked {
 > A uint256 counter would need 2^256 increments to overflow — practically impossible. That's why \`unchecked\` is safe here.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract UncheckedBlock {
     uint256 public counter;
@@ -368,6 +383,7 @@ contract UncheckedBlock {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract UncheckedBlock {
     uint256 public counter;

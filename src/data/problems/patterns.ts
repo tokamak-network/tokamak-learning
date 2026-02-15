@@ -22,6 +22,7 @@ Almost every real contract follows this pattern: store a value in state, provide
 > This pattern is the building block for more complex contracts.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract SimpleStorage {
     event DataStored(address indexed user, uint value);
@@ -39,6 +40,7 @@ contract SimpleStorage {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract SimpleStorage {
     event DataStored(address indexed user, uint value);
@@ -89,6 +91,7 @@ Most contracts have an owner who can perform special actions. The ownership patt
 > The \`onlyOwner\` modifier is already applied — only the current owner can transfer ownership.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract Ownable {
     address public owner;
@@ -112,6 +115,7 @@ contract Ownable {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract Ownable {
     address public owner;
@@ -165,6 +169,7 @@ The code below tries to emit a \`Transfer\` event, but the event was never decla
 > Event declarations follow the pattern: \`event Name(type param1, type param2);\``,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract TokenLedger {
     // This code has an error. Try compiling first!
@@ -179,6 +184,7 @@ contract TokenLedger {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract TokenLedger {
     event Transfer(address from, address to, uint amount);
@@ -230,6 +236,7 @@ function withdraw() public {
 > Always update state before making external calls — this is the "checks-effects-interactions" pattern.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract WithdrawalPattern {
     mapping(address => uint) public balances;
@@ -248,6 +255,7 @@ contract WithdrawalPattern {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract WithdrawalPattern {
     mapping(address => uint) public balances;
@@ -296,6 +304,7 @@ The simplest token pattern: set a total supply in the constructor and give all t
 > Minting tokens from \`address(0)\` is the standard convention — it means "newly created tokens."`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract SimpleToken {
     string public name = "Toka Token";
@@ -315,6 +324,7 @@ contract SimpleToken {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract SimpleToken {
     string public name = "Toka Token";
@@ -374,6 +384,7 @@ balanceOf[to] += amount;
 > The \`require\` checks are already provided — you just need the balance updates and event.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract TransferableToken {
     string public name = "Toka Token";
@@ -400,6 +411,7 @@ contract TransferableToken {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract TransferableToken {
     string public name = "Toka Token";

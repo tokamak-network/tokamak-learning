@@ -25,12 +25,14 @@ bool public isActive = true;
 > Bool values are written in lowercase: \`true\` or \`false\` (no quotes).`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract BoolType {
     // TODO: Declare bool public isActive with value true
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract BoolType {
     bool public isActive = true;
@@ -67,6 +69,7 @@ isActive = !isActive;
 \`\`\``,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract BoolToggle {
     bool public isActive = true;
@@ -77,6 +80,7 @@ contract BoolToggle {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract BoolToggle {
     bool public isActive = true;
@@ -117,6 +121,7 @@ An \`address\` is a 20-byte value that represents an Ethereum account. Every wal
 > You used \`msg.sender\` in the basics. Here the focus is on \`address\` as a data type.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract AddressType {
     // TODO: Declare address public owner
@@ -127,6 +132,7 @@ contract AddressType {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract AddressType {
     address public owner;
@@ -164,6 +170,7 @@ Solidity has fixed-size byte types from \`bytes1\` to \`bytes32\`. They store ra
 2. Declare \`bytes2 public flag\` with value \`0xffff\``,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract FixedBytes {
     // TODO: Declare bytes1 public initial with value 0x41
@@ -171,6 +178,7 @@ contract FixedBytes {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract FixedBytes {
     bytes1 public initial = 0x41;
@@ -208,6 +216,7 @@ A \`string\` variable can only hold text in double quotes. Assigning a bare numb
 > Think about what type is appropriate for the number \`100\`.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract NumberStringFix {
     // This code has an error. Try compiling first!
@@ -215,6 +224,7 @@ contract NumberStringFix {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract NumberStringFix {
     uint256 public score = 100;
@@ -251,6 +261,7 @@ message = _newMessage;
 \`\`\``,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract StringUpdate {
     string public message = "Hello";
@@ -261,6 +272,7 @@ contract StringUpdate {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract StringUpdate {
     string public message = "Hello";
@@ -301,6 +313,7 @@ Unlike \`bytes1\`\u2013\`bytes32\` (fixed size), \`bytes\` is a dynamic-length b
 > \`data.length\` returns the number of bytes stored.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract DynamicBytes {
     // TODO: Declare bytes public data
@@ -315,6 +328,7 @@ contract DynamicBytes {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract DynamicBytes {
     bytes public data;
@@ -364,6 +378,7 @@ enum Color { Red, Green, Blue }
 > Access enum values with: \`EnumName.Value\``,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract EnumType {
     // TODO: Fill in the values: None, Pending, Shipped, Delivered
@@ -377,6 +392,7 @@ contract EnumType {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract EnumType {
     enum OrderStatus { None, Pending, Shipped, Delivered }

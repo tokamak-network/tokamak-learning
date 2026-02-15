@@ -27,6 +27,7 @@ Solidity uses \`==\` to check equality and \`!=\` to check inequality. The resul
 > \`==\` means "is equal to", \`!=\` means "is not equal to". Don't confuse \`==\` with \`=\` (assignment).`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract EqualityCheck {
     function isEqual(uint a, uint b) public pure returns (bool) {
@@ -39,6 +40,7 @@ contract EqualityCheck {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract EqualityCheck {
     function isEqual(uint a, uint b) public pure returns (bool) {
@@ -87,6 +89,7 @@ a <= b  // less than or equal
 2. In \`isLessOrEqual\`, return whether \`a\` is less than or equal to \`b\``,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract OrderComparison {
     function isGreater(uint a, uint b) public pure returns (bool) {
@@ -99,6 +102,7 @@ contract OrderComparison {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract OrderComparison {
     function isGreater(uint a, uint b) public pure returns (bool) {
@@ -148,6 +152,7 @@ true || false  // true  — at least one must be true
 3. In \`negate\`, return the **opposite** of \`a\``,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract LogicalOps {
     function bothTrue(bool a, bool b) public pure returns (bool) {
@@ -164,6 +169,7 @@ contract LogicalOps {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract LogicalOps {
     function bothTrue(bool a, bool b) public pure returns (bool) {
@@ -219,6 +225,7 @@ if (x > 10) {
    - Otherwise, return \`"minor"\``,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract SimpleIfElse {
     function isAdult(uint age) public pure returns (string memory) {
@@ -227,6 +234,7 @@ contract SimpleIfElse {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract SimpleIfElse {
     function isAdult(uint age) public pure returns (string memory) {
@@ -272,6 +280,7 @@ Unlike languages like C or JavaScript, Solidity **catches this mistake at compil
 > This is one of the most common mistakes in programming: using \`=\` when you mean \`==\`. Solidity's type system catches it for you!`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract AssignmentFix {
     // This code has an error. Try compiling first!
@@ -284,6 +293,7 @@ contract AssignmentFix {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract AssignmentFix {
     function isTen(uint x) public pure returns (bool) {
@@ -329,6 +339,7 @@ uint result = (a > b) ? a : b;  // returns the larger value
 > The ternary operator is great for simple conditions. For complex logic, use if/else.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract TernaryOperator {
     function max(uint a, uint b) public pure returns (uint) {
@@ -341,6 +352,7 @@ contract TernaryOperator {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract TernaryOperator {
     function max(uint a, uint b) public pure returns (uint) {
@@ -398,6 +410,7 @@ if (x > 100) {
 > Check the highest condition first. Once a condition is true, the rest are skipped.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract MultiBranch {
     function grade(uint score) public pure returns (string memory) {
@@ -406,6 +419,7 @@ contract MultiBranch {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract MultiBranch {
     function grade(uint score) public pure returns (string memory) {

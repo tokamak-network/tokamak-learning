@@ -22,6 +22,7 @@ uint256 result = 10 + 20; // 30
 Return the sum of two numbers in the \`add()\` function.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract Addition {
     function add(uint256 a, uint256 b) public pure returns (uint256) {
@@ -30,6 +31,7 @@ contract Addition {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract Addition {
     function add(uint256 a, uint256 b) public pure returns (uint256) {
@@ -66,6 +68,7 @@ uint256 result = 10 - 3; // 7
 Return \`a - b\` in the \`subtract()\` function.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract Subtraction {
     function subtract(uint256 a, uint256 b) public pure returns (uint256) {
@@ -74,6 +77,7 @@ contract Subtraction {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract Subtraction {
     function subtract(uint256 a, uint256 b) public pure returns (uint256) {
@@ -109,6 +113,7 @@ uint256 result = 7 * 8; // 56
 Return \`a * b\` in the \`multiply()\` function.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract Multiplication {
     function multiply(uint256 a, uint256 b) public pure returns (uint256) {
@@ -117,6 +122,7 @@ contract Multiplication {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract Multiplication {
     function multiply(uint256 a, uint256 b) public pure returns (uint256) {
@@ -152,6 +158,7 @@ uint256 result = 10 / 3; // 3 (not 3.33)
 Return \`a / b\` in the \`divide()\` function.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract Division {
     function divide(uint256 a, uint256 b) public pure returns (uint256) {
@@ -160,6 +167,7 @@ contract Division {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract Division {
     function divide(uint256 a, uint256 b) public pure returns (uint256) {
@@ -196,6 +204,7 @@ bool even = (4 % 2 == 0); // true
 Write a \`mod()\` function and an \`isEven()\` function that checks if a number is even.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract Modulo {
     function mod(uint256 a, uint256 b) public pure returns (uint256) {
@@ -208,6 +217,7 @@ contract Modulo {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract Modulo {
     function mod(uint256 a, uint256 b) public pure returns (uint256) {
@@ -249,6 +259,7 @@ uint256 unit = 10 ** 18;  // 1 ether
 Write a \`power()\` function and a \`tokenUnit()\` function that returns \`10 ** 18\`.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract Exponent {
     function power(uint256 base, uint256 exp) public pure returns (uint256) {
@@ -261,6 +272,7 @@ contract Exponent {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract Exponent {
     function power(uint256 base, uint256 exp) public pure returns (uint256) {
@@ -304,6 +316,7 @@ x *= 2;  // x = x * 2 → 24
 Use compound assignment operators to modify \`value\` in each function.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract CompoundAssign {
     uint256 public value = 100;
@@ -322,6 +335,7 @@ contract CompoundAssign {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract CompoundAssign {
     uint256 public value = 100;
@@ -370,6 +384,7 @@ Solidity has no decimals. \`5/2 = 2\`, and operation order affects precision.
 Implement \`divideAndLose()\` with truncating division, and \`betterPrecision()\` with multiply-first approach.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract IntegerDivision {
     function divideAndLose(uint256 a, uint256 b) public pure returns (uint256) {
@@ -382,6 +397,7 @@ contract IntegerDivision {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract IntegerDivision {
     function divideAndLose(uint256 a, uint256 b) public pure returns (uint256) {

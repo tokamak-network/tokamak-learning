@@ -27,6 +27,7 @@ emit Transfer(msg.sender, recipient, 100);
 > Use the \`emit\` keyword to fire an event: \`emit EventName(values);\``,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract EventExample {
     // TODO: Declare event ValueChanged(uint oldValue, uint newValue)
@@ -41,6 +42,7 @@ contract EventExample {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract EventExample {
     event ValueChanged(uint oldValue, uint newValue);
@@ -96,6 +98,7 @@ contract Child is Parent {
 1. In the \`Dog\` contract, return \`"Woof!"\` from the \`speak()\` function`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract Animal {
     function speak() public pure virtual returns (string memory) {
@@ -110,6 +113,7 @@ contract Dog is Animal {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract Animal {
     function speak() public pure virtual returns (string memory) {
@@ -153,6 +157,7 @@ When a child contract redefines a \`virtual\` function from its parent, it **mus
 > The compiler tells you exactly which keyword is missing and where.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract Base {
     function getValue() public pure virtual returns (uint) {
@@ -168,6 +173,7 @@ contract Child is Base {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract Base {
     function getValue() public pure virtual returns (uint) {
@@ -218,6 +224,7 @@ function doSomething() public override {
 > After calling increment(), count should be 2 (1 from parent + 1 from child).`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract Counter {
     uint public count;
@@ -235,6 +242,7 @@ contract DoubleCounter is Counter {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract Counter {
     uint public count;
@@ -288,6 +296,7 @@ modifier onlyOwner() {
 > The \`_;\` placeholder tells Solidity where to insert the function's body.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract Ownable {
     address public owner;
@@ -307,6 +316,7 @@ contract Ownable {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract Ownable {
     address public owner;
@@ -361,6 +371,7 @@ interface ICounter {
 > The contract uses \`is IGreeter\` to promise it will implement all interface functions.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 interface IGreeter {
     function greet() external view returns (string memory);
@@ -375,6 +386,7 @@ contract Greeter is IGreeter {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 interface IGreeter {
     function greet() external view returns (string memory);
@@ -424,6 +436,7 @@ The contract's balance can be checked with \`address(this).balance\`.
 > \`receive()\` is called automatically when someone sends ETH to the contract address.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract Vault {
     // TODO: Add a receive() external payable function
@@ -434,6 +447,7 @@ contract Vault {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract Vault {
     receive() external payable {}
@@ -478,6 +492,7 @@ function deposit() public payable {
 > This pattern is the foundation of token deposits, tip jars, and crowdfunding contracts.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract TipJar {
     mapping(address => uint) public balances;
@@ -492,6 +507,7 @@ contract TipJar {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract TipJar {
     mapping(address => uint) public balances;

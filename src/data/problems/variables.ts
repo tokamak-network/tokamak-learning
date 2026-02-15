@@ -24,6 +24,7 @@ Inside the function, complete the two lines:
 > Local variables are cheap because they live in memory, not in storage.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract LocalVariables {
     function getDouble(uint x) public pure returns (uint) {
@@ -33,6 +34,7 @@ contract LocalVariables {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract LocalVariables {
     function getDouble(uint x) public pure returns (uint) {
@@ -72,6 +74,7 @@ Solidity provides special global variables you can use anywhere:
 2. Inside \`getTimestamp()\`, return \`block.timestamp\``,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract GlobalVariables {
     function getSender() public view returns (address) {
@@ -84,6 +87,7 @@ contract GlobalVariables {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract GlobalVariables {
     function getSender() public view returns (address) {
@@ -128,6 +132,7 @@ Solidity has visibility keywords that control access:
 > Even \`private\` variables are visible on the blockchain — \`private\` only prevents other contracts from reading them directly.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract VisibilityBasics {
     // TODO: Add the private keyword
@@ -140,6 +145,7 @@ contract VisibilityBasics {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract VisibilityBasics {
     uint private secretNumber = 42;
@@ -182,6 +188,7 @@ return count;
 > \`view\` tells the compiler: "This function only reads data, it doesn't change anything."`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract ViewFunctions {
     uint public count = 10;
@@ -192,6 +199,7 @@ contract ViewFunctions {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract ViewFunctions {
     uint public count = 10;
@@ -235,6 +243,7 @@ return a + b;
 \`\`\``,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract PureFunctions {
     function add(uint a, uint b) public pure returns (uint) {
@@ -243,6 +252,7 @@ contract PureFunctions {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract PureFunctions {
     function add(uint a, uint b) public pure returns (uint) {
@@ -281,6 +291,7 @@ The code below has a \`pure\` function that tries to read a state variable. This
 > If a function needs to read state, it should be \`view\`, not \`pure\`.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract PureStateError {
     uint public value = 42;
@@ -292,6 +303,7 @@ contract PureStateError {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract PureStateError {
     uint public value = 42;
@@ -336,6 +348,7 @@ delete flag;
 \`\`\``,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract DeleteKeyword {
     uint public value = 100;
@@ -347,6 +360,7 @@ contract DeleteKeyword {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract DeleteKeyword {
     uint public value = 100;

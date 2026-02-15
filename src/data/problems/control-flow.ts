@@ -33,6 +33,7 @@ for (uint i = 1; i <= n; i++) {
 > Be careful with loops in Solidity — they cost gas for every iteration!`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract ForLoop {
     function sum(uint n) public pure returns (uint) {
@@ -43,6 +44,7 @@ contract ForLoop {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract ForLoop {
     function sum(uint n) public pure returns (uint) {
@@ -93,6 +95,7 @@ require(_age > 0, "Age must be positive");
 > \`require\` protects your functions from bad inputs.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract RequireStatement {
     uint public age;
@@ -104,6 +107,7 @@ contract RequireStatement {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract RequireStatement {
     uint public age;
@@ -146,6 +150,7 @@ The code below has a logical error — the \`require\` condition is **reversed**
 > Remember: \`require\` passes when the condition is \`true\`. Ask yourself: "What must be true for a withdrawal to succeed?"`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract RequireFix {
     uint public balance = 100;
@@ -158,6 +163,7 @@ contract RequireFix {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract RequireFix {
     uint public balance = 100;
@@ -212,6 +218,7 @@ while (n > 0) {
 > \`while\` is useful when you don't know in advance how many iterations you need.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract WhileLoop {
     function bitLength(uint n) public pure returns (uint) {
@@ -222,6 +229,7 @@ contract WhileLoop {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract WhileLoop {
     function bitLength(uint n) public pure returns (uint) {
@@ -274,6 +282,7 @@ Write a function that sums only **odd** numbers from 1 to \`n\`. Use \`continue\
 > \`break\` and \`continue\` work in both \`for\` and \`while\` loops.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract BreakContinue {
     function sumOdds(uint n) public pure returns (uint) {
@@ -287,6 +296,7 @@ contract BreakContinue {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract BreakContinue {
     function sumOdds(uint n) public pure returns (uint) {
@@ -346,6 +356,7 @@ if (to == address(0)) revert("Cannot send to zero address");
 > \`revert\` is equivalent to \`require\` but lets you structure complex validation with \`if/else\`.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract RevertStatement {
     mapping(address => uint) public balances;
@@ -363,6 +374,7 @@ contract RevertStatement {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract RevertStatement {
     mapping(address => uint) public balances;
@@ -417,6 +429,7 @@ if (msg.sender != owner) revert Unauthorized();
 > Custom errors save gas and can include data about what went wrong.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 // TODO: Define error TooYoung(uint age, uint required)
 
@@ -430,6 +443,7 @@ contract CustomErrors {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 error TooYoung(uint age, uint required);
 
@@ -481,6 +495,7 @@ assert(balance >= 0);                             // should always be true
 > Use \`require\` for "this might happen", use \`assert\` for "this should never happen".`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract AssertVsRequire {
     uint public balance;
@@ -493,6 +508,7 @@ contract AssertVsRequire {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract AssertVsRequire {
     uint public balance;
@@ -548,6 +564,7 @@ Write a function that returns a grade string based on a score:
 > Order matters! Check the highest threshold first.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract IfElseChain {
     function grade(uint score) public pure returns (string memory) {
@@ -556,6 +573,7 @@ contract IfElseChain {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract IfElseChain {
     function grade(uint score) public pure returns (string memory) {
@@ -617,6 +635,7 @@ do {
 > \`do-while\` is perfect when you need at least one iteration — like counting digits, since even 0 has 1 digit.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract DoWhileLoop {
     function digitCount(uint n) public pure returns (uint) {
@@ -627,6 +646,7 @@ contract DoWhileLoop {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract DoWhileLoop {
     function digitCount(uint n) public pure returns (uint) {

@@ -26,6 +26,7 @@ Solidity has **no floating point numbers**. When you divide integers, the decima
 > Try calling divide(7, 2) — you'll get 3, not 3.5. The .5 is silently lost!`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract IntegerDivision {
     function divide(uint a, uint b) public pure returns (uint) {
@@ -34,6 +35,7 @@ contract IntegerDivision {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract IntegerDivision {
     function divide(uint a, uint b) public pure returns (uint) {
@@ -72,6 +74,7 @@ Since Solidity has no floating point types, you **cannot assign decimal values**
 > In real contracts, developers represent decimals by scaling up: 1.5 ETH is stored as 1500000000000000000 wei (1.5 * 10^18).`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract DecimalError {
     // This code has an error. Try compiling first!
@@ -79,6 +82,7 @@ contract DecimalError {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract DecimalError {
     uint public ratio = 2;
@@ -121,6 +125,7 @@ In Solidity, every variable has a **default value** when declared without an ini
 > Unlike JavaScript or Python, Solidity never has "undefined" — everything starts with a default value.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract DefaultValues {
     uint public num;
@@ -136,6 +141,7 @@ contract DefaultValues {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract DefaultValues {
     uint public num;
@@ -185,6 +191,7 @@ delete x;    // x is now 0 (not removed!)
 > After \`delete counter\`, the variable still exists — it just holds 0 again.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract DeleteKeyword {
     uint public counter = 100;
@@ -195,6 +202,7 @@ contract DeleteKeyword {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract DeleteKeyword {
     uint public counter = 100;
@@ -245,6 +253,7 @@ uint oneEth = 1 ether;  // 1000000000000000000
 > All values in Solidity are stored in wei. These keywords are just convenient multipliers.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract EtherUnits {
     function oneEtherInWei() public pure returns (uint) {
@@ -257,6 +266,7 @@ contract EtherUnits {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract EtherUnits {
     function oneEtherInWei() public pure returns (uint) {
@@ -307,6 +317,7 @@ Just like ether units, Solidity has time units that convert to seconds:
 > These are useful for setting deadlines, lock periods, and time-based conditions.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract TimeUnits {
     function oneDayInSeconds() public pure returns (uint) {
@@ -319,6 +330,7 @@ contract TimeUnits {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract TimeUnits {
     function oneDayInSeconds() public pure returns (uint) {
@@ -364,6 +376,7 @@ keccak256(abi.encodePacked("hello")) == keccak256(abi.encodePacked("hello"))
 > \`abi.encodePacked()\` converts the string to bytes, and \`keccak256()\` hashes them for comparison.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract StringCompare {
     function isEqual(string memory a, string memory b) public pure returns (bool) {
@@ -372,6 +385,7 @@ contract StringCompare {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract StringCompare {
     function isEqual(string memory a, string memory b) public pure returns (bool) {
@@ -415,6 +429,7 @@ return uint8(x);
 > \`type(uint8).max\` is 255. Values above 255 cannot fit in a uint8.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract SafeDowncast {
     function toUint8(uint256 x) public pure returns (uint8) {
@@ -424,6 +439,7 @@ contract SafeDowncast {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract SafeDowncast {
     function toUint8(uint256 x) public pure returns (uint8) {

@@ -27,6 +27,7 @@ numbers.push(99);  // adds 99 to the end
 > Unlike fixed-size arrays, dynamic arrays can grow as needed.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract DynamicArray {
     uint[] public numbers;
@@ -37,6 +38,7 @@ contract DynamicArray {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract DynamicArray {
     uint[] public numbers;
@@ -80,6 +82,7 @@ uint first = numbers[0];    // first element (index starts at 0)
 2. In \`getNumber\`, return the element at \`index\``,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract ArrayAccess {
     uint[] public numbers;
@@ -98,6 +101,7 @@ contract ArrayAccess {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract ArrayAccess {
     uint[] public numbers;
@@ -147,6 +151,7 @@ Fixed-size arrays (e.g., \`uint[3]\`) have a set size and **cannot use \`.push()
 > \`uint[3]\` = fixed size of 3, \`uint[]\` = dynamic (growable).`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract FixedArrayError {
     // This code has an error. Try compiling first!
@@ -158,6 +163,7 @@ contract FixedArrayError {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract FixedArrayError {
     uint[] public scores;
@@ -203,6 +209,7 @@ balances[addr];        // get (returns 100)
 > Non-existent keys return the default value (0 for uint), never an error.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract FirstMapping {
     mapping(address => uint) public balances;
@@ -217,6 +224,7 @@ contract FirstMapping {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract FirstMapping {
     mapping(address => uint) public balances;
@@ -268,6 +276,7 @@ struct Person {
 > Structs help organize related data — instead of separate variables, group them together.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract DefineStruct {
     struct Token {
@@ -283,6 +292,7 @@ contract DefineStruct {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract DefineStruct {
     struct Token {
@@ -331,6 +341,7 @@ todos.push(Todo("Buy milk", false));
 2. In \`getCount\`, return the length of the \`students\` array`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract StructArray {
     struct Student {
@@ -350,6 +361,7 @@ contract StructArray {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract StructArray {
     struct Student {
@@ -403,6 +415,7 @@ allowance[owner][spender] = 100;
 2. In \`getAllowance\`, return \`allowance[owner][spender]\``,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract NestedMapping {
     mapping(address => mapping(address => uint)) public allowance;
@@ -417,6 +430,7 @@ contract NestedMapping {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract NestedMapping {
     mapping(address => mapping(address => uint)) public allowance;
