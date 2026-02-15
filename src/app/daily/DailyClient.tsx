@@ -3,13 +3,12 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import {
-  getTodaysChallengeSet,
-  type ChallengeQuestion,
-  type ChallengeSet,
+import type {
+  ChallengeQuestion,
+  ChallengeSet,
 } from "@/data/daily-challenges";
 
-type Phase = "start" | "playing" | "finished";
+type Phase = "loading" | "error" | "start" | "playing" | "finished";
 
 type SavedProgress = {
   date: string;
@@ -18,6 +17,7 @@ type SavedProgress = {
   challengeSetId: string;
   currentIndex: number;
   answers: string[];
+  challengeSet?: ChallengeSet; // Store the generated set itself
 };
 
 const STORAGE_KEY = "dailyChallenge";
@@ -31,7 +31,7 @@ export type AnswerRecord = {
   questionId: string;
   type: "code" | "concept";
   category: string;
-  question: string; // code snippet or concept question text
+  question: string;
   correctAnswer: string;
   userAnswer: string;
   correct: boolean;
@@ -72,7 +72,7 @@ function saveHistory(
 
     localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
   } catch {
-    // ignore - private browsing or storage disabled
+    // ignore
   }
 }
 
@@ -98,7 +98,7 @@ function shuffleWithSeed(items: string[], seed: string): string[] {
   }
   for (let i = arr.length - 1; i > 0; i--) {
     hash = (hash * 1664525 + 1013904223) | 0;
-    const j = ((hash >>> 0) % (i + 1));
+    const j = (hash >>> 0) % (i + 1);
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
   return arr;
@@ -111,18 +111,54 @@ function shuffleOptions(question: ChallengeQuestion): string[] {
   );
 }
 
-const IS_DEBUG = process.env.NEXT_PUBLIC_DEBUG === "true";
+/** Load all history and call generate API */
+async function generateChallenge(): Promise<ChallengeSet> {
+  const raw = localStorage.getItem(HISTORY_KEY);
+  const history: Record<string, DailyResult> = raw ? JSON.parse(raw) : {};
+  const allAnswers: AnswerRecord[] = Object.values(history).flatMap(
+    (r) => r.answers
+  );
+
+  const res = await fetch("/api/daily/generate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ history: allAnswers }),
+  });
+
+  if (!res.ok) {
+    const data = await res.json();
+    throw new Error(data.error || `Error ${res.status}`);
+  }
+
+  const { challengeSet } = await res.json();
+  return challengeSet;
+}
+
+const LOADING_MESSAGES = [
+  "Reviewing your progress",
+  "Generating new questions",
+  "Finalizing your challenge",
+];
 
 export default function DailyClient() {
-  const [phase, setPhase] = useState<Phase>("start");
+  const [phase, setPhase] = useState<Phase>("loading");
   const [challengeSet, setChallengeSet] = useState<ChallengeSet | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [answers, setAnswers] = useState<string[]>([]);
-  const [loaded, setLoaded] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
-  const [refreshError, setRefreshError] = useState<string | null>(null);
+  const [loadingStep, setLoadingStep] = useState(0);
+
+  useEffect(() => {
+    if (phase !== "loading") return;
+    setLoadingStep(0);
+    const interval = setInterval(() => {
+      setLoadingStep((prev) => (prev + 1) % LOADING_MESSAGES.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [phase]);
 
   const shuffledOptions = useMemo(() => {
     if (!challengeSet) return [];
@@ -143,40 +179,72 @@ export default function DailyClient() {
         challengeSetId: challengeSet.id,
         currentIndex: current?.currentIndex ?? currentIndex,
         answers: current?.answers ?? answers,
+        challengeSet,
         ...overrides,
       };
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
       } catch {
-        // ignore - private browsing or storage disabled
+        // ignore
       }
     },
     [challengeSet, score, currentIndex, answers]
   );
 
-  // Load on mount — restore in-progress or completed state
+  // Load on mount — restore saved progress or generate new challenge
   useEffect(() => {
-    const set = getTodaysChallengeSet();
-    setChallengeSet(set);
     const progress = loadProgress();
-    if (progress && progress.challengeSetId === set.id) {
+
+    // If we have a saved challenge for today with the set data, restore it
+    if (progress?.challengeSet) {
+      setChallengeSet(progress.challengeSet);
       if (progress.completed) {
         setAnswers(progress.answers);
         setScore(progress.score);
         setPhase("finished");
       } else if (progress.answers.length > 0) {
-        // Resume in-progress
         setAnswers(progress.answers);
         setScore(
           progress.answers.filter(
-            (a, i) => a === set.questions[i]?.answer
+            (a, i) => a === progress.challengeSet!.questions[i]?.answer
           ).length
         );
         setCurrentIndex(progress.currentIndex);
         setPhase("playing");
+      } else {
+        setPhase("start");
       }
+      return;
     }
-    setLoaded(true);
+
+    // No saved challenge — generate via LLM
+    setPhase("loading");
+    generateChallenge()
+      .then((set) => {
+        setChallengeSet(set);
+        // Save the generated set so we don't re-generate on refresh
+        try {
+          localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify({
+              date: getTodayString(),
+              completed: false,
+              score: 0,
+              challengeSetId: set.id,
+              currentIndex: 0,
+              answers: [],
+              challengeSet: set,
+            })
+          );
+        } catch {
+          // ignore
+        }
+        setPhase("start");
+      })
+      .catch((err) => {
+        setErrorMsg(err.message);
+        setPhase("error");
+      });
   }, []);
 
   const question = challengeSet?.questions[currentIndex];
@@ -184,45 +252,15 @@ export default function DailyClient() {
 
   async function handleRefresh() {
     setRefreshing(true);
-    setRefreshError(null);
+    setErrorMsg(null);
     try {
-      // Collect all history
-      const raw = localStorage.getItem(HISTORY_KEY);
-      const history: Record<string, DailyResult> = raw ? JSON.parse(raw) : {};
-
-      // Flatten all answers from history
-      const allAnswers: AnswerRecord[] = Object.values(history).flatMap(
-        (r) => r.answers
-      );
-
-      if (allAnswers.length === 0) {
-        setRefreshError("No answer history found");
-        return;
-      }
-
-      const res = await fetch("/api/daily/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ history: allAnswers }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        setRefreshError(data.error || `Error ${res.status}`);
-        return;
-      }
-
-      const { challengeSet: newSet } = await res.json();
-
-      // Replace current challenge and restart
+      const newSet = await generateChallenge();
       setChallengeSet(newSet);
       setPhase("playing");
       setCurrentIndex(0);
       setScore(0);
       setSelected(null);
       setAnswers([]);
-
-      // Clear today's progress for the new set
       try {
         localStorage.setItem(
           STORAGE_KEY,
@@ -233,18 +271,49 @@ export default function DailyClient() {
             challengeSetId: newSet.id,
             currentIndex: 0,
             answers: [],
+            challengeSet: newSet,
           })
         );
       } catch {
         // ignore
       }
     } catch (err) {
-      setRefreshError(
+      setErrorMsg(
         err instanceof Error ? err.message : "Failed to generate"
       );
     } finally {
       setRefreshing(false);
     }
+  }
+
+  function handleRetry() {
+    setPhase("loading");
+    setErrorMsg(null);
+    generateChallenge()
+      .then((set) => {
+        setChallengeSet(set);
+        try {
+          localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify({
+              date: getTodayString(),
+              completed: false,
+              score: 0,
+              challengeSetId: set.id,
+              currentIndex: 0,
+              answers: [],
+              challengeSet: set,
+            })
+          );
+        } catch {
+          // ignore
+        }
+        setPhase("start");
+      })
+      .catch((err) => {
+        setErrorMsg(err.message);
+        setPhase("error");
+      });
   }
 
   function handleStart() {
@@ -263,7 +332,6 @@ export default function DailyClient() {
     const newAnswers = [...answers, option];
     setScore(newScore);
     setAnswers(newAnswers);
-    // Save immediately after answering
     persist({
       score: newScore,
       currentIndex,
@@ -276,7 +344,6 @@ export default function DailyClient() {
       setPhase("finished");
       persist({ completed: true, score, currentIndex, answers });
       if (challengeSet) saveHistory(challengeSet, answers, score);
-      // Dispatch event so Header can update
       window.dispatchEvent(new Event("dailyChallengeUpdate"));
     } else {
       const nextIndex = currentIndex + 1;
@@ -297,14 +364,13 @@ export default function DailyClient() {
   const blankPillRef = useRef<HTMLSpanElement>(null);
   const blankScrollRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to center the blank pill when question changes
   useEffect(() => {
     const pill = blankPillRef.current;
     const container = blankScrollRef.current;
     if (!pill || !container) return;
     const pillCenter = pill.offsetLeft + pill.offsetWidth / 2;
     container.scrollLeft = pillCenter - container.clientWidth / 2;
-  }, [currentIndex, loaded]);
+  }, [currentIndex]);
 
   function renderCodeWithBlank(code: string) {
     const lines = code.split("\n");
@@ -337,14 +403,12 @@ export default function DailyClient() {
                     {parts[1]}
                   </code>
                 </div>
-                {/* Scroll fade indicators */}
                 <div className="pointer-events-none absolute inset-y-0 left-0 w-4 rounded-l-lg bg-gradient-to-r from-[var(--color-accent)]/10 to-transparent" />
                 <div className="pointer-events-none absolute inset-y-0 right-0 w-4 rounded-r-lg bg-gradient-to-l from-[var(--color-accent)]/10 to-transparent" />
               </div>
             );
           }
 
-          // Context lines — show trimmed, muted
           if (line.trim() === "") {
             return <div key={i} className="h-2" />;
           }
@@ -362,9 +426,95 @@ export default function DailyClient() {
     );
   }
 
-  if (!challengeSet || !loaded) return null;
+  // --- Loading Screen ---
+  if (phase === "loading") {
+    return (
+      <div className="min-h-[calc(100dvh-56px)] flex items-center justify-center px-4 relative overflow-hidden">
+        {/* Background glow */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="w-[280px] h-[280px] rounded-full bg-[var(--color-accent)]/5 blur-[100px] animate-[pulse_4s_ease-in-out_infinite]" />
+        </div>
 
-  // ─── Start Screen ───
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="text-center max-w-sm w-full relative z-10"
+        >
+          {/* Dual-ring spinner */}
+          <div className="relative w-16 h-16 mx-auto mb-8">
+            <div className="absolute inset-0 rounded-full border-2 border-[var(--color-border)]" />
+            <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-[var(--color-accent)] animate-spin" />
+            <div className="absolute inset-[6px] rounded-full border-2 border-transparent border-b-[#8b5cf6] animate-[spin_1.5s_linear_infinite_reverse]" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-2 h-2 rounded-full bg-[var(--color-accent)] animate-pulse" />
+            </div>
+          </div>
+
+          {/* Cycling status messages */}
+          <AnimatePresence mode="wait">
+            <motion.p
+              key={loadingStep}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.3 }}
+              className="text-[var(--color-foreground)] font-medium text-sm"
+            >
+              {LOADING_MESSAGES[loadingStep]}
+            </motion.p>
+          </AnimatePresence>
+
+          {/* Step indicator dots */}
+          <div className="flex items-center justify-center gap-2 mt-4">
+            {LOADING_MESSAGES.map((_, i) => (
+              <div
+                key={i}
+                className={`h-1.5 rounded-full transition-all duration-500 ${
+                  i === loadingStep
+                    ? "w-6 bg-[var(--color-accent)]"
+                    : "w-1.5 bg-[var(--color-border)]"
+                }`}
+              />
+            ))}
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // --- Error Screen ---
+  if (phase === "error") {
+    return (
+      <div className="min-h-[calc(100dvh-56px)] flex items-center justify-center px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center max-w-sm w-full"
+        >
+          <p className="text-[var(--color-danger)] text-sm mb-4">
+            {errorMsg || "Failed to generate challenge"}
+          </p>
+          <button
+            onClick={handleRetry}
+            className="w-full py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-[var(--color-accent)] to-[#8b5cf6] hover:opacity-90 transition-opacity"
+          >
+            Retry
+          </button>
+          <Link
+            href="/"
+            className="block mt-3 text-sm text-[var(--color-muted)] hover:underline"
+          >
+            Back to Home
+          </Link>
+        </motion.div>
+      </div>
+    );
+  }
+
+  if (!challengeSet) return null;
+
+  // --- Start Screen ---
   if (phase === "start") {
     return (
       <div className="min-h-[calc(100dvh-56px)] flex items-center justify-center px-4">
@@ -384,7 +534,7 @@ export default function DailyClient() {
             Daily Challenge
           </h1>
           <p className="text-[var(--color-muted)] mb-8">
-            10 Questions · Solidity & Ethereum
+            {total} Questions · Solidity & Ethereum
           </p>
 
           <button
@@ -399,7 +549,7 @@ export default function DailyClient() {
     );
   }
 
-  // ─── Playing Screen ───
+  // --- Playing Screen ---
   if (phase === "playing" && question) {
     const options = shuffledOptions[currentIndex] ?? [];
 
@@ -518,7 +668,7 @@ export default function DailyClient() {
     );
   }
 
-  // ─── Finished Screen ───
+  // --- Finished Screen ---
   if (phase === "finished") {
     return (
       <div className="min-h-[calc(100dvh-56px)] flex items-center justify-center px-4">
@@ -580,22 +730,20 @@ export default function DailyClient() {
             })}
           </div>
 
-          {IS_DEBUG && (
-            <div className="mb-3">
-              <button
-                onClick={handleRefresh}
-                disabled={refreshing}
-                className="w-full py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-[var(--color-accent)] to-[#8b5cf6] hover:opacity-90 transition-opacity disabled:opacity-50"
-              >
-                {refreshing ? "Generating..." : "Refresh"}
-              </button>
-              {refreshError && (
-                <p className="text-xs text-[var(--color-danger)] mt-2 text-center">
-                  {refreshError}
-                </p>
-              )}
-            </div>
-          )}
+          <div className="mb-3">
+            <button
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="w-full py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-[var(--color-accent)] to-[#8b5cf6] hover:opacity-90 transition-opacity disabled:opacity-50"
+            >
+              {refreshing ? "Generating..." : "Try Again"}
+            </button>
+            {errorMsg && (
+              <p className="text-xs text-[var(--color-danger)] mt-2 text-center">
+                {errorMsg}
+              </p>
+            )}
+          </div>
 
           <Link
             href="/"
