@@ -63,6 +63,7 @@ export default function ProblemClient({ problem }: { problem: ClientProblem }) {
   const [showSolution, setShowSolution] = useState(false);
   const [hints, setHints] = useState<string[]>([]);
   const [solution, setSolution] = useState<string | null>(null);
+  const [isTestResult, setIsTestResult] = useState(false);
   const [mobilePanel, setMobilePanel] = useState<"description" | "editor">("description");
   const [activeTab, setActiveTab] = useState<"description" | "results">(
     "description"
@@ -79,7 +80,7 @@ export default function ProblemClient({ problem }: { problem: ClientProblem }) {
   const nextProblem = getNextProblem(problem.id);
   const prevProblem = getPrevProblem(problem.id);
 
-  const allPassed = results?.every((r) => r.passed) ?? false;
+  const allPassed = isTestResult && (results?.every((r) => r.passed) ?? false);
 
   // Save completed problem to localStorage
   useEffect(() => {
@@ -115,6 +116,7 @@ export default function ProblemClient({ problem }: { problem: ClientProblem }) {
     setIsRunning(true);
     setResults(null);
     setConsoleLogs([]);
+    setIsTestResult(false);
     setActiveTab("results");
 
     const controller = new AbortController();
@@ -165,6 +167,7 @@ export default function ProblemClient({ problem }: { problem: ClientProblem }) {
     setIsCompiling(true);
     setResults(null);
     setConsoleLogs([]);
+    setIsTestResult(true);
     setActiveTab("results");
 
     const controller = new AbortController();

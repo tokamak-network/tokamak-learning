@@ -26,10 +26,12 @@ contract HelloSolidity {
 > \`contract\` is the keyword used to declare a smart contract. The curly braces \`{ }\` define where its code goes.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 // TODO: Declare a contract named HelloSolidity`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract HelloSolidity {
 }`,
@@ -61,11 +63,13 @@ Examples: \`MyToken\`, \`SimpleStorage\`, \`HelloWorld\`
 Rename the contract from \`MyContract\` to \`MyStorage\`.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract MyContract {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract MyStorage {
 }`,
@@ -103,12 +107,14 @@ uint public myNumber = 42;
 > Adding \`public\` automatically creates a getter function so the value can be read from outside.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract FirstVariable {
     // TODO: Declare a public uint variable named myNumber with value 42
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract FirstVariable {
     uint public myNumber = 42;
@@ -145,12 +151,14 @@ string public greeting = "Hello Tokamak";
 \`\`\``,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract StringVariable {
     // TODO: Declare a public string variable named greeting with value "Hello Tokamak"
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract StringVariable {
     string public greeting = "Hello Tokamak";
@@ -184,6 +192,7 @@ In the previous problems, you declared \`uint\` and \`string\` in separate contr
 2. Declare \`uint public version\` with the value \`1\``,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract StateVariables {
     // TODO: Declare a public string variable named greeting with value "Hello Tokamak"
@@ -191,6 +200,7 @@ contract StateVariables {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract StateVariables {
     string public greeting = "Hello Tokamak";
@@ -228,6 +238,7 @@ The code below has a **type error**. A \`uint\` variable can only hold numbers, 
 > Think about which type you learned that stores text.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract TypeErrorFix {
     // This code has an error. Try compiling first!
@@ -235,6 +246,7 @@ contract TypeErrorFix {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract TypeErrorFix {
     string public name = "Alice";
@@ -270,6 +282,7 @@ In Solidity, every statement must end with a semicolon (\`;\`). Forgetting one i
 > The compiler error will point you to the line with the problem.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract SemicolonFix {
     // This code has an error. Try compiling first!
@@ -277,6 +290,7 @@ contract SemicolonFix {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract SemicolonFix {
     uint public count = 10;
@@ -315,6 +329,7 @@ owner = msg.sender;
 \`\`\``,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract ConstructorBasics {
     address public owner;
@@ -325,6 +340,7 @@ contract ConstructorBasics {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract ConstructorBasics {
     address public owner;
@@ -367,12 +383,14 @@ uint256 public constant MAX_SUPPLY = 10000;
 > \`constant\` is placed between \`public\` and the variable name.`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract ConstantKeyword {
     // TODO: Declare a public constant uint256 named MAX_SUPPLY with value 10000
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract ConstantKeyword {
     uint256 public constant MAX_SUPPLY = 10000;
@@ -409,6 +427,7 @@ How to use \`immutable\` for values set once at deployment.
 2. Assign \`msg.sender\` to it inside the constructor`,
     starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract ImmutableKeyword {
     // TODO: Declare address public immutable DEPLOYER
@@ -419,6 +438,7 @@ contract ImmutableKeyword {
 }`,
     solution: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+import "hardhat/console.sol";
 
 contract ImmutableKeyword {
     address public immutable DEPLOYER;
@@ -435,6 +455,150 @@ contract ImmutableKeyword {
     expectedFunctions: ["DEPLOYER"],
     testCases: [
       { fn: "DEPLOYER", expected: "DEPLOYER", message: "DEPLOYER() should return the deployer's address" },
+    ],
+  },
+  {
+    id: "hello-console",
+    title: "Hello Console",
+    category: "basics",
+    order: 11,
+    difficulty: "beginner",
+    description: `# Hello Console
+
+## What you'll learn
+How to use \`console.log\` for debugging output.
+
+Every starter code already imports \`"hardhat/console.sol"\`. This gives you access to \`console.log()\`, which prints values to the console — just like \`console.log\` in JavaScript.
+
+You can log strings and numbers:
+
+\`\`\`solidity
+console.log("Hello!");
+console.log(123);
+\`\`\`
+
+Logged values appear in the **Console Output** section when you click **Run**.
+
+## Task
+
+Inside the constructor, add two \`console.log\` calls:
+
+1. \`console.log("Hello Solidity!")\`
+2. \`console.log(42)\`
+
+> After writing the code, click **Run** to see your output in the Console Output section.`,
+    starterCode: `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+import "hardhat/console.sol";
+
+contract HelloConsole {
+    constructor() {
+        // TODO: Log "Hello Solidity!" using console.log
+        // TODO: Log the number 42 using console.log
+    }
+}`,
+    solution: `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+import "hardhat/console.sol";
+
+contract HelloConsole {
+    constructor() {
+        console.log("Hello Solidity!");
+        console.log(42);
+    }
+}`,
+    hints: [
+      "Use console.log(\"Hello Solidity!\") for text and console.log(42) for a number.",
+      "Both calls go inside the constructor body, each ending with a semicolon.",
+    ],
+    testDescription: "Checks that the HelloConsole contract compiles and deploys successfully.",
+    expectedFunctions: [],
+    expectedContractName: "HelloConsole",
+  },
+  {
+    id: "log-types",
+    title: "Log Different Types",
+    category: "basics",
+    order: 12,
+    difficulty: "beginner",
+    description: `# Log Different Types
+
+## What you'll learn
+How to log different Solidity types and use labeled output.
+
+\`console.log\` supports multiple types: \`string\`, \`uint256\`, \`bool\`, and \`address\`. You can combine a label with a value:
+
+\`\`\`solidity
+console.log("count:", count);    // labeled number
+console.log("active:", active);  // labeled bool
+console.log("owner:", addr);     // labeled address
+\`\`\`
+
+For \`bytes32\`, use \`console.logBytes32()\`:
+
+\`\`\`solidity
+console.logBytes32(myData);
+\`\`\`
+
+## Task
+
+Inside the constructor, set each state variable and log it:
+
+1. Set \`count\` to \`7\` and log it: \`console.log("count:", count)\`
+2. Set \`active\` to \`true\` and log it: \`console.log("active:", active)\`
+3. Set \`owner\` to \`msg.sender\` and log it: \`console.log("owner:", msg.sender)\`
+4. Set \`data\` to \`0xabcdef0000000000000000000000000000000000000000000000000000000000\` and log it: \`console.logBytes32(data)\`
+
+> Click **Run** to see all four values in the Console Output section.`,
+    starterCode: `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+import "hardhat/console.sol";
+
+contract LogTypes {
+    uint256 public count;
+    bool public active;
+    address public owner;
+    bytes32 public data;
+
+    constructor() {
+        // TODO: Set count to 7 and log with console.log("count:", count)
+        // TODO: Set active to true and log with console.log("active:", active)
+        // TODO: Set owner to msg.sender and log with console.log("owner:", msg.sender)
+        // TODO: Set data to 0xabcdef00...00 and log with console.logBytes32(data)
+    }
+}`,
+    solution: `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+import "hardhat/console.sol";
+
+contract LogTypes {
+    uint256 public count;
+    bool public active;
+    address public owner;
+    bytes32 public data;
+
+    constructor() {
+        count = 7;
+        console.log("count:", count);
+        active = true;
+        console.log("active:", active);
+        owner = msg.sender;
+        console.log("owner:", msg.sender);
+        data = 0xabcdef0000000000000000000000000000000000000000000000000000000000;
+        console.logBytes32(data);
+    }
+}`,
+    hints: [
+      "Use console.log(\"label:\", variable) for string, uint, bool, and address types.",
+      "For bytes32, use console.logBytes32(data) instead of console.log.",
+    ],
+    testDescription: "Checks that state variables are set correctly.",
+    expectedFunctions: ["count", "active", "owner", "data"],
+    expectedContractName: "LogTypes",
+    testCases: [
+      { fn: "count", expected: "7", message: "count() should return 7" },
+      { fn: "active", expected: "true", message: "active() should return true" },
+      { fn: "owner", expected: "DEPLOYER", message: "owner() should return the deployer's address" },
     ],
   },
 ];

@@ -32,6 +32,8 @@ library console {
     function log(string memory p0, string memory p1, string memory p2) internal view { _sendLogPayload(abi.encodeWithSignature("log(string,string,string)", p0, p1, p2)); }
     function log(string memory p0, uint256 p1, uint256 p2) internal view { _sendLogPayload(abi.encodeWithSignature("log(string,uint256,uint256)", p0, p1, p2)); }
     function log(string memory p0, string memory p1, uint256 p2) internal view { _sendLogPayload(abi.encodeWithSignature("log(string,string,uint256)", p0, p1, p2)); }
+    function logBytes(bytes memory p0) internal view { _sendLogPayload(abi.encodeWithSignature("log(bytes)", p0)); }
+    function logBytes32(bytes32 p0) internal view { _sendLogPayload(abi.encodeWithSignature("log(bytes32)", p0)); }
 }`;
 
 const CONSOLE_ABI = [
@@ -52,6 +54,8 @@ const CONSOLE_ABI = [
   "function log(string, string, string)",
   "function log(string, uint256, uint256)",
   "function log(string, string, uint256)",
+  "function log(bytes)",
+  "function log(bytes32)",
 ];
 
 const consoleIface = new ethers.Interface(CONSOLE_ABI);
