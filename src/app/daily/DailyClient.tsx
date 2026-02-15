@@ -21,9 +21,59 @@ type SavedProgress = {
 };
 
 const STORAGE_KEY = "dailyChallenge";
+const HISTORY_KEY = "dailyChallengeHistory";
 
 function getTodayString() {
   return new Date().toISOString().slice(0, 10);
+}
+
+export type AnswerRecord = {
+  questionId: string;
+  type: "code" | "concept";
+  category: string;
+  question: string; // code snippet or concept question text
+  correctAnswer: string;
+  userAnswer: string;
+  correct: boolean;
+  explanation: string;
+};
+
+export type DailyResult = {
+  score: number;
+  total: number;
+  challengeSetId: string;
+  answers: AnswerRecord[];
+};
+
+function saveHistory(
+  challengeSet: ChallengeSet,
+  answers: string[],
+  score: number
+) {
+  try {
+    const raw = localStorage.getItem(HISTORY_KEY);
+    const history: Record<string, DailyResult> = raw ? JSON.parse(raw) : {};
+
+    history[getTodayString()] = {
+      score,
+      total: challengeSet.questions.length,
+      challengeSetId: challengeSet.id,
+      answers: challengeSet.questions.map((q, i) => ({
+        questionId: q.id,
+        type: q.type,
+        category: q.category,
+        question: q.type === "code" ? q.code : q.question,
+        correctAnswer: q.answer,
+        userAnswer: answers[i] ?? "",
+        correct: answers[i] === q.answer,
+        explanation: q.explanation,
+      })),
+    };
+
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+  } catch {
+    // ignore - private browsing or storage disabled
+  }
 }
 
 function loadProgress(): SavedProgress | null {
@@ -61,6 +111,8 @@ function shuffleOptions(question: ChallengeQuestion): string[] {
   );
 }
 
+const IS_DEBUG = process.env.NEXT_PUBLIC_DEBUG === "true";
+
 export default function DailyClient() {
   const [phase, setPhase] = useState<Phase>("start");
   const [challengeSet, setChallengeSet] = useState<ChallengeSet | null>(null);
@@ -69,6 +121,8 @@ export default function DailyClient() {
   const [selected, setSelected] = useState<string | null>(null);
   const [answers, setAnswers] = useState<string[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshError, setRefreshError] = useState<string | null>(null);
 
   const shuffledOptions = useMemo(() => {
     if (!challengeSet) return [];
@@ -128,6 +182,71 @@ export default function DailyClient() {
   const question = challengeSet?.questions[currentIndex];
   const isCorrect = selected === question?.answer;
 
+  async function handleRefresh() {
+    setRefreshing(true);
+    setRefreshError(null);
+    try {
+      // Collect all history
+      const raw = localStorage.getItem(HISTORY_KEY);
+      const history: Record<string, DailyResult> = raw ? JSON.parse(raw) : {};
+
+      // Flatten all answers from history
+      const allAnswers: AnswerRecord[] = Object.values(history).flatMap(
+        (r) => r.answers
+      );
+
+      if (allAnswers.length === 0) {
+        setRefreshError("No answer history found");
+        return;
+      }
+
+      const res = await fetch("/api/daily/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ history: allAnswers }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        setRefreshError(data.error || `Error ${res.status}`);
+        return;
+      }
+
+      const { challengeSet: newSet } = await res.json();
+
+      // Replace current challenge and restart
+      setChallengeSet(newSet);
+      setPhase("playing");
+      setCurrentIndex(0);
+      setScore(0);
+      setSelected(null);
+      setAnswers([]);
+
+      // Clear today's progress for the new set
+      try {
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({
+            date: getTodayString(),
+            completed: false,
+            score: 0,
+            challengeSetId: newSet.id,
+            currentIndex: 0,
+            answers: [],
+          })
+        );
+      } catch {
+        // ignore
+      }
+    } catch (err) {
+      setRefreshError(
+        err instanceof Error ? err.message : "Failed to generate"
+      );
+    } finally {
+      setRefreshing(false);
+    }
+  }
+
   function handleStart() {
     setPhase("playing");
     setCurrentIndex(0);
@@ -156,6 +275,7 @@ export default function DailyClient() {
     if (currentIndex + 1 >= total) {
       setPhase("finished");
       persist({ completed: true, score, currentIndex, answers });
+      if (challengeSet) saveHistory(challengeSet, answers, score);
       // Dispatch event so Header can update
       window.dispatchEvent(new Event("dailyChallengeUpdate"));
     } else {
@@ -459,6 +579,23 @@ export default function DailyClient() {
               );
             })}
           </div>
+
+          {IS_DEBUG && (
+            <div className="mb-3">
+              <button
+                onClick={handleRefresh}
+                disabled={refreshing}
+                className="w-full py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-[var(--color-accent)] to-[#8b5cf6] hover:opacity-90 transition-opacity disabled:opacity-50"
+              >
+                {refreshing ? "Generating..." : "Refresh"}
+              </button>
+              {refreshError && (
+                <p className="text-xs text-[var(--color-danger)] mt-2 text-center">
+                  {refreshError}
+                </p>
+              )}
+            </div>
+          )}
 
           <Link
             href="/"

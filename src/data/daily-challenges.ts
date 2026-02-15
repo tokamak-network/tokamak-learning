@@ -1,6 +1,7 @@
 export type CodeQuestion = {
   type: "code";
   id: string;
+  category: string;
   code: string; // contains ___BLANK___ marker
   answer: string;
   distractors: [string, string, string];
@@ -10,6 +11,7 @@ export type CodeQuestion = {
 export type ConceptQuestion = {
   type: "concept";
   id: string;
+  category: string;
   question: string;
   answer: string;
   distractors: [string, string, string];
@@ -31,6 +33,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s1-c1",
+        category: "arithmetic",
         code: `pragma solidity ^0.8.0;\n\ncontract Counter {\n    uint256 public count;\n\n    function increment() public {\n        count ___BLANK___ 1;\n    }\n}`,
         answer: "+=",
         distractors: ["=", "-=", "=="],
@@ -40,6 +43,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s1-c2",
+        category: "data-structures",
         code: `pragma solidity ^0.8.0;\n\ncontract Token {\n    mapping(address => uint256) public ___BLANK___;\n}`,
         answer: "balanceOf",
         distractors: ["balance", "amounts", "tokens"],
@@ -49,6 +53,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s1-c3",
+        category: "patterns",
         code: `function transfer(address to, uint256 amount) public {\n    require(balanceOf[msg.sender] >= amount, "Insufficient");\n    balanceOf[msg.sender] -= amount;\n    balanceOf[to] ___BLANK___ amount;\n}`,
         answer: "+=",
         distractors: ["-=", "=", "*="],
@@ -58,6 +63,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s1-c4",
+        category: "variables",
         code: `contract Ownable {\n    address public owner;\n\n    constructor() {\n        owner = ___BLANK___;\n    }\n}`,
         answer: "msg.sender",
         distractors: ["tx.origin", "address(this)", "block.coinbase"],
@@ -67,6 +73,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s1-c5",
+        category: "patterns",
         code: `function withdraw() public {\n    require(msg.sender == owner, "Not owner");\n    payable(owner).___BLANK___(address(this).balance);\n}`,
         answer: "transfer",
         distractors: ["send", "call", "delegatecall"],
@@ -77,6 +84,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s1-q1",
+        category: "basics",
         question: "What is 'gas' in Ethereum?",
         answer: "A unit measuring computational effort",
         distractors: [
@@ -90,6 +98,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s1-q2",
+        category: "variables",
         question:
           "Which keyword allows a Solidity function to read state but NOT modify it?",
         answer: "view",
@@ -100,6 +109,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s1-q3",
+        category: "patterns",
         question: "What does ERC-20 define?",
         answer: "A standard interface for fungible tokens",
         distractors: [
@@ -113,6 +123,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s1-q4",
+        category: "integers",
         question: "What is the maximum value of a uint8 in Solidity?",
         answer: "255",
         distractors: ["256", "127", "1024"],
@@ -122,6 +133,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s1-q5",
+        category: "control-flow",
         question: "What happens when a require() statement fails?",
         answer: "The transaction reverts and unused gas is refunded",
         distractors: [
@@ -140,6 +152,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s2-c1",
+        category: "variables",
         code: `pragma solidity ^0.8.0;\n\ncontract Vault {\n    mapping(address => uint256) public deposits;\n\n    function deposit() public ___BLANK___ {\n        deposits[msg.sender] += msg.value;\n    }\n}`,
         answer: "payable",
         distractors: ["external", "view", "virtual"],
@@ -149,6 +162,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s2-c2",
+        category: "advanced",
         code: `event Transfer(address indexed from, address indexed to, uint256 ___BLANK___);`,
         answer: "value",
         distractors: ["amount", "indexed", "data"],
@@ -158,6 +172,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s2-c3",
+        category: "patterns",
         code: `contract MyToken {\n    string public name;\n    string public symbol;\n    uint8 public ___BLANK___ = 18;\n}`,
         answer: "decimals",
         distractors: ["precision", "digits", "places"],
@@ -167,6 +182,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s2-c4",
+        category: "variables",
         code: `modifier onlyOwner() {\n    require(msg.sender == owner, "Not owner");\n    ___BLANK___;\n}`,
         answer: "_",
         distractors: ["return", "revert", "continue"],
@@ -176,6 +192,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s2-c5",
+        category: "integers",
         code: `function getBalance() public view returns (___BLANK___) {\n    return address(this).balance;\n}`,
         answer: "uint256",
         distractors: ["uint128", "int256", "address"],
@@ -185,6 +202,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s2-q1",
+        category: "variables",
         question:
           "What is the difference between 'memory' and 'storage' in Solidity?",
         answer: "storage is persistent on-chain, memory is temporary",
@@ -199,6 +217,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s2-q2",
+        category: "patterns",
         question: "What is a reentrancy attack?",
         answer:
           "When an external call re-enters the calling contract before state updates",
@@ -213,6 +232,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s2-q3",
+        category: "variables",
         question: "What does msg.value represent?",
         answer: "The amount of Wei sent with the transaction",
         distractors: [
@@ -226,6 +246,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s2-q4",
+        category: "integers",
         question: "How many Wei equal 1 Ether?",
         answer: "10^18",
         distractors: ["10^6", "10^9", "10^12"],
@@ -235,6 +256,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s2-q5",
+        category: "advanced",
         question: "What is the purpose of the 'indexed' keyword in events?",
         answer: "It allows filtering/searching for events by that parameter",
         distractors: [
@@ -253,6 +275,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s3-c1",
+        category: "variables",
         code: `pragma solidity ^0.8.0;\n\ncontract Greeter {\n    string public greeting;\n\n    constructor(string ___BLANK___ _greeting) {\n        greeting = _greeting;\n    }\n}`,
         answer: "memory",
         distractors: ["storage", "calldata", "stack"],
@@ -262,6 +285,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s3-c2",
+        category: "data-structures",
         code: `contract Lottery {\n    address[] public players;\n\n    function enter() public payable {\n        require(msg.value >= 0.01 ether);\n        players.___BLANK___(msg.sender);\n    }\n}`,
         answer: "push",
         distractors: ["add", "append", "insert"],
@@ -271,6 +295,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s3-c3",
+        category: "advanced",
         code: `interface IERC20 {\n    function totalSupply() external view returns (uint256);\n    function balanceOf(address account) external view returns (uint256);\n    function ___BLANK___(address to, uint256 amount) external returns (bool);\n}`,
         answer: "transfer",
         distractors: ["send", "move", "transmit"],
@@ -280,6 +305,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s3-c4",
+        category: "variables",
         code: `contract TimeLock {\n    uint256 public unlockTime;\n\n    constructor(uint256 _duration) {\n        unlockTime = block.___BLANK___ + _duration;\n    }\n}`,
         answer: "timestamp",
         distractors: ["number", "difficulty", "gaslimit"],
@@ -289,6 +315,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s3-c5",
+        category: "basic-types",
         code: `enum Status { Pending, Active, ___BLANK___ }\n\nStatus public currentStatus = Status.Pending;`,
         answer: "Closed",
         distractors: ["Ended", "Done", "Stopped"],
@@ -298,6 +325,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s3-q1",
+        category: "patterns",
         question:
           "What is the Checks-Effects-Interactions pattern used for?",
         answer: "Preventing reentrancy vulnerabilities",
@@ -312,6 +340,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s3-q2",
+        category: "basics",
         question:
           "What is the difference between a contract's address and an EOA?",
         answer: "A contract has code, an EOA is controlled by a private key",
@@ -326,6 +355,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s3-q3",
+        category: "variables",
         question: "What does 'immutable' mean for a state variable?",
         answer: "It can only be assigned once, in the constructor",
         distractors: [
@@ -339,6 +369,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s3-q4",
+        category: "advanced",
         question: "What is a fallback function in Solidity?",
         answer:
           "A function that executes when no matching function is found or ETH is sent",
@@ -353,6 +384,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s3-q5",
+        category: "advanced",
         question:
           "What is the main advantage of using events in smart contracts?",
         answer: "Cheap off-chain data storage that dApps can listen to",
@@ -372,6 +404,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s4-c1",
+        category: "control-flow",
         code: `pragma solidity ^0.8.0;\n\ncontract Loop {\n    function sum(uint256 n) public pure returns (uint256) {\n        uint256 total;\n        for (uint256 i = 1; i ___BLANK___ n; i++) {\n            total += i;\n        }\n        return total;\n    }\n}`,
         answer: "<=",
         distractors: ["<", ">=", "!="],
@@ -381,6 +414,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s4-c2",
+        category: "control-flow",
         code: `function gradeScore(uint256 score) public pure returns (string memory) {\n    if (score >= 90) {\n        return "A";\n    } ___BLANK___ (score >= 80) {\n        return "B";\n    }\n    return "C";\n}`,
         answer: "else if",
         distractors: ["elif", "elseif", "else while"],
@@ -390,6 +424,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s4-c3",
+        category: "control-flow",
         code: `error InsufficientBalance(uint256 requested, uint256 available);\n\nfunction withdraw(uint256 amount) public {\n    if (amount > balance)\n        ___BLANK___ InsufficientBalance(amount, balance);\n    balance -= amount;\n}`,
         answer: "revert",
         distractors: ["throw", "emit", "return"],
@@ -399,6 +434,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s4-c4",
+        category: "data-structures",
         code: `contract Voting {\n    mapping(address => bool) public hasVoted;\n\n    function vote() public {\n        require(!hasVoted[msg.sender], "Already voted");\n        hasVoted[msg.sender] = ___BLANK___;\n    }\n}`,
         answer: "true",
         distractors: ["false", "1", "msg.sender"],
@@ -408,6 +444,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s4-c5",
+        category: "data-structures",
         code: `contract ArrayOps {\n    uint256[] public numbers;\n\n    function removeLast() public {\n        require(numbers.length > 0, "Empty");\n        numbers.___BLANK___();\n    }\n}`,
         answer: "pop",
         distractors: ["remove", "delete", "shift"],
@@ -417,6 +454,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s4-q1",
+        category: "control-flow",
         question: "What happens if a for loop runs too many iterations in Solidity?",
         answer: "The transaction runs out of gas and reverts",
         distractors: [
@@ -430,6 +468,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s4-q2",
+        category: "control-flow",
         question: "What is the difference between 'require' and 'assert' in Solidity?",
         answer: "require is for input validation, assert is for internal invariants",
         distractors: [
@@ -443,6 +482,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s4-q3",
+        category: "control-flow",
         question: "Why are custom errors preferred over require with string messages?",
         answer: "Custom errors use less gas because they avoid storing strings",
         distractors: [
@@ -456,6 +496,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s4-q4",
+        category: "arithmetic",
         question: "What does the 'unchecked' block do in Solidity 0.8+?",
         answer: "Disables overflow/underflow checks for arithmetic operations",
         distractors: [
@@ -469,6 +510,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s4-q5",
+        category: "basic-types",
         question: "What is the default value of a bool in Solidity?",
         answer: "false",
         distractors: ["true", "0", "null"],
@@ -483,6 +525,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s5-c1",
+        category: "advanced",
         code: `contract Animal {\n    function speak() public pure ___BLANK___ returns (string memory) {\n        return "...";\n    }\n}\n\ncontract Dog is Animal {\n    function speak() public pure override returns (string memory) {\n        return "Woof";\n    }\n}`,
         answer: "virtual",
         distractors: ["abstract", "external", "payable"],
@@ -492,6 +535,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s5-c2",
+        category: "patterns",
         code: `contract ERC20 {\n    mapping(address => mapping(address => uint256)) public allowance;\n\n    function approve(address spender, uint256 amount) public returns (bool) {\n        allowance[___BLANK___][spender] = amount;\n        return true;\n    }\n}`,
         answer: "msg.sender",
         distractors: ["tx.origin", "address(this)", "spender"],
@@ -501,6 +545,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s5-c3",
+        category: "advanced",
         code: `contract Base {\n    uint256 public value;\n\n    constructor(uint256 _value) {\n        value = _value;\n    }\n}\n\ncontract Child is ___BLANK___(42) {\n}`,
         answer: "Base",
         distractors: ["Contract", "Parent", "Super"],
@@ -510,6 +555,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s5-c4",
+        category: "variables",
         code: `contract Staking {\n    mapping(address => uint256) public stakedAt;\n\n    function stake() public payable {\n        require(msg.value > 0);\n        stakedAt[msg.sender] = block.timestamp;\n    }\n\n    function unstake() public {\n        require(block.timestamp >= stakedAt[msg.sender] + 1 ___BLANK___, "Locked");\n    }\n}`,
         answer: "days",
         distractors: ["hours", "minutes", "blocks"],
@@ -519,6 +565,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s5-c5",
+        category: "advanced",
         code: `library SafeMath {\n    function add(uint256 a, uint256 b) internal pure returns (uint256) {\n        return a + b;\n    }\n}\n\ncontract Calculator {\n    ___BLANK___ SafeMath for uint256;\n\n    function sum(uint256 a, uint256 b) public pure returns (uint256) {\n        return a.add(b);\n    }\n}`,
         answer: "using",
         distractors: ["import", "with", "apply"],
@@ -528,6 +575,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s5-q1",
+        category: "advanced",
         question: "What is the 'diamond problem' in Solidity inheritance?",
         answer:
           "When a contract inherits from two contracts that share a common base",
@@ -542,6 +590,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s5-q2",
+        category: "variables",
         question:
           "What is the difference between 'external' and 'public' functions?",
         answer:
@@ -557,6 +606,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s5-q3",
+        category: "advanced",
         question: "What does the 'abstract' keyword do on a contract?",
         answer: "Marks a contract that has unimplemented functions and cannot be deployed",
         distractors: [
@@ -570,6 +620,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s5-q4",
+        category: "variables",
         question: "What does 'calldata' mean as a data location?",
         answer: "Read-only data location for external function parameters",
         distractors: [
@@ -583,6 +634,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s5-q5",
+        category: "advanced",
         question: "What is a library in Solidity?",
         answer: "A contract without state that provides reusable functions",
         distractors: [
@@ -601,6 +653,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s6-c1",
+        category: "advanced",
         code: `contract HashExample {\n    function hash(string memory input) public pure returns (bytes32) {\n        return ___BLANK___(abi.encodePacked(input));\n    }\n}`,
         answer: "keccak256",
         distractors: ["sha256", "sha3", "md5"],
@@ -610,6 +663,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s6-c2",
+        category: "data-structures",
         code: `contract MultiSig {\n    address[] public owners;\n    uint256 public required;\n\n    struct Transaction {\n        address to;\n        uint256 value;\n        bool ___BLANK___;\n    }\n}`,
         answer: "executed",
         distractors: ["confirmed", "pending", "valid"],
@@ -619,6 +673,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s6-c3",
+        category: "advanced",
         code: `contract Registry {\n    mapping(bytes32 => address) public records;\n\n    function register(string memory name) public {\n        bytes32 key = keccak256(___BLANK___(name));\n        require(records[key] == address(0), "Taken");\n        records[key] = msg.sender;\n    }\n}`,
         answer: "abi.encodePacked",
         distractors: ["abi.encode", "bytes", "keccak256"],
@@ -628,6 +683,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s6-c4",
+        category: "patterns",
         code: `contract Proxy {\n    address public implementation;\n\n    fallback() external payable {\n        (bool success, ) = implementation.___BLANK___(msg.data);\n        require(success);\n    }\n}`,
         answer: "delegatecall",
         distractors: ["call", "staticcall", "transfer"],
@@ -637,6 +693,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s6-c5",
+        category: "advanced",
         code: `contract Token {\n    mapping(address => uint256) balances;\n\n    function transfer(address to, uint256 amount) public {\n        require(balances[msg.sender] >= amount);\n        balances[msg.sender] -= amount;\n        balances[to] += amount;\n        ___BLANK___ Transfer(msg.sender, to, amount);\n    }\n\n    event Transfer(address indexed from, address indexed to, uint256 value);\n}`,
         answer: "emit",
         distractors: ["fire", "log", "trigger"],
@@ -646,6 +703,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s6-q1",
+        category: "patterns",
         question: "What is delegatecall used for?",
         answer:
           "Running another contract's code in the caller's storage context",
@@ -660,6 +718,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s6-q2",
+        category: "patterns",
         question:
           "Why is the order of state variables important in proxy contracts?",
         answer:
@@ -675,6 +734,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s6-q3",
+        category: "advanced",
         question: "What is the maximum contract size allowed on Ethereum?",
         answer: "24,576 bytes (24 KB)",
         distractors: ["1 MB", "256 KB", "16 KB"],
@@ -684,6 +744,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s6-q4",
+        category: "advanced",
         question: "What does abi.encode do?",
         answer: "Encodes values into ABI-standard bytes with padding",
         distractors: [
@@ -697,6 +758,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s6-q5",
+        category: "advanced",
         question: "What is a 'selector' in Solidity?",
         answer: "The first 4 bytes of the keccak256 hash of a function signature",
         distractors: [
@@ -715,6 +777,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s7-c1",
+        category: "variables",
         code: `contract Auction {\n    uint256 public highestBid;\n    address public highestBidder;\n\n    function bid() public payable {\n        require(msg.value > highestBid, "Bid too low");\n        highestBid = msg.value;\n        highestBidder = ___BLANK___;\n    }\n}`,
         answer: "msg.sender",
         distractors: ["tx.origin", "address(this)", "block.coinbase"],
@@ -724,6 +787,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s7-c2",
+        category: "variables",
         code: `contract Access {\n    mapping(address => bool) public admins;\n\n    modifier onlyAdmin() {\n        require(admins[msg.sender], "Not admin");\n        ___BLANK___;\n    }\n\n    function restricted() public onlyAdmin {\n        // admin-only logic\n    }\n}`,
         answer: "_",
         distractors: ["return", "continue", "stop"],
@@ -733,6 +797,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s7-c3",
+        category: "basic-types",
         code: `contract Escrow {\n    enum State { Created, Funded, Released }\n    State public state;\n\n    function fund() public payable {\n        require(state == State.Created);\n        state = State.___BLANK___;\n    }\n}`,
         answer: "Funded",
         distractors: ["Released", "Created", "Active"],
@@ -742,6 +807,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s7-c4",
+        category: "variables",
         code: `contract Wallet {\n    function getBalance() public view returns (uint256) {\n        return ___BLANK___(this).balance;\n    }\n}`,
         answer: "address",
         distractors: ["payable", "uint256", "contract"],
@@ -751,6 +817,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "code",
         id: "s7-c5",
+        category: "variables",
         code: `contract Whitelist {\n    mapping(address => bool) public isWhitelisted;\n    address public owner;\n\n    function addToWhitelist(address[] ___BLANK___ users) external {\n        require(msg.sender == owner);\n        for (uint i = 0; i < users.length; i++) {\n            isWhitelisted[users[i]] = true;\n        }\n    }\n}`,
         answer: "calldata",
         distractors: ["memory", "storage", "stack"],
@@ -760,6 +827,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s7-q1",
+        category: "patterns",
         question: "What is a flash loan?",
         answer:
           "A loan that must be borrowed and repaid within one transaction",
@@ -774,6 +842,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s7-q2",
+        category: "patterns",
         question:
           "What is the 'pull over push' pattern for sending ETH?",
         answer:
@@ -789,6 +858,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s7-q3",
+        category: "patterns",
         question:
           "What is 'slippage' in the context of decentralized exchanges?",
         answer:
@@ -804,6 +874,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s7-q4",
+        category: "patterns",
         question: "What is an oracle in blockchain?",
         answer:
           "A service that provides external real-world data to smart contracts",
@@ -818,6 +889,7 @@ export const challengeSets: ChallengeSet[] = [
       {
         type: "concept",
         id: "s7-q5",
+        category: "gotchas",
         question:
           "Why should you avoid using tx.origin for authentication?",
         answer:
