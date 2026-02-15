@@ -7,6 +7,7 @@ import {
 } from "@ethereumjs/util";
 import { ethers } from "ethers";
 import type { TestCase } from "@/data/problems";
+import { CONSOLE_ADDRESS, decodeConsoleLog } from "@/lib/console-sol";
 
 export interface TestResult {
   passed: boolean;
@@ -173,4 +174,63 @@ function compareValues(actual: string, expected: string): boolean {
   if (expected === "DEPLOYER" && actual.toLowerCase() === DEPLOYER.toLowerCase())
     return true;
   return false;
+}
+
+export async function runCode(
+  bytecode: string,
+  abi: ethers.InterfaceAbi,
+  constructorArgs?: string[]
+): Promise<{ success: boolean; error?: string; consoleLogs: string[] }> {
+  const consoleLogs: string[] = [];
+
+  try {
+    const common = new Common({ chain: Mainnet, hardfork: Hardfork.Osaka });
+    const vm = await createVM({ common });
+
+    // Capture console.log calls
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (vm.evm as any).events?.on("beforeMessage", (data: any) => {
+      const to = data.to?.toString()?.toLowerCase();
+      if (to === CONSOLE_ADDRESS.toLowerCase()) {
+        const decoded = decodeConsoleLog(data.data);
+        if (decoded !== null) consoleLogs.push(decoded);
+      }
+    });
+
+    const deployerAddr = createAddressFromString(DEPLOYER);
+    await vm.stateManager.putAccount(
+      deployerAddr,
+      createAccount({ balance: BigInt(10) * BigInt(10) ** BigInt(18) })
+    );
+
+    const iface = new ethers.Interface(abi);
+    let deployHex = "0x" + bytecode;
+    if (constructorArgs && constructorArgs.length > 0) {
+      const encodedArgs = iface.encodeDeploy(constructorArgs);
+      deployHex += encodedArgs.slice(2);
+    }
+
+    const deployResult = await vm.evm.runCall({
+      caller: deployerAddr,
+      data: hexToBytes(deployHex as `0x${string}`),
+      gasLimit: BigInt(5_000_000),
+      value: BigInt(0),
+    });
+
+    if (deployResult.execResult.exceptionError || !deployResult.createdAddress) {
+      return {
+        success: false,
+        error: `Deployment failed: ${deployResult.execResult.exceptionError?.error || "Unknown error"}`,
+        consoleLogs,
+      };
+    }
+
+    return { success: true, consoleLogs };
+  } catch (err) {
+    return {
+      success: false,
+      error: `Error: ${err instanceof Error ? err.message : String(err)}`,
+      consoleLogs,
+    };
+  }
 }

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import solc from "solc";
 import { runTests, type TestResult } from "@/lib/evm-runner";
 import type { TestCase } from "@/data/problems";
+import { CONSOLE_SOL } from "@/lib/console-sol";
+import { humanizeError } from "@/lib/humanize-error";
 
 // Simple in-memory rate limiter: max 10 requests per 60s per IP
 const rateMap = new Map<string, { count: number; resetAt: number }>();
@@ -70,6 +72,7 @@ export async function POST(req: NextRequest) {
       language: "Solidity",
       sources: {
         "contract.sol": { content: source },
+        "hardhat/console.sol": { content: CONSOLE_SOL },
       },
       settings: {
         outputSelection: {
@@ -99,9 +102,10 @@ export async function POST(req: NextRequest) {
 
     // Test 1: Compilation
     if (errors.length > 0) {
+      const friendly = humanizeError(errors[0], source);
       results.push({
         passed: false,
-        message: `Compilation failed:\n${errors[0]}`,
+        message: `Compilation failed:\n${friendly}`,
       });
       return NextResponse.json({ results });
     }

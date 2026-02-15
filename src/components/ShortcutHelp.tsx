@@ -13,7 +13,8 @@ const shortcuts = [
   {
     group: "Editor (Problem page)",
     items: [
-      { keys: ["⌘", "Enter"], description: "Run tests" },
+      { keys: ["⌘", "Enter"], description: "Run" },
+      { keys: ["⌘", "⇧", "Enter"], description: "Test" },
       { keys: ["⌘", "⇧", "H"], description: "Toggle hints" },
       { keys: ["⌘", "⇧", "S"], description: "Toggle solution" },
     ],

@@ -56,7 +56,9 @@ function highlightSolidity(code: string): string {
 export default function ProblemClient({ problem }: { problem: ClientProblem }) {
   const [code, setCode] = useState(problem.starterCode);
   const [isCompiling, setIsCompiling] = useState(false);
+  const [isRunning, setIsRunning] = useState(false);
   const [results, setResults] = useState<TestResult[] | null>(null);
+  const [consoleLogs, setConsoleLogs] = useState<string[]>([]);
   const [showHints, setShowHints] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
   const [hints, setHints] = useState<string[]>([]);
@@ -107,9 +109,62 @@ export default function ProblemClient({ problem }: { problem: ClientProblem }) {
     }
   }, [problem.id, solution]);
 
+  const isLoading = isCompiling || isRunning;
+
+  const handleRun = useCallback(async () => {
+    setIsRunning(true);
+    setResults(null);
+    setConsoleLogs([]);
+    setActiveTab("results");
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30_000);
+
+    try {
+      const res = await fetch("/api/run", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ source: code }),
+        signal: controller.signal,
+      });
+
+      if (res.status === 429) {
+        setResults([{ passed: false, message: "Too many requests. Please wait a moment and try again." }]);
+        return;
+      }
+
+      const data = await res.json();
+      const newResults: TestResult[] = [];
+
+      if (!data.compiled) {
+        newResults.push({ passed: false, message: `Compilation failed:\n${data.error}` });
+      } else {
+        newResults.push({ passed: true, message: "Compilation successful" });
+        if (data.deployed) {
+          newResults.push({ passed: true, message: "Deployment successful" });
+        } else if (data.error) {
+          newResults.push({ passed: false, message: data.error });
+        }
+      }
+
+      setResults(newResults);
+      setConsoleLogs(data.consoleLogs || []);
+    } catch (err) {
+      if (err instanceof Error && err.name === "AbortError") {
+        setResults([{ passed: false, message: "Request timed out." }]);
+      } else {
+        setResults([{ passed: false, message: "Network error." }]);
+      }
+    } finally {
+      clearTimeout(timeoutId);
+      setIsRunning(false);
+    }
+  }, [code]);
+
   const handleCompile = useCallback(async () => {
     setIsCompiling(true);
     setResults(null);
+    setConsoleLogs([]);
     setActiveTab("results");
 
     const controller = new AbortController();
@@ -174,10 +229,16 @@ export default function ProblemClient({ problem }: { problem: ClientProblem }) {
     const handleKeyDown = (e: KeyboardEvent) => {
       const mod = e.metaKey || e.ctrlKey;
 
-      // Cmd/Ctrl + Enter → Run tests
-      if (mod && e.key === "Enter") {
+      // Cmd/Ctrl + Shift + Enter → Test
+      if (mod && e.shiftKey && e.key === "Enter") {
         e.preventDefault();
         handleCompile();
+        return;
+      }
+      // Cmd/Ctrl + Enter → Run
+      if (mod && e.key === "Enter") {
+        e.preventDefault();
+        handleRun();
       }
       // Cmd/Ctrl + Shift + H → Toggle hints
       if (mod && e.shiftKey && e.key === "H") {
@@ -197,7 +258,7 @@ export default function ProblemClient({ problem }: { problem: ClientProblem }) {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleCompile, fetchSolutionData]);
+  }, [handleCompile, handleRun, fetchSolutionData]);
 
   return (
     <div className="h-[calc(100dvh-56px)] flex flex-col lg:flex-row">
@@ -385,21 +446,23 @@ export default function ProblemClient({ problem }: { problem: ClientProblem }) {
                 className="p-6"
                 aria-live="polite"
               >
-                {!results && !isCompiling && (
+                {!results && !isCompiling && !isRunning && (
                   <div className="flex flex-col items-center justify-center py-8 text-center">
                     <svg aria-hidden="true" className="w-10 h-10 text-[var(--color-muted)] opacity-40 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 010 1.972l-11.54 6.347a1.125 1.125 0 01-1.667-.986V5.653z" />
                     </svg>
-                    <p className="text-[var(--color-muted)] text-sm mb-1">Ready to test your code?</p>
+                    <p className="text-[var(--color-muted)] text-sm mb-1">Ready to run your code?</p>
                     <p className="text-xs text-[var(--color-muted)] opacity-60">
-                      Press <kbd className="px-1.5 py-0.5 bg-[var(--color-border)] rounded text-[10px]">&#8984;Enter</kbd> or click &quot;Run Tests&quot;
+                      <kbd className="px-1.5 py-0.5 bg-[var(--color-border)] rounded text-[10px]">&#8984;Enter</kbd> Run
+                      <span className="mx-2">|</span>
+                      <kbd className="px-1.5 py-0.5 bg-[var(--color-border)] rounded text-[10px]">&#8984;&#8679;Enter</kbd> Test
                     </p>
                   </div>
                 )}
-                {isCompiling && (
+                {(isCompiling || isRunning) && (
                   <div className="flex items-center gap-3 text-sm text-[var(--color-muted)]">
                     <div className="w-4 h-4 border-2 border-[var(--color-accent)] border-t-transparent rounded-full animate-spin" />
-                    Compiling
+                    {isRunning ? "Running" : "Compiling"}
                     <span className="inline-flex gap-0.5">
                       <span className="w-1 h-1 rounded-full bg-[var(--color-muted)] animate-[dotPulse_1.4s_infinite_0s]" />
                       <span className="w-1 h-1 rounded-full bg-[var(--color-muted)] animate-[dotPulse_1.4s_infinite_0.2s]" />
@@ -469,6 +532,21 @@ export default function ProblemClient({ problem }: { problem: ClientProblem }) {
                         </span>
                       </motion.div>
                     ))}
+
+                    {/* Console output */}
+                    {consoleLogs.length > 0 && (
+                      <motion.div variants={fadeInUpVariant}>
+                        <div className="text-xs text-[var(--color-muted)] uppercase tracking-wider mb-2">Console Output</div>
+                        <div className="bg-[var(--color-background)] border border-[var(--color-border)] rounded-lg p-3 font-mono text-sm space-y-1">
+                          {consoleLogs.map((log, i) => (
+                            <div key={i} className="text-[var(--color-foreground)]">
+                              <span className="text-[var(--color-muted)] mr-2">&gt;</span>
+                              {log || <span className="text-[var(--color-muted)] italic">(empty)</span>}
+                            </div>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
 
                     {/* Next problem button */}
                     {allPassed && nextProblem && (
@@ -585,18 +663,41 @@ export default function ProblemClient({ problem }: { problem: ClientProblem }) {
         <div className="flex items-center justify-between px-4 py-2 border-b border-[var(--color-border)] bg-[var(--color-surface)]">
           <div className="flex items-center gap-2">
           <button
-            onClick={handleCompile}
-            disabled={isCompiling}
-            aria-busy={isCompiling}
-            aria-label="Run tests"
-            className="inline-flex items-center gap-1.5 text-sm px-4 py-1.5 rounded-full border border-[var(--color-success)]/40 text-[var(--color-success)] hover:bg-[var(--color-success)]/10 font-medium transition-all duration-200 disabled:opacity-50"
+            onClick={handleRun}
+            disabled={isLoading}
+            aria-busy={isRunning}
+            aria-label="Run code"
+            className="inline-flex items-center gap-1.5 text-sm px-4 py-1.5 rounded-full border border-[var(--color-accent)]/40 text-[var(--color-accent)] hover:bg-[var(--color-accent)]/10 font-medium transition-all duration-200 disabled:opacity-50"
           >
             <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M8 5v14l11-7z" />
             </svg>
+            {isRunning ? (
+              <span className="inline-flex items-center gap-1">
+                Running
+                <span className="inline-flex gap-0.5">
+                  <span className="w-1 h-1 rounded-full bg-[var(--color-accent)] animate-[dotPulse_1.4s_infinite_0s]" />
+                  <span className="w-1 h-1 rounded-full bg-[var(--color-accent)] animate-[dotPulse_1.4s_infinite_0.2s]" />
+                  <span className="w-1 h-1 rounded-full bg-[var(--color-accent)] animate-[dotPulse_1.4s_infinite_0.4s]" />
+                </span>
+              </span>
+            ) : (
+              "Run"
+            )}
+          </button>
+          <button
+            onClick={handleCompile}
+            disabled={isLoading}
+            aria-busy={isCompiling}
+            aria-label="Run tests"
+            className="inline-flex items-center gap-1.5 text-sm px-4 py-1.5 rounded-full border border-[var(--color-success)]/40 text-[var(--color-success)] hover:bg-[var(--color-success)]/10 font-medium transition-all duration-200 disabled:opacity-50"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+            </svg>
             {isCompiling ? (
               <span className="inline-flex items-center gap-1">
-                Compiling
+                Testing
                 <span className="inline-flex gap-0.5">
                   <span className="w-1 h-1 rounded-full bg-[var(--color-success)] animate-[dotPulse_1.4s_infinite_0s]" />
                   <span className="w-1 h-1 rounded-full bg-[var(--color-success)] animate-[dotPulse_1.4s_infinite_0.2s]" />
@@ -604,7 +705,7 @@ export default function ProblemClient({ problem }: { problem: ClientProblem }) {
                 </span>
               </span>
             ) : (
-              "Run Tests"
+              "Test"
             )}
           </button>
           <button
@@ -618,9 +719,15 @@ export default function ProblemClient({ problem }: { problem: ClientProblem }) {
             Reset
           </button>
           </div>
-          <span className="text-xs text-[var(--color-muted)] hidden sm:inline-flex items-center gap-1 opacity-60">
-            <kbd className="px-1 py-0.5 rounded bg-[var(--color-border)] text-[10px]">&#8984;Enter</kbd>
-            <span>Run</span>
+          <span className="text-xs text-[var(--color-muted)] hidden sm:inline-flex items-center gap-2 opacity-60">
+            <span className="inline-flex items-center gap-1">
+              <kbd className="px-1 py-0.5 rounded bg-[var(--color-border)] text-[10px]">&#8984;Enter</kbd>
+              <span>Run</span>
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <kbd className="px-1 py-0.5 rounded bg-[var(--color-border)] text-[10px]">&#8984;&#8679;Enter</kbd>
+              <span>Test</span>
+            </span>
           </span>
         </div>
 
