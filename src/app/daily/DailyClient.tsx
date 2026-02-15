@@ -200,17 +200,17 @@ export default function DailyClient() {
             return (
               <div
                 key={i}
-                className="relative -mx-1 rounded-lg bg-[#38bdf8]/10 border border-[#38bdf8]/25"
+                className="relative -mx-1 rounded-lg bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/25"
               >
                 <div
                   ref={blankScrollRef}
                   className="px-1 py-1 overflow-x-auto whitespace-pre scrollbar-none"
                 >
-                  <code className="text-[#e2e8f0]">
+                  <code className="text-[var(--color-foreground)]">
                     {parts[0]}
                     <span
                       ref={blankPillRef}
-                      className="inline-block px-2 py-0.5 mx-0.5 rounded bg-[#38bdf8]/20 text-[#38bdf8] border border-[#38bdf8]/40 font-bold min-w-[40px] text-center text-xs"
+                      className="inline-block px-2 py-0.5 mx-0.5 rounded bg-[var(--color-accent)]/20 text-[var(--color-accent)] border border-[var(--color-accent)]/40 font-bold min-w-[40px] text-center text-xs"
                     >
                       {selected ?? "?"}
                     </span>
@@ -218,8 +218,8 @@ export default function DailyClient() {
                   </code>
                 </div>
                 {/* Scroll fade indicators */}
-                <div className="pointer-events-none absolute inset-y-0 left-0 w-4 rounded-l-lg bg-gradient-to-r from-[#38bdf8]/10 to-transparent" />
-                <div className="pointer-events-none absolute inset-y-0 right-0 w-4 rounded-r-lg bg-gradient-to-l from-[#38bdf8]/10 to-transparent" />
+                <div className="pointer-events-none absolute inset-y-0 left-0 w-4 rounded-l-lg bg-gradient-to-r from-[var(--color-accent)]/10 to-transparent" />
+                <div className="pointer-events-none absolute inset-y-0 right-0 w-4 rounded-r-lg bg-gradient-to-l from-[var(--color-accent)]/10 to-transparent" />
               </div>
             );
           }
@@ -232,7 +232,7 @@ export default function DailyClient() {
           return (
             <div
               key={i}
-              className="overflow-hidden whitespace-pre text-[#94a3b8] truncate"
+              className="overflow-hidden whitespace-pre text-[var(--color-muted)] truncate"
             >
               <code>{line}</code>
             </div>
