@@ -59,7 +59,7 @@ function CategorySection({ cat, completedProblems }: { cat: Category; completedP
       {/* Progress bar */}
       <div className="h-1 bg-[var(--color-border)] rounded-full mb-3 overflow-hidden">
         <motion.div
-          className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full"
+          className="h-full bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent-secondary)] rounded-full"
           initial={{ width: 0 }}
           animate={isInView ? { width: `${progress}%` } : { width: 0 }}
           transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
@@ -166,7 +166,7 @@ export default function SolidityCoursePage() {
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
         <div className="flex items-center gap-4 mb-4">
-          <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(56,189,248,0.2)]">
+          <div className="w-12 h-12 bg-gradient-to-br from-[var(--color-accent)] to-[var(--color-accent-secondary)] rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(56,189,248,0.2)]">
             <span className="text-2xl font-bold text-white">S</span>
           </div>
           <div>

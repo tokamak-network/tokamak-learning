@@ -445,7 +445,7 @@ export default function DailyClient() {
           <div className="relative w-16 h-16 mx-auto mb-8">
             <div className="absolute inset-0 rounded-full border-2 border-[var(--color-border)]" />
             <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-[var(--color-accent)] animate-spin" />
-            <div className="absolute inset-[6px] rounded-full border-2 border-transparent border-b-[#8b5cf6] animate-[spin_1.5s_linear_infinite_reverse]" />
+            <div className="absolute inset-[6px] rounded-full border-2 border-transparent border-b-[var(--color-accent-secondary)] animate-[spin_1.5s_linear_infinite_reverse]" />
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="w-2 h-2 rounded-full bg-[var(--color-accent)] animate-pulse" />
             </div>
@@ -497,7 +497,7 @@ export default function DailyClient() {
           </p>
           <button
             onClick={handleRetry}
-            className="w-full py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-[var(--color-accent)] to-[#8b5cf6] hover:opacity-90 transition-opacity"
+            className="w-full py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent-secondary)] hover:opacity-90 transition-opacity"
           >
             Retry
           </button>
@@ -540,7 +540,7 @@ export default function DailyClient() {
           <button
             onClick={handleStart}
             aria-label="Start daily challenge"
-            className="w-full py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-[var(--color-accent)] to-[#8b5cf6] hover:opacity-90 transition-opacity text-lg"
+            className="w-full py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent-secondary)] hover:opacity-90 transition-opacity text-lg"
           >
             Start
           </button>
@@ -562,7 +562,7 @@ export default function DailyClient() {
           </span>
           <div className="flex-1 h-2 rounded-full bg-[var(--color-surface)] overflow-hidden">
             <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-[var(--color-accent)] to-[#8b5cf6]"
+              className="h-full rounded-full bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent-secondary)]"
               initial={false}
               animate={{ width: `${((currentIndex + 1) / total) * 100}%` }}
               transition={{ duration: 0.3 }}
@@ -656,7 +656,7 @@ export default function DailyClient() {
                 </div>
                 <button
                   onClick={handleNext}
-                  className="w-full py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-[var(--color-accent)] to-[#8b5cf6] hover:opacity-90 transition-opacity"
+                  className="w-full py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent-secondary)] hover:opacity-90 transition-opacity"
                 >
                   {currentIndex + 1 >= total ? "See Results" : "Next"}
                 </button>
@@ -734,7 +734,7 @@ export default function DailyClient() {
             <button
               onClick={handleRefresh}
               disabled={refreshing}
-              className="w-full py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-[var(--color-accent)] to-[#8b5cf6] hover:opacity-90 transition-opacity disabled:opacity-50"
+              className="w-full py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent-secondary)] hover:opacity-90 transition-opacity disabled:opacity-50"
             >
               {refreshing ? "Generating..." : "Try Again"}
             </button>

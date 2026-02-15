@@ -401,7 +401,7 @@ export default function ProblemClient({ problem }: { problem: ClientProblem }) {
                 <div className="mt-4">
                   <button
                     onClick={() => { fetchSolutionData(); setShowSolution(!showSolution); }}
-                    className="text-sm text-[var(--color-warning)] hover:text-yellow-300 transition-colors"
+                    className="text-sm text-[var(--color-warning)] hover:text-[var(--color-warning)] transition-colors"
                   >
                     {showSolution ? "Hide Solution" : "Show Solution"}
                     <span className="ml-1 text-xs opacity-50">&#8984;&#8679;S</span>
@@ -653,7 +653,7 @@ export default function ProblemClient({ problem }: { problem: ClientProblem }) {
               onClick={toggleVimMode}
               className={`text-xs px-2 py-1 rounded-md border transition-all duration-200 ${
                 vimMode
-                  ? "text-[var(--color-accent)] border-[var(--color-accent)] bg-blue-500/10"
+                  ? "text-[var(--color-accent)] border-[var(--color-accent)] bg-[var(--color-accent)]/10"
                   : "text-[var(--color-muted)] border-[var(--color-border)] hover:text-[var(--color-foreground)] hover:border-[var(--color-muted)]"
               }`}
             >

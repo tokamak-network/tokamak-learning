@@ -15,7 +15,7 @@ export default function NotFound() {
         </p>
         <Link
           href="/"
-          className="inline-block bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:shadow-[var(--shadow-glow-strong)] transition-all"
+          className="inline-block bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent-secondary)] text-white px-6 py-3 rounded-lg font-medium hover:shadow-[var(--shadow-glow-strong)] transition-all"
         >
           Go Home
         </Link>

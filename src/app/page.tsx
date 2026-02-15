@@ -168,9 +168,9 @@ export default function Home() {
       <section className="relative overflow-hidden">
         {/* Layered plasma background */}
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/8 via-blue-600/5 to-transparent" />
-          <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-cyan-500/5 rounded-full blur-[120px] animate-[plasma-drift_20s_ease-in-out_infinite]" />
-          <div className="absolute top-20 right-1/4 w-[400px] h-[400px] bg-violet-500/5 rounded-full blur-[100px] animate-[plasma-drift_15s_ease-in-out_infinite_reverse]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[var(--color-accent)]/8 via-[var(--color-accent-secondary)]/5 to-transparent" />
+          <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-[var(--color-accent)]/5 rounded-full blur-[120px] animate-[plasma-drift_20s_ease-in-out_infinite]" />
+          <div className="absolute top-20 right-1/4 w-[400px] h-[400px] bg-[var(--color-accent-secondary)]/5 rounded-full blur-[100px] animate-[plasma-drift_15s_ease-in-out_infinite_reverse]" />
         </div>
 
         <div className="max-w-6xl mx-auto px-6 pt-20 pb-24 relative flex flex-col lg:flex-row items-center gap-16">
@@ -203,7 +203,7 @@ export default function Home() {
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: "-100%", opacity: 0 }}
                     transition={{ duration: 0.35, ease: "easeInOut" }}
-                    className="absolute bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent"
+                    className="absolute bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent-secondary)] bg-clip-text text-transparent"
                   >
                     {rotatingWords[wordIndex]}
                   </motion.span>
@@ -229,14 +229,14 @@ export default function Home() {
                 className={`md:hidden group relative px-6 py-3 rounded-lg font-medium transition-all ${
                   dailyDone
                     ? "bg-[var(--color-success)]/15 text-[var(--color-success)] border border-[var(--color-success)]/30"
-                    : "bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:shadow-[var(--shadow-glow-strong)] hover:scale-[1.02]"
+                    : "bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent-secondary)] text-white hover:shadow-[var(--shadow-glow-strong)] hover:scale-[1.02]"
                 }`}
               >
                 {dailyDone ? "✓ Completed" : "Daily Challenge"}
               </Link>
               <Link
                 href="/language/solidity"
-                className="hidden md:inline-flex group relative bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-all hover:shadow-[var(--shadow-glow-strong)] hover:scale-[1.02]"
+                className="hidden md:inline-flex group relative bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent-secondary)] text-white px-6 py-3 rounded-lg font-medium transition-all hover:shadow-[var(--shadow-glow-strong)] hover:scale-[1.02]"
               >
                 Start Learning
               </Link>
@@ -285,7 +285,7 @@ export default function Home() {
             </div>
           </div>
           <div>
-            <div className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent tabular-nums tracking-tight">
+            <div className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-[var(--color-accent)] to-[var(--color-accent-secondary)] bg-clip-text text-transparent tabular-nums tracking-tight">
               <CountUp target={100} suffix="%" />
             </div>
             <div className="text-xs md:text-sm text-[var(--color-muted)] mt-1.5">
@@ -304,7 +304,7 @@ export default function Home() {
       <footer className="border-t border-[var(--color-border)] py-8">
         <div className="max-w-6xl mx-auto px-4 md:px-6 flex items-center justify-between">
           <div className="text-xs md:text-sm text-[var(--color-muted)]">
-            &copy; 2025 TokamakLearn[:run]
+            &copy; 2026 TokamakLearn[:run]
           </div>
           <a
             href="https://tokamak.network"

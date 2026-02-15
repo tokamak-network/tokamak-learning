@@ -11,6 +11,7 @@
   --color-danger: #f87171;
   --color-warning: #fbbf24;
   --color-muted: #64748b;
+  --color-accent-secondary: #8b5cf6;
   --color-surface-hover: #151f2e;
   --color-code-bg: #0f1520;
   --color-code-border: #1e2a3a;
@@ -33,6 +34,7 @@
   --color-danger: #dc2626;
   --color-warning: #d97706;
   --color-muted: #64748b;
+  --color-accent-secondary: #7c3aed;
   --color-surface-hover: #e2e8f0;
   --color-code-bg: #f1f5f9;
   --color-code-border: #cbd5e1;
@@ -174,6 +176,9 @@ input:focus-visible {
 }
 .glow-card:hover {
   will-change: transform;
+}
+[data-theme="light"] .glow-card::before {
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.15), rgba(124, 58, 237, 0.1), rgba(2, 132, 199, 0.05));
 }
 
 @keyframes fadeInUp {
