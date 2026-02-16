@@ -480,27 +480,28 @@ export default function ProblemClient({ problem }: { problem: ClientProblem }) {
                     initial="hidden"
                     animate="visible"
                   >
-                    {/* Summary */}
-                    <motion.div
-                      variants={fadeInUpVariant}
-                      className={`p-4 rounded-lg border ${
-                        allPassed
-                          ? "bg-[var(--color-success)]/5 border-[var(--color-success)]/20"
-                          : "bg-[var(--color-danger)]/5 border-[var(--color-danger)]/20"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 mb-1">
-                        <span
-                          className={`text-lg ${allPassed ? "text-[var(--color-success)]" : "text-[var(--color-danger)]"}`}
-                        >
-                          {allPassed ? "Pass" : "Fail"}
-                        </span>
-                      </div>
-                      <p className="text-sm text-[var(--color-muted)]">
-                        {results.filter((r) => r.passed).length} /{" "}
-                        {results.length} tests passed
-                      </p>
-                    </motion.div>
+                    {isTestResult && (
+                      <motion.div
+                        variants={fadeInUpVariant}
+                        className={`p-4 rounded-lg border ${
+                          allPassed
+                            ? "bg-[var(--color-success)]/5 border-[var(--color-success)]/20"
+                            : "bg-[var(--color-danger)]/5 border-[var(--color-danger)]/20"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <span
+                            className={`text-lg ${allPassed ? "text-[var(--color-success)]" : "text-[var(--color-danger)]"}`}
+                          >
+                            {allPassed ? "Pass" : "Fail"}
+                          </span>
+                        </div>
+                        <p className="text-sm text-[var(--color-muted)]">
+                          {results.filter((r) => r.passed).length} /{" "}
+                          {results.length} tests passed
+                        </p>
+                      </motion.div>
+                    )}
 
                     {/* Individual results */}
                     {results.map((r, i) => (
