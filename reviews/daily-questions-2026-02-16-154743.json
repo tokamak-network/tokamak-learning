@@ -1,0 +1,135 @@
+{
+  "id": "generated",
+  "questions": [
+    {
+      "type": "code",
+      "id": "gen-c1",
+      "category": "basic-types",
+      "code": "pragma solidity ^0.8.0;\n\ncontract ByteDemo {\n    ___BLANK___ public flag = 0xffff;\n}",
+      "answer": "bytes2",
+      "distractors": [
+        "bytes1",
+        "bytes4",
+        "bytes8"
+      ],
+      "explanation": "The value 0xffff is 2 bytes (4 hex digits), so bytes2 is the correct fixed-size byte type. bytes1 is too small, bytes4 and bytes8 are larger than needed."
+    },
+    {
+      "type": "code",
+      "id": "gen-c2",
+      "category": "patterns",
+      "code": "pragma solidity ^0.8.0;\n\ncontract Token {\n    ___BLANK___ Transfer(address from, address to, uint amount);\n    \n    function send(address to, uint amount) public {\n        emit Transfer(msg.sender, to, amount);\n    }\n}",
+      "answer": "event",
+      "distractors": [
+        "function",
+        "modifier",
+        "error"
+      ],
+      "explanation": "The 'event' keyword declares an event that can be emitted. Using 'function', 'modifier', or 'error' would cause a compile error because the emit statement requires an event."
+    },
+    {
+      "type": "code",
+      "id": "gen-c3",
+      "category": "basics",
+      "code": "pragma solidity ^0.8.0;\n\ncontract Ownable {\n    address public owner;\n\n    ___BLANK___() {\n        owner = msg.sender;\n    }\n}",
+      "answer": "constructor",
+      "distractors": [
+        "function",
+        "init",
+        "setup"
+      ],
+      "explanation": "The 'constructor' keyword defines the special function that runs once at deployment. Using 'function' would create a regular function, not a constructor, and owner wouldn't be set on deployment."
+    },
+    {
+      "type": "code",
+      "id": "gen-c4",
+      "category": "integers",
+      "code": "pragma solidity ^0.8.0;\n\ncontract Numbers {\n    ___BLANK___ public max = 65535;\n}",
+      "answer": "uint16",
+      "distractors": [
+        "uint8",
+        "uint32",
+        "uint64"
+      ],
+      "explanation": "The value 65535 fits in uint16 (max 65535) but exceeds uint8 (max 255). uint32 and uint64 work but waste gas - uint16 is the smallest correct type."
+    },
+    {
+      "type": "code",
+      "id": "gen-c5",
+      "category": "arithmetic",
+      "code": "pragma solidity ^0.8.0;\n\ncontract Math {\n    function divide(uint256 a, uint256 b) ___BLANK___ returns (uint256) {\n        return a / b;\n    }\n}",
+      "answer": "pure",
+      "distractors": [
+        "view",
+        "payable",
+        "external"
+      ],
+      "explanation": "This function only performs computation without reading or modifying state, so it must be 'pure'. 'view' would be incorrect because it implies reading state (even though this doesn't), and 'payable' is unrelated."
+    },
+    {
+      "type": "concept",
+      "id": "gen-q1",
+      "category": "basics",
+      "question": "In Ethereum's proof-of-stake consensus, who proposes blocks?",
+      "answer": "Validators selected through random pseudo-selection",
+      "distractors": [
+        "Miners with the most hash power",
+        "The contract deployer",
+        "The first address in the block"
+      ],
+      "explanation": "In PoS, validators are randomly selected (pseudo-randomly via RANDAO and VDF) to propose blocks. This replaced proof-of-work mining."
+    },
+    {
+      "type": "concept",
+      "id": "gen-q2",
+      "category": "advanced",
+      "question": "What is the primary purpose of EIP-1559?",
+      "answer": "To make gas fees more predictable and burn a portion of transaction fees",
+      "distractors": [
+        "To increase the block gas limit",
+        "To enable cross-chain transactions",
+        "To add new opcodes to the EVM"
+      ],
+      "explanation": "EIP-1559 introduced base fees that adjust per block and burn a portion of fees, making fees more predictable and reducing MEV extraction."
+    },
+    {
+      "type": "concept",
+      "id": "gen-q3",
+      "category": "patterns",
+      "question": "What is a flash loan in DeFi?",
+      "answer": "A loan that must be borrowed and repaid within a single transaction",
+      "distractors": [
+        "A loan with zero interest",
+        "A loan that requires collateral",
+        "A loan that persists across multiple blocks"
+      ],
+      "explanation": "Flash loans allow borrowing any amount without collateral as long as the loan is repaid plus fees within the same transaction - enabling arbitrage and liquidations."
+    },
+    {
+      "type": "concept",
+      "id": "gen-q4",
+      "category": "basics",
+      "question": "What type of Ethereum account can have code?",
+      "answer": "Contract accounts (CA)",
+      "distractors": [
+        "Externally owned accounts (EOA)",
+        "Only proxy contracts",
+        "No accounts can have code"
+      ],
+      "explanation": "Contract accounts have executable code, while EOAs (owned by private keys) cannot. This is a fundamental distinction in Ethereum's account model."
+    },
+    {
+      "type": "concept",
+      "id": "gen-q5",
+      "category": "advanced",
+      "question": "What is the main security concern with delegatecall in Solidity?",
+      "answer": "The called contract can modify the caller's storage",
+      "distractors": [
+        "It uses more gas than a regular call",
+        "It cannot return values",
+        "It only works with view functions"
+      ],
+      "explanation": "delegatecall executes code in the context of the caller, meaning the called contract can overwrite the caller's storage variables if not carefully protected."
+    }
+  ]
+}

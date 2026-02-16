@@ -1,0 +1,135 @@
+{
+  "id": "generated",
+  "questions": [
+    {
+      "type": "code",
+      "id": "gen-c1",
+      "category": "arithmetic",
+      "code": "pragma solidity ^0.8.0;\n\ncontract Multiply {\n    function calc(uint256 a, uint256 b) public pure returns (uint256) {\n        return a ___BLANK___ b;\n    }\n}",
+      "answer": "*",
+      "distractors": [
+        "+",
+        "-",
+        "/"
+      ],
+      "explanation": "The asterisk (*) is the multiplication operator in Solidity. Using +, -, or / would perform addition, subtraction, or division instead, producing incorrect results."
+    },
+    {
+      "type": "code",
+      "id": "gen-c2",
+      "category": "advanced",
+      "code": "pragma solidity ^0.8.0;\n\ncontract Parent {\n    function greet() public pure virtual returns (string memory) {\n        return \"hello\";\n    }\n}\n\ncontract Child is Parent {\n    function greet() public pure ___BLANK___ returns (string memory) {\n        return \"hi\";\n    }\n}",
+      "answer": "override",
+      "distractors": [
+        "virtual",
+        "extends",
+        "super"
+      ],
+      "explanation": "When a child contract redefines a virtual function from its parent, the override keyword is required. Without it, the code fails to compile. Virtual is used in the parent, not the child."
+    },
+    {
+      "type": "code",
+      "id": "gen-c3",
+      "category": "comparison",
+      "code": "pragma solidity ^0.8.0;\n\ncontract Grader {\n    function getGrade(uint256 score) public pure returns (string memory) {\n        if (score >= 90) {\n            return \"A\";\n        } ___BLANK___ (score >= 80) {\n            return \"B\";\n        } else {\n            return \"C\";\n        }\n    }\n}",
+      "answer": "else if",
+      "distractors": [
+        "if",
+        "else",
+        "while"
+      ],
+      "explanation": "To chain multiple conditions in Solidity, use 'else if' after the first if block. Using just 'if' would create a syntax error. 'else' requires no condition, and 'while' is for loops."
+    },
+    {
+      "type": "code",
+      "id": "gen-c4",
+      "category": "basics",
+      "code": "pragma solidity ^0.8.0;\nimport \"hardhat/console.sol\";\n\ncontract Logger {\n    function logData(bytes32 data) public pure {\n        ___BLANK___(data);\n    }\n}",
+      "answer": "console.logBytes32",
+      "distractors": [
+        "console.log",
+        "console.logString",
+        "console.logBytes"
+      ],
+      "explanation": "For logging bytes32 types in Hardhat, you must use console.logBytes32(). Using console.log() for bytes32 produces incorrect output, and the other functions don't exist."
+    },
+    {
+      "type": "code",
+      "id": "gen-c5",
+      "category": "comparison",
+      "code": "pragma solidity ^0.8.0;\n\ncontract Voter {\n    function canVote(uint256 age) public pure returns (bool) {\n        if (age ___BLANK___ 18) {\n            return true;\n        }\n        return false;\n    }\n}",
+      "answer": ">=",
+      "distractors": [
+        ">",
+        "==",
+        "<"
+      ],
+      "explanation": "The >= operator returns true when age is 18 or greater, which matches legal voting age. Using > would exclude exactly 18-year-olds, == would only allow 18, and < would invert the logic."
+    },
+    {
+      "type": "concept",
+      "id": "gen-q1",
+      "category": "basics",
+      "question": "In Ethereum after the Merge upgrade, who receives the gas fees from transactions?",
+      "answer": "Validators (Proof of Stake validators)",
+      "distractors": [
+        "Miners (Proof of Work)",
+        "The block proposer",
+        "All network nodes equally"
+      ],
+      "explanation": "After The Merge, Ethereum uses Proof of Stake. Validators (specifically the block proposer) receive gas fees. This replaced the Proof of Work miner reward system."
+    },
+    {
+      "type": "concept",
+      "id": "gen-q2",
+      "category": "advanced",
+      "question": "What is the primary purpose of EIP-1559 (the London upgrade)?",
+      "answer": "To make gas fees more predictable and burn a portion of transaction fees",
+      "distractors": [
+        "To increase the block gas limit",
+        "To enable cross-chain transactions",
+        "To add smart contract size limits"
+      ],
+      "explanation": "EIP-1559 introduced a base fee that gets burned, making fees more predictable and reducing miner extractable value. It doesn't directly increase block limits or add contract size limits."
+    },
+    {
+      "type": "concept",
+      "id": "gen-q3",
+      "category": "patterns",
+      "question": "What is a flash loan in DeFi?",
+      "answer": "A loan that must be borrowed and repaid within a single transaction",
+      "distractors": [
+        "A loan with zero interest",
+        "A loan that persists across multiple blocks",
+        "A loan secured by physical assets"
+      ],
+      "explanation": "Flash loans allow borrowing any amount of tokens without collateral as long as the loan is repaid plus fees within the same transaction. This is possible because Ethereum transactions are atomic."
+    },
+    {
+      "type": "concept",
+      "id": "gen-q4",
+      "category": "advanced",
+      "question": "What is the maximum stack depth in the EVM before operations start failing?",
+      "answer": "1024",
+      "distractors": [
+        "256",
+        "512",
+        "2048"
+      ],
+      "explanation": "The EVM has a maximum stack depth of 1024. When the stack exceeds this, operations begin to revert. This is a hard limit defined in the Ethereum specification."
+    },
+    {
+      "type": "concept",
+      "id": "gen-q5",
+      "category": "basics",
+      "question": "What type of Ethereum account can contain bytecode and interact with the blockchain?",
+      "answer": "Contract account (CA)",
+      "distractors": [
+        "Externally owned account (EOA)",
+        "Wallet account",
+        "Light client account"
+      ],
+      "explanation": "Only contract accounts (CAs) contain bytecode. EOAs are controlled by private keys and have no bytecode. Both can hold ETH and interact with the blockchain, but only CAs can execute logic."
+    }
+  ]
+}

@@ -1,0 +1,122 @@
+{
+  "id": "generated",
+  "questions": [
+    {
+      "type": "code",
+      "id": "gen-c2",
+      "category": "arithmetic",
+      "code": "pragma solidity ^0.8.0;\n\ncontract Calculator {\n    function multiply(uint256 a, uint256 b) public pure returns (uint256) {\n        return a ___BLANK___ b;\n    }\n}",
+      "answer": "*",
+      "distractors": [
+        "x",
+        "multiply",
+        "**"
+      ],
+      "explanation": "The multiplication operator in Solidity is *. The ** operator is for exponentiation, not multiplication."
+    },
+    {
+      "type": "code",
+      "id": "gen-c3",
+      "category": "advanced",
+      "code": "pragma solidity ^0.8.0;\n\ncontract Base {\n    function process() public virtual {\n        // base implementation\n    }\n}\n\ncontract Derived is Base {\n    function process() public override {\n        ___BLANK___.process();\n        // additional logic\n    }\n}",
+      "answer": "super",
+      "distractors": [
+        "this",
+        "Base",
+        "parent"
+      ],
+      "explanation": "The super keyword is used to call the parent contract's function. this refers to the current contract, and Base is the contract name, not the keyword for parent calls."
+    },
+    {
+      "type": "code",
+      "id": "gen-c4",
+      "category": "advanced",
+      "code": "pragma solidity ^0.8.0;\n\ncontract Vault {\n    ___BLANK___() external payable {}\n    \n    function getBalance() public view returns (uint256) {\n        return address(this).balance;\n    }\n}",
+      "answer": "receive",
+      "distractors": [
+        "fallback",
+        "entry",
+        "onReceive"
+      ],
+      "explanation": "The receive() function is the special function that gets called when ETH is sent to a contract without data. fallback is for other unmatched calls."
+    },
+    {
+      "type": "code",
+      "id": "gen-c5",
+      "category": "control-flow",
+      "code": "pragma solidity ^0.8.0;\n\ncontract Token {\n    mapping(address => uint) public balanceOf;\n    \n    function transfer(address to, uint amount) public {\n        if (balanceOf[msg.sender] < amount) ___BLANK___(\"Insufficient funds\");\n        balanceOf[msg.sender] -= amount;\n        balanceOf[to] += amount;\n    }\n}",
+      "answer": "revert",
+      "distractors": [
+        "throw",
+        "return",
+        "assert"
+      ],
+      "explanation": "The revert statement unconditionally reverts the transaction with an optional message string. throw is deprecated; assert is for invariant checks."
+    },
+    {
+      "type": "concept",
+      "id": "gen-q1",
+      "category": "basics",
+      "question": "What is the primary mechanism EIP-1559 introduced to reduce ETH supply?",
+      "answer": "Base fee burning",
+      "distractors": [
+        "Validator rewards elimination",
+        "Transaction fee reduction",
+        "Block reward reduction"
+      ],
+      "explanation": "EIP-1559 introduced base fee burning, where the base fee from each transaction is burned, reducing overall ETH supply over time."
+    },
+    {
+      "type": "concept",
+      "id": "gen-q2",
+      "category": "patterns",
+      "question": "What is the defining characteristic of a flash loan in DeFi?",
+      "answer": "The loan must be borrowed and repaid within a single transaction",
+      "distractors": [
+        "The loan has zero interest rate",
+        "The loan requires no collateral",
+        "The loan can be extended indefinitely"
+      ],
+      "explanation": "Flash loans allow borrowing without collateral as long as the borrowed amount plus fees are repaid in the same transaction."
+    },
+    {
+      "type": "concept",
+      "id": "gen-q3",
+      "category": "advanced",
+      "question": "In Ethereum's proof-of-stake, what happens to a validator who signs two conflicting blocks?",
+      "answer": "Their staked ETH is slashed",
+      "distractors": [
+        "They receive a warning",
+        "Their validator license is suspended",
+        "Nothing happens"
+      ],
+      "explanation": "Double signing (creating conflicting blocks) is a slashable offense that results in the validator losing a portion of their staked ETH."
+    },
+    {
+      "type": "concept",
+      "id": "gen-q4",
+      "category": "basics",
+      "question": "What is the main purpose of a Merkle tree in Ethereum block headers?",
+      "answer": "To efficiently verify that a transaction is included in a block",
+      "distractors": [
+        "To store the block's timestamp",
+        "To encrypt transaction data",
+        "To generate new block hashes"
+      ],
+      "explanation": "Merkle trees allow lightweight clients to verify transaction inclusion without downloading the entire block data."
+    },
+    {
+      "type": "concept",
+      "id": "gen-q5",
+      "category": "patterns",
+      "question": "What security vulnerability does the checks-effects-interactions pattern prevent?",
+      "answer": "Reentrancy attacks",
+      "distractors": [
+        "Integer overflow",
+        "Front-running",
+        "Signature replay"
+      ],
+      "explanation": "By updating state (effects) before making external calls (interactions), the contract prevents attackers from recursively call back into the contract."
+    }
+  ]
+}

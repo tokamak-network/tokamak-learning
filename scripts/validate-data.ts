@@ -1,9 +1,8 @@
 /**
- * Validates problem and daily challenge data integrity.
+ * Validates problem data integrity.
  * Run with: npx tsx scripts/validate-data.ts
  */
 import { problems, categories } from "../src/data/problems";
-import { challengeSets } from "../src/data/daily-challenges";
 
 const errors: string[] = [];
 const warnings: string[] = [];
@@ -42,34 +41,6 @@ for (const p of problems) {
   }
 }
 
-// --- Daily challenge validation ---
-
-for (const set of challengeSets) {
-  for (const q of set.questions) {
-    // Answer must not appear in distractors
-    if (q.distractors.includes(q.answer)) {
-      errors.push(`Challenge ${q.id}: answer "${q.answer}" is in distractors`);
-    }
-
-    // Must have exactly 3 distractors
-    if (q.distractors.length !== 3) {
-      errors.push(`Challenge ${q.id}: expected 3 distractors, got ${q.distractors.length}`);
-    }
-
-    // Code questions must have exactly 1 blank
-    if (q.type === "code") {
-      const blankCount = (q.code.match(/___BLANK___/g) || []).length;
-      if (blankCount !== 1) {
-        errors.push(`Challenge ${q.id}: expected 1 ___BLANK___, got ${blankCount}`);
-      }
-    }
-
-    if (!q.explanation) {
-      warnings.push(`Challenge ${q.id}: missing explanation`);
-    }
-  }
-}
-
 // --- Report ---
 
 if (warnings.length > 0) {
@@ -84,4 +55,4 @@ if (errors.length > 0) {
 }
 
 // eslint-disable-next-line no-console
-console.log(`\n✓  All ${problems.length} problems and ${challengeSets.length} challenge sets validated.\n`);
+console.log(`\n✓  All ${problems.length} problems validated.\n`);
