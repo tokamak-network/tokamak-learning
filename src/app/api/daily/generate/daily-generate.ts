@@ -1,23 +1,20 @@
 import type { AnswerRecord } from "@/app/daily/DailyClient";
 import { categories, problems, type Problem } from "@/data/problems";
 
-/** Fisher-Yates shuffle — pick `count` random items from an array */
-export function pickRandom<T>(arr: T[], count: number): T[] {
+/** Fisher-Yates shuffle, optionally limiting to `count` items */
+export function shuffleArray<T>(arr: T[], count?: number): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [a[i], a[j]] = [a[j], a[i]];
   }
-  return a.slice(0, count);
+  return count !== undefined ? a.slice(0, count) : a;
 }
 
 /** Extract the educational summary from a problem description */
 export function extractLearningSummary(description: string): string {
-  const match = description.match(
-    /## What you'll learn\n([\s\S]*?)(?=\n## |\n$)/
-  );
-  if (!match) return "";
-  return match[1].trim().slice(0, 300);
+  const match = description.match(/## What you'll learn\n([\s\S]*?)(?=\n## |\n$)/);
+  return match ? match[1].trim().slice(0, 300) : "";
 }
 
 /** Determine mastered categories: 70%+ accuracy AND at least 3 answers */
@@ -40,31 +37,20 @@ export function getMasteredCategories(history: AnswerRecord[]): Set<string> {
 }
 
 /** Pick curriculum problems from categories the user hasn't mastered yet */
-export function pickCurriculumProblems(
-  mastered: Set<string>,
-  count: number
-): Problem[] {
+export function pickCurriculumProblems(mastered: Set<string>, count: number): Problem[] {
   const allCategoryIds = categories.map((c) => c.id);
-  const remaining = allCategoryIds.filter((id) => !mastered.has(id));
-  const target = remaining.length > 0 ? remaining : allCategoryIds;
-  const candidates = problems.filter((p) => target.includes(p.category));
-  return pickRandom(candidates, count);
+  const target = allCategoryIds.filter((id) => !mastered.has(id)).length > 0
+    ? allCategoryIds.filter((id) => !mastered.has(id))
+    : allCategoryIds;
+  return shuffleArray(problems.filter((p) => target.includes(p.category)), count);
 }
 
-/** Keep only the most recent 14 days of history */
-export function trimHistory(
-  history: AnswerRecord[],
-  days: number
-): AnswerRecord[] {
+export function trimHistory(history: AnswerRecord[], days: number): AnswerRecord[] {
   const maxAnswers = days * 10;
-  if (history.length <= maxAnswers) return history;
-  return history.slice(-maxAnswers);
+  return history.length <= maxAnswers ? history : history.slice(-maxAnswers);
 }
 
-/** Deduplicate wrong answers by category+question to avoid repetitive prompt content */
-export function deduplicateWrongAnswers(
-  wrong: AnswerRecord[]
-): AnswerRecord[] {
+export function deduplicateWrongAnswers(wrong: AnswerRecord[]): AnswerRecord[] {
   const seen = new Set<string>();
   return wrong.filter((a) => {
     const key = `${a.category}::${a.correctAnswer}`;
@@ -90,91 +76,60 @@ const CATEGORY_GROUPS: string[][] = [
   ["patterns"],
 ];
 
-export function divideCurriculumIntoSections(
-  mastered: Set<string>,
-  sectionCount: number = 5
-): Problem[][] {
-  const sections: Problem[][] = [];
-
-  for (let i = 0; i < sectionCount; i++) {
-    const groupCategories = CATEGORY_GROUPS[i] || [];
-    const availableCategories = groupCategories.filter((c) => !mastered.has(c));
-    
-    const targetCategories = availableCategories.length > 0 
-      ? availableCategories 
+export function divideCurriculumIntoSections(mastered: Set<string>, sectionCount = 5): Problem[][] {
+  return CATEGORY_GROUPS.slice(0, sectionCount).map((groupCategories) => {
+    const target = groupCategories.filter((c) => !mastered.has(c)).length > 0
+      ? groupCategories.filter((c) => !mastered.has(c))
       : groupCategories;
-    
-    const groupProblems = problems
-      .filter((p) => targetCategories.includes(p.category))
-      .sort((a, b) => a.order - b.order);
-    
-    const shuffled = shuffleArray(groupProblems);
-    sections.push(shuffled);
-  }
-
-  return sections;
+    return shuffleArray(
+      problems.filter((p) => target.includes(p.category)).sort((a, b) => a.order - b.order)
+    );
+  });
 }
 
-export function shuffleArray<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
+const CODE_QUESTION_RULES = `## Role: Senior Solidity Security Auditor & Instructor
 
-const CODE_QUESTION_RULES = `## CRITICAL CORRECTNESS RULES:
+## Task:
+Generate a fill-in-the-blank quiz question from the provided Solidity code. Select ONE semantically important keyword (not a simple variable name) to replace with \`___BLANK___\`.
 
-### MANDATORY:
-- Every code question MUST contain exactly one \`___BLANK___\` marker in the code.
-- Without this marker, the question is invalid and will be rejected.
+## Selection Logic:
+The blank MUST be at a position that tests understanding of:
+- Solidity keywords with no equivalent: \`mapping\`, \`event\`, \`emit\`, \`modifier\`, \`require\`, \`override\`, \`constructor\`
+- Operators with verifiable output: \`*\`, \`/\`, \`%\` (when function name indicates the operation)
+- Built-in globals: \`msg.sender\`, \`msg.value\`, \`block.timestamp\` (when context forces exactly one)
+- Control flow: \`break\` vs \`continue\` (different loop behavior)
+- Array methods: \`push\` (only way to append to dynamic array)
 
-### For this code question:
-1. The \`answer\` field MUST be the EXACT string that, when placed at the ___BLANK___ position, makes the code syntactically valid and semantically correct Solidity (^0.8.0).
-2. NONE of the 3 distractors should produce valid, correct code when placed at the blank. Each distractor must cause a compilation error, runtime error, or semantic incorrectness.
-3. The answer must be a single token or short expression (e.g., "mapping", "emit", "=", "msg.sender"). Do NOT use long multi-word answers.
+## Distractor Quality:
+Distractors must be plausible but WRONG. Good distractors include:
+- Similar keywords that don't work in this context
+- Old Solidity syntax (pre-0.8.0)
+- Common beginner misconceptions
+Each distractor MUST cause compilation error, runtime error, or semantic incorrectness.
 
-### ABSOLUTELY BANNED ANSWERS — NEVER USE THESE (instant rejection):
-1. **Visibility modifiers**: public, external, internal, private
-2. **State mutability**: view, pure, payable
-3. **Data locations**: memory, calldata, storage
-4. **Integer types**: int, uint, int8, uint8, int256, uint256, and ALL other integer sizes
-5. **Comparison operators**: >=, >, <=, <
-6. **Function names or variable names** at blank position
-7. **Equivalent mechanisms**: super vs ParentName, receive vs fallback, require vs revert
+## ABSOLUTELY BANNED ANSWERS (will be rejected):
+1. Visibility modifiers: public, external, internal, private
+2. State mutability: view, pure, payable
+3. Data locations: memory, calldata, storage
+4. Integer types: int, uint, int8, uint8, int256, uint256
+5. Comparison operators: >=, >, <=, <
+6. Function names or variable names
+7. Equivalent mechanisms: super vs ParentName, receive vs fallback, require vs revert
 
-### BANNED BLANK POSITIONS — DO NOT PLACE BLANK AT:
-1. Function or variable names — any identifier works.
-2. Visibility modifiers — multiple options compile.
-3. Data locations — memory/calldata often interchangeable.
-4. State mutability — view/pure/payable often interchangeable.
-5. Integer types — larger types always hold smaller values.
-6. \`if\` vs \`else if\` when branches end with return/revert — identical behavior.
-7. Comparison operators — >= vs > both compile with different logic.
+## Self-Verification (MANDATORY):
+Before finalizing, verify:
+1. Replace ___BLANK___ with answer → MUST compile and behave correctly
+2. Replace ___BLANK___ with each distractor → MUST NOT compile or behave incorrectly
+If any distractor works, rewrite the question.
 
-### SAFE BLANK POSITIONS — USE ONLY THESE:
-- **Solidity keywords with no equivalent**: \`mapping\`, \`event\`, \`emit\`, \`modifier\`, \`require\`, \`override\`, \`constructor\`
-- **Operators with verifiable output**: \`*\` (multiply), \`/\` (divide), \`%\` (modulo) — when function name indicates the operation
-- **Assignment operator**: \`=\` — when clearly assigning a value
-- **Built-in globals**: \`msg.sender\`, \`msg.value\`, \`block.timestamp\` — when context forces exactly one
-- **Control flow**: \`break\` vs \`continue\` — different loop behavior
-- **Array methods**: \`push\` — only way to append to dynamic array
-
-### SELF-VERIFICATION (mandatory):
-Before finalizing, perform this check:
-1. Replace ___BLANK___ with the answer → Does it compile AND behave correctly? → MUST be YES
-2. Replace ___BLANK___ with each distractor → Does it compile AND behave correctly? → MUST be NO
-If ANY distractor also works, you MUST rewrite the question.
-
-### Required fields:
+## Required Output Format:
 - type: "code"
 - id: the provided question ID
 - category: one of the valid categories
 - code: Solidity code with exactly one \`___BLANK___\` marker
-- answer: the correct answer (must NOT appear in distractors)
-- distractors: array of exactly 3 strings (all different, non-empty)
-- explanation: 1-2 sentences explaining WHY the answer is correct`;
+- answer: the correct answer (single token or short expression)
+- distractors: array of exactly 3 different strings
+- explanation: why the answer is correct and why distractors are wrong`;
 
 const CONCEPT_QUESTIONS_RULES = `## CRITICAL CORRECTNESS RULES:
 
@@ -193,33 +148,24 @@ const CONCEPT_QUESTIONS_RULES = `## CRITICAL CORRECTNESS RULES:
 - distractors: array of exactly 3 strings (all different, non-empty)
 - explanation: 1-2 sentences explaining WHY the answer is correct`;
 
-/** Build prompt for a single code question from curriculum section */
 export function buildCodeQuestionPrompt(
   questionId: string,
   curriculumSection: Problem[],
   wrongAnswer?: AnswerRecord
 ): string {
-  const inspirationSection = `\n## CURRICULUM REFERENCE (generate a question inspired by these problems):
-${curriculumSection.slice(0, 5).map((p, i) => `
-### Problem ${i + 1}: ${p.title} [${p.category}]
-${extractLearningSummary(p.description)}
-Hints: ${p.hints.join(" | ")}
-Solution:
-\`\`\`solidity
-${p.solution.slice(0, 400)}
-\`\`\`
-`).join("\n")}
+  const randomProblem = curriculumSection[Math.floor(Math.random() * curriculumSection.length)];
+  const inputCodeSection = randomProblem
+    ? `\n## Input Code (generate a quiz question from this code):\n\`\`\`solidity\n${randomProblem.solution}\n\`\`\`\n\nCategory: ${randomProblem.category}\nConcept being taught: ${extractLearningSummary(randomProblem.description) || randomProblem.title}\n`
+    : "";
 
-IMPORTANT: Generate a question based on the curriculum above. Do NOT copy the example format. Create a unique question that tests the concept shown in the curriculum.
-`;
+  const additionalProblems = curriculumSection
+    .filter((p) => p.id !== randomProblem?.id)
+    .slice(0, 3)
+    .map((p, i) => `### Reference ${i + 1}: ${p.title}\n\`\`\`solidity\n${p.solution.slice(0, 300)}\n\`\`\``)
+    .join("\n");
 
   const weakAreaSection = wrongAnswer
-    ? `\n## User's weak area (prioritize if relevant):
-The user got a question wrong in category "${wrongAnswer.category}".
-- Correct answer was: "${wrongAnswer.correctAnswer}"
-- User answered: "${wrongAnswer.userAnswer}"
-Consider creating a question that reinforces this concept.
-`
+    ? `\n## User's Weak Area (prioritize if similar concept exists):\nThe user got a question wrong recently:\n- Category: ${wrongAnswer.category}\n- Correct answer: "${wrongAnswer.correctAnswer}"\nConsider creating a similar question to reinforce learning.\n`
     : "";
 
   return `Generate exactly 1 Solidity code question (fill-in-the-blank).
@@ -228,22 +174,24 @@ Question ID: ${questionId}
 Valid categories: ${validCategories}
 
 ${CODE_QUESTION_RULES}
-${inspirationSection}
+
+${inputCodeSection}
+
+## Additional Reference Code:
+${additionalProblems}
 ${weakAreaSection}
 
-Respond with ONLY valid JSON (no markdown fences, no extra text). The response must contain exactly one question in the "questions" array.`;
+Respond with ONLY valid JSON (no markdown fences, no extra text):
+{
+  "id": "${questionId}",
+  "questions": [{ ... one question object ... }]
+}`;
 }
 
-/** Build prompt for 5 concept questions */
-export function buildConceptQuestionsPrompt(
-  pastConcepts: string[]
-): string {
-  let dedupSection = "";
-  if (pastConcepts.length > 0) {
-    dedupSection = `\n## Previously asked concept questions (DO NOT repeat these):
-${pastConcepts.slice(-20).map((q) => `- "${q}"`).join("\n")}
-`;
-  }
+export function buildConceptQuestionsPrompt(pastConcepts: string[]): string {
+  const dedupSection = pastConcepts.length > 0
+    ? `\n## Previously asked concept questions (DO NOT repeat these):\n${pastConcepts.slice(-20).map((q) => `- "${q}"`).join("\n")}\n`
+    : "";
 
   return `Generate exactly 5 Ethereum Fundamentals concept questions (multiple-choice).
 
@@ -282,118 +230,76 @@ Respond with ONLY valid JSON (no markdown fences, no extra text):
 }`;
 }
 
-/** Prepare data for generating code questions */
 export function prepareCodeQuestionData(history: AnswerRecord[]): {
   wrongAnswers: AnswerRecord[];
   mastered: Set<string>;
   curriculumProblems: Problem[];
 } {
   const trimmed = trimHistory(history, 14);
-  const wrongAnswers = deduplicateWrongAnswers(
-    trimmed.filter((a) => !a.correct)
-  );
-  const mastered = getMasteredCategories(trimmed);
-  const curriculumProblems = pickCurriculumProblems(mastered, 5);
-
-  return { wrongAnswers, mastered, curriculumProblems };
+  return {
+    wrongAnswers: deduplicateWrongAnswers(trimmed.filter((a) => !a.correct)),
+    mastered: getMasteredCategories(trimmed),
+    curriculumProblems: pickCurriculumProblems(getMasteredCategories(trimmed), 5),
+  };
 }
 
-/** Get past concept questions for deduplication */
 export function getPastConcepts(history: AnswerRecord[]): string[] {
-  const trimmed = trimHistory(history, 14);
-  return trimmed
+  return trimHistory(history, 14)
     .filter((a) => a.type === "concept")
     .map((a) => a.question);
 }
 
-/** Validate a single question, return null if valid or a reason string if invalid */
-export function validateQuestion(
-  q: Record<string, unknown>,
-  validCategoryIds: Set<string>
-): string | null {
-  // Required fields
-  if (!q.type || !q.id) return "missing type or id";
-  if (typeof q.answer !== "string" || q.answer.trim() === "")
-    return "missing or empty answer";
-  if (typeof q.explanation !== "string" || q.explanation.trim() === "")
-    return "missing or empty explanation";
+const BANNED_PATTERNS = [
+  { test: (a: string) => /^u?int\d*$/i.test(a), msg: (a: string) => `banned answer pattern: integer type "${a}" — multiple sizes are usually valid` },
+  { test: (a: string) => ["public", "external", "internal", "private"].includes(a.toLowerCase()), msg: (a: string) => `banned answer pattern: visibility "${a}" — multiple modifiers often valid` },
+  { test: (a: string) => ["pure", "view", "payable"].includes(a.toLowerCase()), msg: (a: string) => `banned answer pattern: mutability "${a}" — multiple options often compile` },
+  { test: (a: string) => ["memory", "calldata", "storage"].includes(a.toLowerCase()), msg: (a: string) => `banned answer pattern: data location "${a}" — memory/calldata often interchangeable` },
+  { test: (a: string) => [">=", ">", "<=", "<"].includes(a), msg: (a: string) => `banned answer pattern: comparison "${a}" — >= vs > often both valid depending on interpretation` },
+];
 
-  // Distractors: must be array of exactly 3 non-empty strings
-  if (!Array.isArray(q.distractors) || q.distractors.length !== 3)
-    return "distractors not array of 3";
+export function validateQuestion(q: Record<string, unknown>, validCategoryIds: Set<string>): string | null {
+  if (!q.type || !q.id) return "missing type or id";
+  if (typeof q.answer !== "string" || !q.answer.trim()) return "missing or empty answer";
+  if (typeof q.explanation !== "string" || !q.explanation.trim()) return "missing or empty explanation";
+
+  if (!Array.isArray(q.distractors) || q.distractors.length !== 3) return "distractors not array of 3";
   const distractors = q.distractors as string[];
   for (let i = 0; i < distractors.length; i++) {
-    if (typeof distractors[i] !== "string" || distractors[i].trim() === "")
-      return `distractor[${i}] is empty or not a string`;
+    if (typeof distractors[i] !== "string" || !distractors[i].trim()) return `distractor[${i}] is empty or not a string`;
   }
 
-  // Answer must not be in distractors
   const answer = (q.answer as string).trim();
-  if (distractors.map((d) => d.trim()).includes(answer))
-    return "answer found in distractors";
+  const trimmedDistractors = distractors.map((d) => d.trim());
+  if (trimmedDistractors.includes(answer)) return "answer found in distractors";
+  if (new Set(trimmedDistractors).size !== 3) return "duplicate distractors";
 
-  // Distractors must be unique
-  const uniqueDistractors = new Set(distractors.map((d) => d.trim()));
-  if (uniqueDistractors.size !== 3) return "duplicate distractors";
-
-  // Code-specific checks
   if (q.type === "code") {
     if (typeof q.code !== "string") return "code is not a string";
     const code = q.code as string;
-    const blankCount = (code.match(/___BLANK___/g) || []).length;
-    if (blankCount !== 1)
-      return `code has ${blankCount} blanks (expected 1)`;
-    // Answer should be reasonably short (a single token/expression)
-    if (answer.length > 80)
-      return `answer too long (${answer.length} chars)`;
-    // Answer should not contain newlines
+    if ((code.match(/___BLANK___/g) || []).length !== 1) return `code has wrong number of blanks (expected 1)`;
+    if (answer.length > 80) return `answer too long (${answer.length} chars)`;
     if (answer.includes("\n")) return "answer contains newlines";
+    if (/function\s+___BLANK___/.test(code)) return "banned blank position: function name — any identifier works";
 
-    // --- Pattern-based rejection: answers that almost always have valid alternatives ---
     const lower = answer.toLowerCase();
+    for (const pattern of BANNED_PATTERNS) {
+      if (pattern.test(answer)) return pattern.msg(answer);
+    }
 
-    // Integer types: larger types always hold smaller values
-    if (/^u?int\d*$/.test(lower))
-      return `banned answer pattern: integer type "${answer}" — multiple sizes are usually valid`;
-
-    // Visibility modifiers: often 2+ compile
-    if (["public", "external", "internal", "private"].includes(lower))
-      return `banned answer pattern: visibility "${answer}" — multiple modifiers often valid`;
-
-    // State mutability: view is superset of pure, payable always compiles
-    if (["pure", "view", "payable"].includes(lower))
-      return `banned answer pattern: mutability "${answer}" — multiple options often compile`;
-
-    // Data location: memory and calldata often interchangeable
-    if (["memory", "calldata", "storage"].includes(lower))
-      return `banned answer pattern: data location "${answer}" — memory/calldata often interchangeable`;
-
-    // Comparison operators: >= vs > and <= vs < are often both valid
-    if ([">=", ">", "<=", "<"].includes(answer))
-      return `banned answer pattern: comparison "${answer}" — >= vs > often both valid depending on interpretation`;
-
-    // Compound visibility+mutability (e.g. "external payable", "public view")
     const words = lower.split(/\s+/);
-    const visibilitySet = new Set(["public", "external", "internal", "private"]);
-    const mutabilitySet = new Set(["pure", "view", "payable"]);
-    if (words.some((w) => visibilitySet.has(w)) || words.some((w) => mutabilitySet.has(w)))
+    const visibilityOrMutability = new Set(["public", "external", "internal", "private", "pure", "view", "payable"]);
+    if (words.some((w) => visibilityOrMutability.has(w))) {
       return `banned answer pattern: visibility/mutability "${answer}" — multiple combinations often valid`;
-
-    // Blank at function/variable name position
-    if (/function\s+___BLANK___/.test(code))
-      return "banned blank position: function name — any identifier works";
+    }
   }
 
-  // Concept-specific checks
-  if (q.type === "concept") {
-    if (typeof q.question !== "string" || (q.question as string).trim() === "")
-      return "concept question text is empty";
+  if (q.type === "concept" && (typeof q.question !== "string" || !q.question.trim())) {
+    return "concept question text is empty";
   }
 
-  // Fix invalid category
   if (!q.category || !validCategoryIds.has(q.category as string)) {
     q.category = "basics";
   }
 
-  return null; // valid
+  return null;
 }

@@ -236,11 +236,7 @@ export function analyzeBlankPositions(code: string): BlankPosition[] {
   return positions;
 }
 
-/**
- * Filter positions to get only high-quality blanks
- */
 export function filterHighQualityPositions(positions: BlankPosition[]): BlankPosition[] {
-  // Prefer certain types for better quiz questions
   const typePriority: Record<BlankPosition["type"], number> = {
     keyword: 1,
     operator: 2,
@@ -250,24 +246,17 @@ export function filterHighQualityPositions(positions: BlankPosition[]): BlankPos
     statement: 6,
   };
   
+  const seen = new Set<string>();
   return positions
     .filter(p => {
-      // Filter out duplicates by answer
-      const seen = new Set<string>();
       if (seen.has(p.answer)) return false;
-      seen.add(p.answer);
-      
-      // Skip if answer is too short (single char)
       if (p.answer.length <= 1) return false;
-      
+      seen.add(p.answer);
       return true;
     })
     .sort((a, b) => typePriority[a.type] - typePriority[b.type]);
 }
 
-/**
- * Generate a code question from a blank position
- */
 export function generateCodeQuestion(
   problemId: string,
   category: string,
@@ -282,21 +271,16 @@ export function generateCodeQuestion(
   distractors: [string, string, string];
   explanation: string;
 } {
-  // Replace the answer in the code with blank marker
   const codeWithBlank = position.context.replace(position.answer, "___BLANK___");
-  
-  // Get full code context
   const fullCode = `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
 contract Quiz {
-${"    " + codeWithBlank.replace(/\n/g, "\n    ")}
+    ${codeWithBlank.replace(/\n/g, "\n    ")}
 }`;
-  
-  // Generate distractors
-  const allDistractors = generateDistractors(position);
-  const distractors = allDistractors.slice(0, 3) as [string, string, string];
-  
+
+  const distractors = generateDistractors(position).slice(0, 3) as [string, string, string];
+
   return {
     type: "code",
     id: `${problemId}-${Date.now()}`,

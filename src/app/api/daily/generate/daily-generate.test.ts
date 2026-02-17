@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import type { AnswerRecord } from "@/app/daily/DailyClient";
 import {
-  pickRandom,
+  shuffleArray,
   extractLearningSummary,
   getMasteredCategories,
   pickCurriculumProblems,
@@ -30,40 +30,47 @@ function makeAnswer(
 }
 
 // ===========================================================================
-// pickRandom
+// shuffleArray
 // ===========================================================================
-describe("pickRandom", () => {
-  it("returns the requested number of items", () => {
-    const result = pickRandom([1, 2, 3, 4, 5], 3);
+describe("shuffleArray", () => {
+  it("returns the requested number of items when count is provided", () => {
+    const result = shuffleArray([1, 2, 3, 4, 5], 3);
     expect(result).toHaveLength(3);
   });
 
   it("returns all items when count >= array length", () => {
-    const result = pickRandom([1, 2, 3], 5);
+    const result = shuffleArray([1, 2, 3], 5);
     expect(result).toHaveLength(3);
   });
 
   it("returns empty array for empty input", () => {
-    expect(pickRandom([], 3)).toEqual([]);
+    expect(shuffleArray([], 3)).toEqual([]);
   });
 
   it("returns 0 items when count is 0", () => {
-    expect(pickRandom([1, 2, 3], 0)).toEqual([]);
+    expect(shuffleArray([1, 2, 3], 0)).toEqual([]);
   });
 
   it("does not mutate the original array", () => {
     const original = [1, 2, 3, 4, 5];
     const copy = [...original];
-    pickRandom(original, 3);
+    shuffleArray(original, 3);
     expect(original).toEqual(copy);
   });
 
   it("returns items that are all from the original array", () => {
     const source = ["a", "b", "c", "d"];
-    const result = pickRandom(source, 2);
+    const result = shuffleArray(source, 2);
     for (const item of result) {
       expect(source).toContain(item);
     }
+  });
+
+  it("shuffles the entire array when count is not provided", () => {
+    const source = [1, 2, 3, 4, 5];
+    const result = shuffleArray(source);
+    expect(result).toHaveLength(5);
+    expect(result.sort()).toEqual(source.sort());
   });
 });
 
@@ -386,7 +393,7 @@ describe("validateQuestion", () => {
     const q = validCodeQuestion();
     q.code = "contract A { function f() public {} }";
     expect(validateQuestion(q, validCategories)).toBe(
-      "code has 0 blanks (expected 1)"
+      "code has wrong number of blanks (expected 1)"
     );
   });
 
@@ -394,7 +401,7 @@ describe("validateQuestion", () => {
     const q = validCodeQuestion();
     q.code = "contract A { ___BLANK___ f() ___BLANK___ {} }";
     expect(validateQuestion(q, validCategories)).toBe(
-      "code has 2 blanks (expected 1)"
+      "code has wrong number of blanks (expected 1)"
     );
   });
 
