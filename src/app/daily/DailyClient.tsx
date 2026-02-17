@@ -36,6 +36,7 @@ export type AnswerRecord = {
   userAnswer: string;
   correct: boolean;
   explanation: string;
+  timestamp?: number;
 };
 
 export type DailyResult = {
@@ -67,6 +68,7 @@ function saveHistory(
         userAnswer: answers[i] ?? "",
         correct: answers[i] === q.answer,
         explanation: q.explanation,
+        timestamp: Date.now(),
       })),
     };
 
@@ -163,8 +165,9 @@ export default function DailyClient() {
   const shuffledOptions = useMemo(() => {
     if (!challengeSet) return [];
     return challengeSet.questions.map((q) => shuffleOptions(q));
+    // Use question IDs as dependency to ensure re-shuffle when questions change
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [challengeSet?.id]);
+  }, [challengeSet?.questions.map((q) => q.id).join(",")]);
 
   const total = challengeSet?.questions.length ?? 10;
 
