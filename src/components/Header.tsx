@@ -83,6 +83,17 @@ export default function Header() {
           >
             Curriculum
           </Link>
+          <Link
+            href="/vulnerabilities"
+            aria-current={pathname.startsWith("/vulnerabilities") ? "page" : undefined}
+            className={`hidden md:inline-block text-sm px-3 py-1.5 rounded-md transition-all ${
+              pathname.startsWith("/vulnerabilities")
+                ? "text-[var(--color-accent)] bg-[var(--color-accent)]/10 font-medium"
+                : "text-[var(--color-muted)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-surface)]"
+            }`}
+          >
+            취약점 재현
+          </Link>
           <a
             href="https://tokamak.network"
             target="_blank"
