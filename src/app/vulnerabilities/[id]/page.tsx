@@ -1,7 +1,5 @@
-// src/app/vulnerabilities/[id]/page.tsx
-
 import { notFound } from "next/navigation";
-import { getVulnerabilityById, vulnerabilityProblems } from "@/data/vulnerabilities";
+import { getChallengeById, vulnerabilityChallenges } from "@/data/vulnerabilities";
 import { VulnerabilityClient } from "./VulnerabilityClient";
 
 interface PageProps {
@@ -9,18 +7,18 @@ interface PageProps {
 }
 
 export async function generateStaticParams() {
-  return vulnerabilityProblems.map((problem) => ({
-    id: problem.id,
+  return vulnerabilityChallenges.map((challenge) => ({
+    id: challenge.id,
   }));
 }
 
 export default async function VulnerabilityPage({ params }: PageProps) {
   const { id } = await params;
-  const problem = getVulnerabilityById(id);
+  const challenge = getChallengeById(id);
 
-  if (!problem) {
+  if (!challenge) {
     notFound();
   }
 
-  return <VulnerabilityClient problem={problem} />;
+  return <VulnerabilityClient challenge={challenge} />;
 }

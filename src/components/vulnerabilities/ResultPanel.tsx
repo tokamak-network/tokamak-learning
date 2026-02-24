@@ -1,13 +1,16 @@
-// src/components/vulnerabilities/ResultPanel.tsx
-
 "use client";
 
 import { useMemo } from "react";
-import type { ValidationResult } from "@/lib/exploit-validator";
 
 export interface LogEntry {
   type: "info" | "success" | "error" | "warning";
   message: string;
+}
+
+export interface ValidationResult {
+  passed: boolean;
+  message: string;
+  details: string[];
 }
 
 interface ResultPanelProps {
@@ -18,7 +21,7 @@ interface ResultPanelProps {
 
 export function ResultPanel({ logs, validationResult, isRunning }: ResultPanelProps) {
   const logColor = useMemo(() => ({
-    info: "text-[var(--color-text-secondary)]",
+    info: "text-[var(--color-muted)]",
     success: "text-green-400",
     error: "text-red-400",
     warning: "text-yellow-400",
@@ -26,19 +29,19 @@ export function ResultPanel({ logs, validationResult, isRunning }: ResultPanelPr
 
   return (
     <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg p-4 mt-4">
-      <h3 className="text-sm font-semibold text-[var(--color-text)] mb-3">
+      <h3 className="text-sm font-semibold text-[var(--color-foreground)] mb-3">
         Execution Results
       </h3>
 
       <div className="bg-[var(--color-background)] rounded p-3 min-h-[120px] max-h-[300px] overflow-y-auto font-mono text-xs">
         {logs.length === 0 && !isRunning && (
-          <span className="text-[var(--color-text-secondary)]">
+          <span className="text-[var(--color-muted)]">
             Run your exploit to see results...
           </span>
         )}
 
         {isRunning && (
-          <div className="flex items-center gap-2 text-[var(--color-text-secondary)]">
+          <div className="flex items-center gap-2 text-[var(--color-muted)]">
             <div className="animate-spin h-4 w-4 border-2 border-[var(--color-accent)] border-t-transparent rounded-full" />
             Executing...
           </div>
@@ -46,7 +49,7 @@ export function ResultPanel({ logs, validationResult, isRunning }: ResultPanelPr
 
         {logs.map((log, i) => (
           <div key={i} className={`${logColor[log.type]} py-0.5`}>
-            <span className="text-[var(--color-text-secondary)] mr-2">
+            <span className="text-[var(--color-muted)] mr-2">
               [{log.type.toUpperCase()}]
             </span>
             {log.message}
@@ -69,11 +72,11 @@ export function ResultPanel({ logs, validationResult, isRunning }: ResultPanelPr
           >
             {validationResult.passed ? "🎉 Exploit Successful!" : "❌ Exploit Failed"}
           </div>
-          <div className="text-xs text-[var(--color-text-secondary)] mt-1">
+          <div className="text-xs text-[var(--color-muted)] mt-1">
             {validationResult.message}
           </div>
           {validationResult.details.map((detail, i) => (
-            <div key={i} className="text-xs text-[var(--color-text-secondary)] mt-1">
+            <div key={i} className="text-xs text-[var(--color-muted)] mt-1">
               {detail}
             </div>
           ))}

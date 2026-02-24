@@ -92,7 +92,7 @@ export default function Header() {
                 : "text-[var(--color-muted)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-surface)]"
             }`}
           >
-            취약점 재현
+            Vulnerabilities
           </Link>
           <a
             href="https://tokamak.network"
