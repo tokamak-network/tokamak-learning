@@ -50,7 +50,9 @@ export function compileSolidity(
     },
     settings: {
       optimizer: {
-        enabled: true,
+        // Disable optimization to preserve state variable initialization
+        // This ensures all state variables are properly stored in storage slots
+        enabled: options?.optimizerRuns !== undefined ? true : false,
         runs: options?.optimizerRuns ?? 200,
       },
       outputSelection: {
