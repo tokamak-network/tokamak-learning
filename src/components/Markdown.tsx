@@ -1,90 +1,118 @@
 "use client";
 
-import { useMemo } from "react";
-
-function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
-
-function parseMarkdown(md: string): string {
-  let html = md;
-
-  // Code blocks
-  html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, (_m, _lang, code) => {
-    return `<pre><code>${escapeHtml(code.trim())}</code></pre>`;
-  });
-
-  // Inline code
-  html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
-
-  // Headers
-  html = html.replace(/^### (.+)$/gm, "<h3>$1</h3>");
-  html = html.replace(/^## (.+)$/gm, "<h2>$1</h2>");
-  html = html.replace(/^# (.+)$/gm, "<h1>$1</h1>");
-
-  // Bold
-  html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
-
-  // Italic
-  html = html.replace(/\*(.+?)\*/g, "<em>$1</em>");
-
-  // Unordered lists
-  html = html.replace(/^- (.+)$/gm, "<li>$1</li>");
-  html = html.replace(/((?:<li>.*<\/li>\n?)+)/g, "<ul>$1</ul>");
-
-  // Ordered lists
-  html = html.replace(/^\d+\. (.+)$/gm, "<li>$1</li>");
-
-  // Blockquotes
-  html = html.replace(/^> (.+)$/gm, "<blockquote>$1</blockquote>");
-
-  // Paragraphs
-  const lines = html.split("\n");
-  const result: string[] = [];
-  let inPre = false;
-
-  for (const line of lines) {
-    if (line.includes("<pre>")) inPre = true;
-    if (line.includes("</pre>")) {
-      inPre = false;
-      result.push(line);
-      continue;
-    }
-    if (inPre) {
-      result.push(line);
-      continue;
-    }
-
-    const trimmed = line.trim();
-    if (
-      trimmed === "" ||
-      trimmed.startsWith("<h") ||
-      trimmed.startsWith("<ul") ||
-      trimmed.startsWith("<ol") ||
-      trimmed.startsWith("<li") ||
-      trimmed.startsWith("<pre") ||
-      trimmed.startsWith("<block") ||
-      trimmed.startsWith("</")
-    ) {
-      result.push(line);
-    } else {
-      result.push(`<p>${line}</p>`);
-    }
-  }
-
-  return result.join("\n");
-}
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 export default function Markdown({ content }: { content: string }) {
-  const html = useMemo(() => parseMarkdown(content), [content]);
-
   return (
-    <div
-      className="prose-dark"
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
+    <div className="prose prose-invert prose-sm max-w-none">
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          // Custom styling for code blocks
+          pre: ({ children }) => (
+            <pre className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg p-4 overflow-x-auto">
+              {children}
+            </pre>
+          ),
+          code: ({ className, children, ...props }) => {
+            const isInline = !className;
+            if (isInline) {
+              return (
+                <code
+                  className="bg-[var(--color-surface)] px-1.5 py-0.5 rounded text-[var(--color-accent)]"
+                  {...props}
+                >
+                  {children}
+                </code>
+              );
+            }
+            return (
+              <code className={className} {...props}>
+                {children}
+              </code>
+            );
+          },
+          // Custom table styling
+          table: ({ children }) => (
+            <div className="overflow-x-auto my-4">
+              <table className="min-w-full border border-[var(--color-border)] rounded-lg">
+                {children}
+              </table>
+            </div>
+          ),
+          thead: ({ children }) => (
+            <thead className="bg-[var(--color-surface)]">{children}</thead>
+          ),
+          th: ({ children }) => (
+            <th className="px-4 py-2 text-left border-b border-[var(--color-border)] font-semibold text-[var(--color-foreground)]">
+              {children}
+            </th>
+          ),
+          td: ({ children }) => (
+            <td className="px-4 py-2 border-b border-[var(--color-border)] border-r last:border-r-0 text-[var(--color-foreground)]">
+              {children}
+            </td>
+          ),
+          tr: ({ children }) => (
+            <tr className="border-b border-[var(--color-border)] last:border-b-0">
+              {children}
+            </tr>
+          ),
+          // Custom heading styling
+          h1: ({ children }) => (
+            <h1 className="text-2xl font-bold text-[var(--color-foreground)] mt-6 mb-4">
+              {children}
+            </h1>
+          ),
+          h2: ({ children }) => (
+            <h2 className="text-xl font-bold text-[var(--color-foreground)] mt-5 mb-3">
+              {children}
+            </h2>
+          ),
+          h3: ({ children }) => (
+            <h3 className="text-lg font-semibold text-[var(--color-foreground)] mt-4 mb-2">
+              {children}
+            </h3>
+          ),
+          // Custom list styling
+          ul: ({ children }) => (
+            <ul className="list-disc list-inside space-y-1 text-[var(--color-foreground)]">
+              {children}
+            </ul>
+          ),
+          ol: ({ children }) => (
+            <ol className="list-decimal list-inside space-y-1 text-[var(--color-foreground)]">
+              {children}
+            </ol>
+          ),
+          // Custom paragraph styling
+          p: ({ children }) => (
+            <p className="text-[var(--color-foreground)] leading-relaxed mb-3">
+              {children}
+            </p>
+          ),
+          // Custom blockquote styling
+          blockquote: ({ children }) => (
+            <blockquote className="border-l-4 border-[var(--color-accent)] pl-4 italic text-[var(--color-muted)]">
+              {children}
+            </blockquote>
+          ),
+          // Custom link styling
+          a: ({ href, children }) => (
+            <a
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[var(--color-accent)] hover:underline"
+            >
+              {children}
+            </a>
+          ),
+        }}
+      >
+        {content}
+      </ReactMarkdown>
+    </div>
   );
 }
