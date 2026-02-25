@@ -330,7 +330,16 @@ async function validateSuccess(
 
     const value = await client.getStorageAt({ address: resolvedContract, slot });
 
-    // Check if owner array contains the expected owner
+    // Check if the slot directly contains the expected owner (for single owner)
+    if (value) {
+      const addressFromSlot = "0x" + value.slice(-40) as `0x${string}`;
+      if (addressFromSlot.toLowerCase() === expected.toLowerCase()) {
+        details.push(`Ownership check: PASSED`);
+        return { passed: true, message: "Ownership check passed", details };
+      }
+    }
+
+    // Check if owner array contains the expected owner (for owner arrays)
     // For the WalletLibrary, owners are in a dynamic array at slot 0
     // The first element is at keccak256(0) + 0
     const isOwner = await checkOwnerInArray(client, resolvedContract, expected);

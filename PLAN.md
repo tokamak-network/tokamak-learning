@@ -1,26 +1,112 @@
-# PLAN.md - 개선 필요 사항 체크리스트
+# Implementation Plan: Vulnerability Playground with TEVM
 
-## 1. 버그 / 기능 오류
+## Status: ✅ COMPLETED
 
-- [x] **Run / Test 버튼 동작 중복** — 중복 Test 버튼 제거, "Run Tests" 단일 버튼으로 통합
-- [x] **카테고리 카드 링크 동일** — `/language/solidity#카테고리id`로 수정, 섹션에 id 속성 추가
-- [x] **Footer 연도 하드코딩** — `new Date().getFullYear()`로 동적 처리
+All phases have been successfully implemented. The vulnerability playground now uses TEVM in local mode.
 
-## 2. 미사용 / 중복 코드
+---
 
-- [x] **`src/lib/compiler.ts` 미사용** — 파일 삭제
-- [x] **`TestResult` 인터페이스 중복 정의** — `evm-runner.ts`에서 export, `route.ts`와 `ProblemClient.tsx`에서 import로 통일
+## Summary of Changes
 
-## 3. UX / 반응형
+### New Files Created
+- `src/types/vulnerability.ts` - Type definitions for challenges
+- `src/lib/challenge-runner.ts` - TEVM local mode execution engine
+- `src/data/vulnerabilities/access-control/parity-wallet.ts` - First challenge
 
-- [x] **문제 풀이 페이지 모바일 미지원** — 모바일용 Description/Editor 탭 전환 추가, `lg:` breakpoint 기반 반응형 레이아웃
-- [x] **Solution 코드에 구문 강조 없음** — `highlightSolidity()` 함수로 키워드/타입/리터럴 하이라이팅 적용
+### Files Updated
+- `src/app/api/vulnerability/run/route.ts` - Rewritten to use local TEVM
+- `src/app/vulnerabilities/[id]/VulnerabilityClient.tsx` - Simplified UI
+- `src/app/vulnerabilities/[id]/page.tsx` - Load challenge data
+- `src/app/vulnerabilities/page.tsx` - Updated list page
+- `src/data/vulnerabilities/index.ts` - Challenge loader
+- `src/lib/solc-compiler.ts` - Fixed to handle interfaces/abstract contracts
+- `src/components/vulnerabilities/ResultPanel.tsx` - Self-contained types
 
-## 4. 보안 / 성능
+### Files Deleted
+- `src/app/api/vulnerability/fork/route.ts` - No longer needed
+- `src/components/vulnerabilities/ForkConfigPanel.tsx` - No longer needed
+- `src/lib/exploit-runner.ts` - Replaced by challenge-runner
+- `src/lib/exploit-validator.ts` - Replaced by challenge-runner
+- `src/lib/exploit-executor.ts` - Replaced by challenge-runner
+- `src/lib/tevm-client.ts` - No longer needed
 
-- [x] **Solution이 클라이언트 번들에 포함** — `/api/solution` API 분리, 서버 컴포넌트에서 solution/hints 제거 후 클라이언트에서 요청 시 fetch
-- [x] **컴파일 API 속도 제한 없음** — IP 기반 인메모리 rate limiter 추가 (10 req/60s)
+---
 
-## 5. 코드 품질
+## Architecture
 
-- [x] **problems.ts 3680줄 단일 파일** — 카테고리별 11개 파일로 분리, index 파일에서 합산
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         VULNERABILITY PLAYGROUND                             │
+│                                                                              │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │  TEVM MemoryClient (Local Mode)                                      │    │
+│  │                                                                      │    │
+│  │  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────────┐  │    │
+│  │  │ Vulnerable      │  │ User's Exploit  │  │ Attacker Account    │  │    │
+│  │  │ Contract(s)     │  │ Contract        │  │ (funded with ETH)   │  │    │
+│  │  │ (pre-deployed)  │  │ (user deploys)  │  │                     │  │    │
+│  │  └─────────────────┘  └─────────────────┘  └─────────────────────┘  │    │
+│  │                                                                      │    │
+│  │  - Standalone EVM (no forking)                                      │    │
+│  │  - Auto-mining enabled                                               │    │
+│  │  - All contracts exist in memory                                     │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## How It Works
+
+### 1. Challenge Setup (PUT /api/vulnerability/run)
+- Creates a fresh TEVM MemoryClient in local mode
+- Funds the attacker account (0xdead...)
+- Compiles and deploys challenge contracts
+- Returns session ID and deployed contract addresses
+
+### 2. Exploit Execution (POST /api/vulnerability/run)
+- Loads or creates EVM session
+- Compiles user's exploit contract
+- Deploys exploit contract
+- Calls `attack()` function
+- Validates success conditions
+
+### 3. Validation
+- Check storage slots
+- Check balances
+- Check ownership (supports dynamic arrays)
+- Check if contract was drained
+
+---
+
+## Challenges
+
+| ID | Category | Incident | Difficulty | Status |
+|----|----------|----------|------------|--------|
+| `parity-wallet-library` | access-control | Parity Wallet Library Hack (Nov 2017) | beginner | ✅ |
+
+---
+
+## Future Challenges to Add
+
+| ID | Category | Incident | Difficulty |
+|----|----------|----------|------------|
+| `dao-reentrancy` | reentrancy | The DAO (June 2016) | intermediate |
+| `bec-overflow` | overflow | BEC Token (Apr 2018) | beginner |
+| `parity-freeze` | access-control | Parity Wallet Freeze (Nov 2017) | intermediate |
+| `simple-honeypot` | honeypot | Honey Pot Example | beginner |
+| `flash-loan-oracle` | oracle | Flash Loan Attacks | advanced |
+
+---
+
+## Benefits Over Fork Approach
+
+| Aspect | Before (Fork) | After (Local TEVM) |
+|--------|---------------|-------------------|
+| **Dependencies** | Requires RPC | None |
+| **Speed** | Slow (network) | Instant |
+| **Reliability** | RPC dependency | Always works |
+| **Simplicity** | Fork → Fund → Deploy | Setup → Deploy → Run |
+| **Code reuse** | Duplicated logic | Shared with problems |
+| **Extensibility** | Limited by history | Any scenario |

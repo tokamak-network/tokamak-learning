@@ -139,8 +139,12 @@ contract Exploit {
   ],
 
   successCondition: {
-    checkOwnership: {
-      contract: "SimpleCounter",
+    // Tutorial success: just check the contract is deployed
+    // Slot 0 = count, initial value is 0
+    checkStorage: {
+      address: "SimpleCounter",
+      slot: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      contains: "0x",
     },
   },
 };

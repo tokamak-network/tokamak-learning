@@ -1,51 +1,58 @@
 import type { VulnerabilityChallenge } from "@/types/vulnerability";
 
-const VAULT_SOURCE = `// SPDX-License-Identifier: MIT
+const STORAGE_SOURCE = `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-// A vault contract to learn parameter calls
-// Each user has a balance stored in a mapping
+// A simple storage contract to learn parameter calls
+// Practice calling functions with different parameter types!
 
-contract SimpleVault {
-    mapping(address => uint256) public balances;
-    address[] public users;
-    uint256 public totalUsers;
+contract SimpleStorage {
+    // Public variables - each has a getter function
+    uint256 public favoriteNumber;
+    string public favoriteColor;
+    address public owner;
+    
+    // A simple counter
+    uint256 public count;
+    
+    // Storage data
+    mapping(address => uint256) public scores;
+    address[] public players;
 
     constructor() {
-        // Pre-populate with some users
-        users.push(0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266); // Default deployer
-        users.push(0x70997970C51812dc3A010C7d01b50e0d17dc79C8); // Test user 1
-        users.push(0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC); // Test user 2
-        totalUsers = 3;
-
-        balances[users[0]] = 100;
-        balances[users[1]] = 200;
-        balances[users[2]] = 300;
+        owner = msg.sender;
+        favoriteNumber = 42;
+        favoriteColor = "blue";
+        count = 0;
+        
+        // Pre-set some scores for practice
+        players.push(0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266);
+        players.push(0x70997970C51812dc3A010C7d01b50e0d17dc79C8);
+        players.push(0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC);
+        
+        scores[players[0]] = 100;
+        scores[players[1]] = 250;
+        scores[players[2]] = 500;
     }
 
-    function deposit() external payable {
-        require(msg.value > 0, "Must send ETH");
-        balances[msg.sender] += msg.value;
+    function increment() external {
+        count += 1;
     }
-
-    function withdraw(uint256 amount) external {
-        require(balances[msg.sender] >= amount, "Insufficient balance");
-        balances[msg.sender] -= amount;
-        (bool success, ) = msg.sender.call{value: amount}("");
-        require(success, "Transfer failed");
+    
+    function setFavoriteNumber(uint256 _number) external {
+        favoriteNumber = _number;
     }
-
-    function getUserBalance(address user) external view returns (uint256) {
-        return balances[user];
+    
+    function setFavoriteColor(string calldata _color) external {
+        favoriteColor = _color;
     }
-
-    function getUser(uint256 index) external view returns (address) {
-        require(index < users.length, "Index out of bounds");
-        return users[index];
+    
+    function getPlayerCount() external view returns (uint256) {
+        return players.length;
     }
-
-    function getAllUsers() external view returns (address[] memory) {
-        return users;
+    
+    function getPlayerScore(address player) external view returns (uint256) {
+        return scores[player];
     }
 }`;
 
@@ -63,131 +70,151 @@ export const tutorialParameterCalls: VulnerabilityChallenge = {
 
   description: `# Tutorial 2: Calling Functions with Parameters
 
-In the previous tutorial, you used Quick Calls for functions without parameters. Now let's learn **Parameter Calls**!
+In the previous tutorial, you used **Quick Calls** for functions without parameters. Now let's learn to call functions that **require arguments**!
 
-## What are Parameter Calls?
+## Understanding Function Signatures
 
-Some functions require input values (parameters). For example:
-- \`balances(address)\` needs an address to look up
-- \`getUser(uint256)\` needs an index number
+Look at the **Parameter Calls** section below. You'll see functions with their parameter types:
 
-## The Parameter Calls Section
+| Function | Parameter Type | What it does |
+|----------|---------------|--------------|
+| \`scores(address)\` | address | Get a player's score |
+| \`players(uint256)\` | uint256 | Get a player address by index |
+| \`setFavoriteNumber(uint256)\` | uint256 | Set the favorite number |
 
-Below the Quick Calls, you'll see a "Parameter Calls" section showing:
-\`\`\`
-balances(address) → uint256
-getUser(uint256) → address
-\`\`\`
+## How to Call with Parameters
 
-## How to Use
-
-1. **Click on a parameter function**
-   - The function name is auto-filled in the "Function Name" field
-
-2. **Enter arguments in JSON array format**
-   - Single argument: \`["0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"]\`
-   - Multiple arguments: \`["arg1", "arg2", 123]\`
-
+1. **Click the function button** (e.g., \`players(uint256)\`)
+2. **Enter arguments** in the "Arguments" field as a JSON array
 3. **Click Execute**
 
-## Your Tasks
+## Argument Format
 
-1. **Check balance of user 0**
-   - Click \`getUser(uint256)\` in Parameter Calls
-   - Enter arguments: \`["0"]\`
-   - Click Execute → This returns an address
-   - Copy that address
+You MUST provide arguments as a **JSON array**:
 
-2. **Check that user's balance**
-   - Click \`balances(address)\` in Parameter Calls
-   - Enter arguments: \`["<copied_address>"]\`
-   - Click Execute → Should show 100
+| Parameter Type | Correct Format | Wrong Format |
+|---------------|----------------|--------------|
+| address | \`["0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"]\` | \`0xf39Fd6...\` |
+| uint256 | \`["0"]\` or \`["123"]\` | \`0\` or \`123\` |
+| string | \`["hello"]\` | \`hello\` |
 
-3. **Try \`getUserBalance(address)\` shortcut**
-   - This combines the above two steps
-   - Use the same address
+## Practice Tasks
 
-## Argument Format Reference
+### Task 1: Read player scores
+Call \`scores(address)\` with these addresses to see their scores:
+- \`["0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"]\` → Score: 100
+- \`["0x70997970C51812dc3A010C7d01b50e0d17dc79C8"]\` → Score: 250
+- \`["0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC"]\` → Score: 500
 
-| Type | Example |
-|------|---------|
-| address | \`["0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"]\` |
-| uint256 | \`["0"]\` or \`["123"]\` |
-| string | \`["Hello World"]\` |
-| Multiple | \`["address", 123]\` |`,
+### Task 2: Get player addresses
+Call \`players(uint256)\` with index \`["0"]\` to get the first player's address.
+
+### Task 3: Set a value (optional)
+Try calling \`setFavoriteNumber(uint256)\` with \`["100"]\` to change the favorite number.
+
+## Tips
+
+- Always use double quotes around string values in JSON
+- Addresses must be quoted: \`["0x..."]\` not \`[0x...]\`
+- Numbers in JSON can be unquoted: \`[100]\` or \`["100"]\` both work for uint256`,
 
   starterCode: `// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+// This tutorial teaches Parameter Calls
+// Use the UI to call contract functions!
+// No need to write exploit code here.
+
 contract Exploit {
     constructor() {}
     
-    // This tutorial focuses on Parameter Calls - no attack needed
     function attack() external pure {
-        // Great job! Now you know how to use Parameter Calls!
+        // Great job! You learned how to use Parameter Calls!
     }
 }`,
 
-  hint: "Click a parameter function, then enter arguments as a JSON array like [\"value\"]",
+  hint: "Arguments must be a JSON array like [\"0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266\"]",
 
   setup: {
     contracts: [
       {
-        name: "SimpleVault",
-        source: VAULT_SOURCE,
+        name: "SimpleStorage",
+        source: STORAGE_SOURCE,
       },
     ],
     attackerBalance: "10",
   },
 
   exposedFunctions: [
+    // Quick Calls (no parameters)
     {
-      name: "totalUsers",
-      signature: "totalUsers()",
+      name: "favoriteNumber",
+      signature: "favoriteNumber()",
       inputs: [],
       outputs: [{ name: "", type: "uint256" }],
       stateMutability: "view",
     },
     {
-      name: "getAllUsers",
-      signature: "getAllUsers()",
+      name: "favoriteColor",
+      signature: "favoriteColor()",
       inputs: [],
-      outputs: [{ name: "", type: "address[]" }],
+      outputs: [{ name: "", type: "string" }],
       stateMutability: "view",
     },
     {
-      name: "balances",
-      signature: "balances(address)",
-      inputs: [{ name: "user", type: "address" }],
+      name: "count",
+      signature: "count()",
+      inputs: [],
       outputs: [{ name: "", type: "uint256" }],
       stateMutability: "view",
     },
     {
-      name: "users",
-      signature: "users(uint256)",
+      name: "getPlayerCount",
+      signature: "getPlayerCount()",
+      inputs: [],
+      outputs: [{ name: "", type: "uint256" }],
+      stateMutability: "view",
+    },
+    // Parameter Calls (with parameters)
+    {
+      name: "scores",
+      signature: "scores(address)",
+      inputs: [{ name: "player", type: "address" }],
+      outputs: [{ name: "", type: "uint256" }],
+      stateMutability: "view",
+    },
+    {
+      name: "players",
+      signature: "players(uint256)",
       inputs: [{ name: "index", type: "uint256" }],
       outputs: [{ name: "", type: "address" }],
       stateMutability: "view",
     },
     {
-      name: "getUser",
-      signature: "getUser(uint256)",
-      inputs: [{ name: "index", type: "uint256" }],
-      outputs: [{ name: "", type: "address" }],
+      name: "getPlayerScore",
+      signature: "getPlayerScore(address)",
+      inputs: [{ name: "player", type: "address" }],
+      outputs: [{ name: "", type: "uint256" }],
       stateMutability: "view",
     },
     {
-      name: "getUserBalance",
-      signature: "getUserBalance(address)",
-      inputs: [{ name: "user", type: "address" }],
-      outputs: [{ name: "", type: "uint256" }],
-      stateMutability: "view",
+      name: "setFavoriteNumber",
+      signature: "setFavoriteNumber(uint256)",
+      inputs: [{ name: "_number", type: "uint256" }],
+      outputs: [],
+      stateMutability: "nonpayable",
     },
   ],
 
   successCondition: {
-    checkOwnership: {
-      contract: "SimpleVault",
+    // For this tutorial, we just check that the contract is deployed
+    // The goal is to learn Parameter Calls, not to exploit anything
+    checkStorage: {
+      address: "SimpleStorage",
+      slot: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      // Slot 0 = favoriteNumber, initial value is 42 (0x2a)
+      // We use "contains" instead of "expectedValue" so any value passes
+      contains: "0x",
     },
   },
 };
