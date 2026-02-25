@@ -215,7 +215,7 @@ contract Exploit {
         value: "100", // 100 ETH to drain
       },
     ],
-    attackerBalance: "10",
+    attackerBalance: "110", // Needs extra for gas fees
   },
 
   exposedFunctions: [

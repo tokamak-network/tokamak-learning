@@ -140,7 +140,7 @@ contract Exploit {
         value: "10", // Contract starts with 10 ETH
       },
     ],
-    attackerBalance: "10",
+    attackerBalance: "20", // Needs extra for gas fees
   },
 
   exposedFunctions: [
