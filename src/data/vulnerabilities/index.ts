@@ -1,5 +1,9 @@
 import type { VulnerabilityChallenge, VulnerabilityCategoryInfo } from "@/types/vulnerability";
 import { parityWalletChallenge } from "./access-control/parity-wallet";
+import { erc20TransferAclChallenge } from "./access-control/erc20-transfer-acl";
+import { unprotectedInitChallenge } from "./access-control/unprotected-init";
+import { erc20OverflowChallenge } from "./arithmetic/erc20-overflow";
+import { erc20UnderflowChallenge } from "./arithmetic/erc20-underflow";
 import { tutorialUIBasics } from "./tutorial/01-ui-basics";
 import { tutorialParameterCalls } from "./tutorial/02-parameter-calls";
 import { tutorialInspectTools } from "./tutorial/03-inspect-tools";
@@ -14,15 +18,15 @@ export const vulnerabilityCategories: VulnerabilityCategoryInfo[] = [
     order: 1,
   },
   {
-    id: "reentrancy",
-    title: "Reentrancy",
-    description: "State manipulation through recursive external calls",
+    id: "arithmetic",
+    title: "Arithmetic Issues",
+    description: "Integer overflow, underflow, and precision errors",
     order: 2,
   },
   {
-    id: "overflow",
-    title: "Integer Overflow",
-    description: "Arithmetic overflow and underflow vulnerabilities",
+    id: "reentrancy",
+    title: "Reentrancy",
+    description: "State manipulation through recursive external calls",
     order: 3,
   },
   {
@@ -46,8 +50,13 @@ export const vulnerabilityChallenges: VulnerabilityChallenge[] = [
   tutorialInspectTools,
   tutorialWriteExploit,
   tutorialMultiAttack,
-  // Real challenges
+  // Access Control challenges
   parityWalletChallenge,
+  erc20TransferAclChallenge,
+  unprotectedInitChallenge,
+  // Arithmetic challenges
+  erc20OverflowChallenge,
+  erc20UnderflowChallenge,
 ];
 
 export function getChallengeById(id: string): VulnerabilityChallenge | undefined {
@@ -89,6 +98,10 @@ export function getNonTutorialChallenges(): VulnerabilityChallenge[] {
 
 export { 
   parityWalletChallenge,
+  erc20TransferAclChallenge,
+  unprotectedInitChallenge,
+  erc20OverflowChallenge,
+  erc20UnderflowChallenge,
   tutorialUIBasics,
   tutorialParameterCalls,
   tutorialInspectTools,

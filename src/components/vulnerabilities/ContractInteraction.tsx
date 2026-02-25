@@ -376,7 +376,8 @@ export function ContractInteraction({
 
   return (
     <div ref={containerRef} className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg overflow-hidden flex flex-col h-full">
-      <div className="flex border-b border-[var(--color-border)]">
+      {/* Tab buttons - fixed at top */}
+      <div className="flex-shrink-0 flex border-b border-[var(--color-border)]">
         <button
           onClick={() => handleTabChange("call")}
           className={`flex-1 px-4 py-2 text-sm font-medium transition-colors ${
@@ -399,7 +400,8 @@ export function ContractInteraction({
         </button>
       </div>
 
-      <div className="p-4 border-b border-[var(--color-border)]">
+      {/* Content area - scrollable */}
+      <div className="flex-1 overflow-y-auto p-4 border-b border-[var(--color-border)]">
         <div className="mb-3">
           <label className="text-xs text-[var(--color-muted)] block mb-1">
             Target Contract
