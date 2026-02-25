@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import type { ExposedFunction } from "@/types/vulnerability";
+import { parseContractAbi } from "@/lib/abi-parser";
 
 interface ContractInteractionProps {
   sessionId: string | null;
@@ -74,6 +75,44 @@ export function ContractInteraction({
   useEffect(() => {
     logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [logs]);
+
+  // Parse ABI for selected contract to generate dynamic function list
+  const parsedFunctions = useMemo(() => {
+    const abi = contractAbis[selectedContract] || [];
+    if (abi.length > 0) {
+      return parseContractAbi(abi);
+    }
+    return [];
+  }, [selectedContract, contractAbis]);
+
+  // Merge exposedFunctions prop with parsed functions (props take precedence)
+  const availableFunctions = useMemo(() => {
+    const functionMap = new Map<string, ExposedFunction>();
+
+    // Add parsed functions first
+    for (const fn of parsedFunctions) {
+      functionMap.set(fn.signature, fn);
+    }
+
+    // Override with exposedFunctions prop (for challenge-specific definitions)
+    for (const fn of exposedFunctions) {
+      functionMap.set(fn.signature, fn);
+    }
+
+    return Array.from(functionMap.values());
+  }, [parsedFunctions, exposedFunctions]);
+
+  // Quick call functions (no parameters)
+  const quickCallFunctions = useMemo(() => 
+    availableFunctions.filter(fn => !fn.inputs || fn.inputs.length === 0),
+    [availableFunctions]
+  );
+
+  // Parameter call functions (with parameters)
+  const parameterCallFunctions = useMemo(() => 
+    availableFunctions.filter(fn => fn.inputs && fn.inputs.length > 0),
+    [availableFunctions]
+  );
 
   const addLog = (action: string, target: string, result: CallResult) => {
     const newLog: InteractionLog = {
@@ -351,63 +390,59 @@ export function ContractInteraction({
               </div>
             )}
 
-            {exposedFunctions.filter(fn => !fn.inputs || fn.inputs.length === 0).length > 0 && (
+            {quickCallFunctions.length > 0 && (
               <div className="mb-3">
                 <label className="text-xs text-[var(--color-muted)] block mb-1">
                   Quick Calls
                 </label>
                 <div className="flex flex-wrap gap-1">
-                  {exposedFunctions
-                    .filter(fn => !fn.inputs || fn.inputs.length === 0)
-                    .map((fn) => (
-                      <button
-                        key={fn.name}
-                        onClick={() => handleQuickFunction(fn)}
-                        disabled={loading || !isReady}
-                        className="text-xs px-2 py-1 bg-[var(--color-background)] border border-[var(--color-border)] rounded hover:border-[var(--color-accent)] transition-colors disabled:opacity-50"
-                      >
-                        {fn.name}()
-                      </button>
-                    ))}
+                  {quickCallFunctions.map((fn) => (
+                    <button
+                      key={fn.signature}
+                      onClick={() => handleQuickFunction(fn)}
+                      disabled={loading || !isReady}
+                      className="text-xs px-2 py-1 bg-[var(--color-background)] border border-[var(--color-border)] rounded hover:border-[var(--color-accent)] transition-colors disabled:opacity-50"
+                    >
+                      {fn.name}()
+                    </button>
+                  ))}
                 </div>
               </div>
             )}
 
-            {exposedFunctions.filter(fn => fn.inputs && fn.inputs.length > 0).length > 0 && (
+            {parameterCallFunctions.length > 0 && (
               <div className="mb-3">
                 <label className="text-xs text-[var(--color-muted)] block mb-1">
                   Parameter Calls
                 </label>
                 <div className="space-y-1">
-                  {exposedFunctions
-                    .filter(fn => fn.inputs && fn.inputs.length > 0)
-                    .map((fn) => (
-                      <button
-                        key={fn.name}
-                        onClick={() => {
-                          setFunctionName(fn.name);
-                          const inputTypes = fn.inputs?.map(i => i.type).join(", ") || "";
-                          const inputNames = fn.inputs?.map(i => i.name).join(", ") || "";
-                          const placeholder = fn.inputs?.map(i => {
-                            if (i.type === "address") return '"0x..."';
-                            if (i.type === "uint256" || i.type === "uint") return "0";
-                            if (i.type === "bool") return "true";
-                            if (i.type === "bytes") return '"0x..."';
-                            return "?";
-                          }).join(", ") || "";
-                          setArgsInput("");
-                          (document.querySelector('[data-placeholder-hint]') as HTMLElement)?.setAttribute('data-hint', placeholder);
-                        }}
-                        disabled={loading || !isReady}
-                        className="w-full text-left text-xs px-2 py-1.5 bg-[var(--color-background)] border border-[var(--color-border)] rounded hover:border-[var(--color-accent)] transition-colors disabled:opacity-50"
-                      >
-                        <span className="text-[var(--color-foreground)]">{fn.name}</span>
-                        <span className="text-[var(--color-muted)]">({fn.inputs?.map(i => `${i.type} ${i.name}`).join(", ")})</span>
-                        {fn.outputs && fn.outputs.length > 0 && (
-                          <span className="text-[var(--color-muted)]"> → {fn.outputs.map(o => o.type).join(", ")}</span>
-                        )}
-                      </button>
-                    ))}
+                  {parameterCallFunctions.map((fn) => (
+                    <button
+                      key={fn.signature}
+                      onClick={() => {
+                        setFunctionName(fn.name);
+                        const inputTypes = fn.inputs?.map(i => i.type).join(", ") || "";
+                        const inputNames = fn.inputs?.map(i => i.name).join(", ") || "";
+                        const placeholder = fn.inputs?.map(i => {
+                          if (i.type === "address") return '"0x..."';
+                          if (i.type === "uint256" || i.type === "uint") return "0";
+                          if (i.type === "bool") return "true";
+                          if (i.type === "bytes") return '"0x..."';
+                          return "?";
+                        }).join(", ") || "";
+                        setArgsInput("");
+                        (document.querySelector('[data-placeholder-hint]') as HTMLElement)?.setAttribute('data-hint', placeholder);
+                      }}
+                      disabled={loading || !isReady}
+                      className="w-full text-left text-xs px-2 py-1.5 bg-[var(--color-background)] border border-[var(--color-border)] rounded hover:border-[var(--color-accent)] transition-colors disabled:opacity-50"
+                    >
+                      <span className="text-[var(--color-foreground)]">{fn.name}</span>
+                      <span className="text-[var(--color-muted)]">({fn.inputs?.map(i => `${i.type} ${i.name}`).join(", ")})</span>
+                      {fn.outputs && fn.outputs.length > 0 && (
+                        <span className="text-[var(--color-muted)]"> → {fn.outputs.map(o => o.type).join(", ")}</span>
+                      )}
+                    </button>
+                  ))}
                 </div>
               </div>
             )}
