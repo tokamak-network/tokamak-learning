@@ -92,22 +92,38 @@ export function ContractInteraction({
     return [];
   }, [selectedContract, contractAbis]);
 
-  // Merge exposedFunctions prop with parsed functions (props take precedence)
+  // Create a set of parsed function signatures for filtering
+  const parsedSignatures = useMemo(() => {
+    return new Set(parsedFunctions.map(fn => fn.signature));
+  }, [parsedFunctions]);
+
+  // Filter exposedFunctions to only include those that exist in the selected contract's ABI
+  // This prevents showing buttons for functions that don't exist in the current contract
+  const relevantExposedFunctions = useMemo(() => {
+    if (parsedFunctions.length === 0) {
+      // If no ABI parsed, fall back to exposedFunctions (for backward compatibility)
+      return exposedFunctions;
+    }
+    // Only include exposedFunctions that exist in the parsed ABI
+    return exposedFunctions.filter(fn => parsedSignatures.has(fn.signature));
+  }, [exposedFunctions, parsedFunctions, parsedSignatures]);
+
+  // Merge exposedFunctions prop with parsed functions (props take precedence for matching signatures)
   const availableFunctions = useMemo(() => {
     const functionMap = new Map<string, ExposedFunction>();
 
-    // Add parsed functions first
+    // Add parsed functions first (from ABI)
     for (const fn of parsedFunctions) {
       functionMap.set(fn.signature, fn);
     }
 
-    // Override with exposedFunctions prop (for challenge-specific definitions)
-    for (const fn of exposedFunctions) {
+    // Only override with relevant exposedFunctions (filtered to current contract)
+    for (const fn of relevantExposedFunctions) {
       functionMap.set(fn.signature, fn);
     }
 
     return Array.from(functionMap.values());
-  }, [parsedFunctions, exposedFunctions]);
+  }, [parsedFunctions, relevantExposedFunctions]);
 
   // Quick call functions (no parameters)
   const quickCallFunctions = useMemo(() => 
