@@ -88,34 +88,27 @@ export function decodeConsoleLog(data: Uint8Array): string | null {
 }
 
 /**
- * Create an onStep handler that captures console.log calls
- * Returns an object with the handler and a function to get captured logs
+ * Create an onBeforeMessage handler that captures console.log calls
+ * This is more reliable than onStep because it receives the full message data directly
  */
 export function createConsoleLogCapture() {
-  const capturedLogs: string[] = [];return {
+  const capturedLogs: string[] = [];
+
+  return {
     logs: capturedLogs,
-    onStep: (step: { opcode: { name: string }; stack?: bigint[]; memory?: Uint8Array }, next?: () => void) => {
-      // Check for STATICCALL opcode (0xFA)
-      if (step.opcode?.name === "STATICCALL" && step.stack && step.stack.length >= 7) {
-        // STATICCALL pops: gas, to, in_offset, in_size, out_offset, out_size
-        // Stack is in reverse order (top is first)
-        const toAddress = step.stack[1]; // The 'to' address is the second item from top
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onBeforeMessage: (message: any, next?: () => void) => {
+      // Check if this is a call to the console address
+      if (message.to) {
+        const toLower = typeof message.to === "string" 
+          ? message.to.toLowerCase() 
+          : String(message.to).toLowerCase();
         
-        // Convert to hex address (last 20 bytes)
-        const toHex = "0x" + toAddress.toString(16).padStart(40, "0").slice(-40);
-        
-        // Check if this is a call to the console address
-        if (toHex.toLowerCase() === CONSOLE_ADDRESS_LOWER) {
-          // Get input data from memory
-          const inOffset = Number(step.stack[3]);
-          const inSize = Number(step.stack[4]);
-          
-          if (step.memory && inSize > 0) {
-            const callData = step.memory.slice(inOffset, inOffset + inSize);
-            const decoded = decodeConsoleLog(callData);
-            if (decoded !== null) {
-              capturedLogs.push(decoded);
-            }
+        if (toLower === CONSOLE_ADDRESS_LOWER) {
+          // Decode the console log data
+          const decoded = decodeConsoleLog(message.data);
+          if (decoded !== null) {
+            capturedLogs.push(decoded);
           }
         }
       }

@@ -607,7 +607,7 @@ export async function executeContractCall(
       value: valueWei,
       gas: BigInt(10_000_000),
       addToBlockchain: true,
-      onStep: consoleCapture.onStep,
+      onBeforeMessage: consoleCapture.onBeforeMessage,
     });
 
     // Get captured console logs
