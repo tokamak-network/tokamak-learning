@@ -178,6 +178,141 @@ async function deployChallengeContract(
   return { address: result.createdAddress, abi: abiStrings };
 }
 
+/**
+ * Deploy user's exploit contract without executing attack
+ */
+export async function deployUserContract(
+  client: MemoryClient,
+  userCode: string,
+  deployedContracts: Record<string, string>,
+  contractAbis: Record<string, string[]>
+): Promise<{
+  success: boolean;
+  logs: Array<{ type: "info" | "success" | "error"; message: string }>;
+  deployedContracts?: Record<string, string>;
+  contractAbis?: Record<string, string[]>;
+  error?: string;
+}> {
+  const logs: Array<{ type: "info" | "success" | "error"; message: string }> = [];
+
+  try {
+    logs.push({ type: "info", message: "Compiling exploit contract..." });
+    const compiled = compileSolidity(userCode);
+
+    if (!compiled.success || !compiled.bytecode) {
+      logs.push({ type: "error", message: `Compilation failed: ${compiled.errors?.[0]}` });
+      return { success: false, logs, error: "Compilation failed" };
+    }
+
+    logs.push({ type: "success", message: `Compiled: ${compiled.contractName}` });
+
+    logs.push({ type: "info", message: "Deploying exploit contract..." });
+
+    const deployResult = await client.tevmCall({
+      from: ATTACKER_ADDRESS,
+      data: `0x${compiled.bytecode}` as `0x${string}`,
+      gas: BigInt(10_000_000),
+      addToBlockchain: true,
+    });
+
+    if (deployResult.errors || !deployResult.createdAddress) {
+      logs.push({ type: "error", message: `Deployment failed: ${deployResult.errors?.[0]?.message}` });
+      return { success: false, logs, error: "Deployment failed" };
+    }
+
+    const exploitAddress = deployResult.createdAddress;
+    logs.push({ type: "success", message: `Deployed at: ${exploitAddress}` });
+
+    // Add user contract to deployed contracts
+    const newDeployedContracts = {
+      ...deployedContracts,
+      [compiled.contractName || "ExploitContract"]: exploitAddress,
+    };
+
+    // Extract ABI
+    const abiStrings = compiled.abi
+      ? (compiled.abi as Array<{ type: string; name?: string; inputs?: Array<{ type: string; name?: string }>; outputs?: Array<{ type: string }>; stateMutability?: string }>)
+          .filter((item) => item.type === "function")
+          .map((fn) => {
+            const inputs = fn.inputs?.map((i) => `${i.type}${i.name ? ` ${i.name}` : ""}`).join(", ") || "";
+            const outputs = fn.outputs?.map((o) => o.type).join(", ") || "";
+            const mutability = fn.stateMutability || "";
+            let signature = `function ${fn.name}(${inputs})`;
+            if (mutability) signature += ` ${mutability}`;
+            if (outputs) signature += ` returns (${outputs})`;
+            return signature;
+          })
+      : [];
+
+    const newContractAbis = {
+      ...contractAbis,
+      [compiled.contractName || "ExploitContract"]: abiStrings,
+    };
+
+    return {
+      success: true,
+      logs,
+      deployedContracts: newDeployedContracts,
+      contractAbis: newContractAbis,
+    };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    logs.push({ type: "error", message });
+    return { success: false, logs, error: message };
+  }
+}
+
+/**
+ * Verify exploit success by checking chain state
+ */
+export async function verifyExploit(
+  client: MemoryClient,
+  challenge: VulnerabilityChallenge,
+  deployedContracts: Record<string, string>
+): Promise<{
+  success: boolean;
+  logs: Array<{ type: "info" | "success" | "error"; message: string }>;
+  validation?: {
+    passed: boolean;
+    message: string;
+    details: string[];
+  };
+  error?: string;
+}> {
+  const logs: Array<{ type: "info" | "success" | "error"; message: string }> = [];
+
+  try {
+    logs.push({ type: "info", message: "Verifying exploit results..." });
+
+    // Find user's exploit contract from deployed contracts
+    const exploitAddress = Object.entries(deployedContracts).find(
+      ([name]) => name !== "WalletLibrary" && name !== "SimpleDAO" && !name.startsWith("Target")
+    )?.[1] as `0x${string}` | undefined;
+
+    const validation = await validateSuccess(client, challenge.successCondition, deployedContracts, exploitAddress);
+
+    if (validation.passed) {
+      logs.push({ type: "success", message: validation.message });
+    } else {
+      logs.push({ type: "error", message: validation.message });
+    }
+
+    validation.details.forEach(detail => {
+      logs.push({ type: validation.passed ? "success" : "info", message: detail });
+    });
+
+    return {
+      success: validation.passed,
+      logs,
+      validation,
+    };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    logs.push({ type: "error", message });
+    return { success: false, logs, error: message };
+  }
+}
+
 export async function runExploit(
   client: MemoryClient,
   challenge: VulnerabilityChallenge,
