@@ -19,6 +19,7 @@ interface CallResult {
   gasUsed?: string;
   reverted?: boolean;
   isView?: boolean;
+  consoleLogs?: string[];
 }
 
 interface InteractionLog {
@@ -609,6 +610,15 @@ export function ContractInteraction({
                       {log.result.success ? "✓" : "✗"}
                     </span>
                   </div>
+                  {log.result.consoleLogs && log.result.consoleLogs.length > 0 && (
+                    <div className="mb-2">
+                      {log.result.consoleLogs.map((consoleLog, i) => (
+                        <pre key={i} className="text-cyan-400 whitespace-pre-wrap break-all text-xs before:content-['[console]_'] before:text-cyan-600">
+                          {consoleLog}
+                        </pre>
+                      ))}
+                    </div>
+                  )}
                   {log.result.error ? (
                     <pre className="text-red-400 whitespace-pre-wrap break-all">{log.result.error}</pre>
                   ) : (

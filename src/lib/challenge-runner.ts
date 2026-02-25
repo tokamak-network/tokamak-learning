@@ -4,6 +4,7 @@ import type { MemoryClient } from "tevm";
 import { compileSolidity } from "./solc-compiler";
 import { encodeDeployData, encodeFunctionData, parseEther, formatEther, decodeFunctionResult } from "viem";
 import type { VulnerabilityChallenge, SuccessCondition, VerificationStep, VerificationResult, InteractionResult } from "@/types/vulnerability";
+import { createConsoleLogCapture } from "./console-sol";
 
 export const ATTACKER_ADDRESS = "0xdead000000000000000000000000000000000000" as const;
 
@@ -570,7 +571,7 @@ export async function executeContractCall(
   abi: unknown[],
   value: string,
   deployedContracts: Record<string, string>
-): Promise<InteractionResult> {
+): Promise<InteractionResult & { consoleLogs?: string[] }> {
   try {
     const targetAddress = resolveAddress(target as `0x${string}`, deployedContracts);
 
@@ -596,6 +597,9 @@ export async function executeContractCall(
 
     const valueWei = value ? parseEther(value) : BigInt(0);
 
+    // Create console.log capture
+    const consoleCapture = createConsoleLogCapture();
+
     const result = await client.tevmCall({
       from: ATTACKER_ADDRESS,
       to: targetAddress,
@@ -603,7 +607,11 @@ export async function executeContractCall(
       value: valueWei,
       gas: BigInt(10_000_000),
       addToBlockchain: true,
+      onStep: consoleCapture.onStep,
     });
+
+    // Get captured console logs
+    const consoleLogs = consoleCapture.getLogs();
 
     if (result.errors) {
       return {
@@ -611,6 +619,7 @@ export async function executeContractCall(
         error: result.errors[0].message,
         reverted: true,
         isView,
+        consoleLogs,
       };
     }
 
@@ -631,6 +640,7 @@ export async function executeContractCall(
       success: true,
       data: serializeBigInt(returnValue),
       isView,
+      consoleLogs,
     };
   } catch (error) {
     return {
