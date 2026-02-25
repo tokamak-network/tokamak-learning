@@ -181,11 +181,25 @@ export function ContractInteraction({
   };
 
   const handleQuickFunction = async (fn: ExposedFunction) => {
+    // Build complete ABI with return types for proper decoding
+    let functionAbi = `function ${fn.signature}`;
+    
+    // Add state mutability if present
+    if (fn.stateMutability) {
+      functionAbi += ` ${fn.stateMutability}`;
+    }
+    
+    // Add return types for proper decoding
+    if (fn.outputs && fn.outputs.length > 0) {
+      const outputs = fn.outputs.map(o => o.type).join(", ");
+      functionAbi += ` returns (${outputs})`;
+    }
+    
     await handleApiCall("call", {
       target: selectedContract,
       functionName: fn.name,
       args: [],
-      abi: [`function ${fn.signature}`],
+      abi: [functionAbi],
       value: "0",
     });
   };

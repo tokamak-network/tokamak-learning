@@ -14,22 +14,28 @@ import {
   createSession, 
   getSession, 
   deleteSession, 
-  sessionExists,
-  sessions 
+  sessionExists 
 } from "../challenge-runner";
 import { createMemoryClient } from "tevm";
 import type { MemoryClient } from "tevm";
 
 describe("API Route Session Sharing Integration Test", () => {
   let testClient: MemoryClient;
+  let createdSessionIds: string[] = [];
 
   beforeAll(async () => {
     testClient = await createMemoryClient();
   });
 
   afterAll(() => {
-    // Cleanup
-    sessions.clear();
+    // Cleanup created sessions
+    createdSessionIds.forEach(id => {
+      try {
+        deleteSession(id);
+      } catch {
+        // ignore
+      }
+    });
   });
 
   it("should verify session is created and accessible (same module)", async () => {
@@ -38,8 +44,8 @@ describe("API Route Session Sharing Integration Test", () => {
 
     // Simulate PUT /api/vulnerability/run
     const sessionId = createSession(testClient, deployedContracts, contractAbis);
+    createdSessionIds.push(sessionId);
     console.log("Step 1 - Created sessionId:", sessionId);
-    console.log("Step 1 - sessions.size:", sessions.size);
 
     // Immediately check if session exists (same module)
     const exists = sessionExists(sessionId);
@@ -54,16 +60,9 @@ describe("API Route Session Sharing Integration Test", () => {
     expect(session?.deployedContracts).toEqual(deployedContracts);
   });
 
-  it("should demonstrate sessions Map is accessible", () => {
-    // Direct access to the Map
-    console.log("sessions instanceof Map:", sessions instanceof Map);
-    console.log("sessions.size:", sessions.size);
-    
-    expect(sessions instanceof Map).toBe(true);
-  });
-
   it("should handle session lifecycle", async () => {
     const sessionId = createSession(testClient, { Contract: "0xabcd" }, {});
+    createdSessionIds.push(sessionId);
     
     expect(sessionExists(sessionId)).toBe(true);
     
@@ -71,5 +70,21 @@ describe("API Route Session Sharing Integration Test", () => {
     
     expect(sessionExists(sessionId)).toBe(false);
     expect(getSession(sessionId)).toBeUndefined();
+  });
+  
+  it("should distinguish between different sessions", async () => {
+    const id1 = createSession(testClient, { Contract1: "0x1111" }, {});
+    const id2 = createSession(testClient, { Contract2: "0x2222" }, {});
+    createdSessionIds.push(id1, id2);
+    
+    expect(id1).not.toBe(id2);
+    expect(sessionExists(id1)).toBe(true);
+    expect(sessionExists(id2)).toBe(true);
+    
+    const session1 = getSession(id1);
+    const session2 = getSession(id2);
+    
+    expect(session1?.deployedContracts).toEqual({ Contract1: "0x1111" });
+    expect(session2?.deployedContracts).toEqual({ Contract2: "0x2222" });
   });
 });

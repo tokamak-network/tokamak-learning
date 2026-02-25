@@ -7,24 +7,69 @@ import type { VulnerabilityChallenge, SuccessCondition, VerificationStep, Verifi
 
 export const ATTACKER_ADDRESS = "0xdead000000000000000000000000000000000000" as const;
 
-const sessions = new Map<string, { client: MemoryClient; deployedContracts: Record<string, string>; contractAbis: Record<string, string[]> }>();
+// Use globalThis to persist sessions across Next.js HMR and API route contexts
+// This ensures the Map is shared between all API routes
+interface SessionData {
+  client: MemoryClient;
+  deployedContracts: Record<string, string>;
+  contractAbis: Record<string, string[]>;
+}
 
-export function getSession(sessionId: string): { client: MemoryClient; deployedContracts: Record<string, string>; contractAbis: Record<string, string[]> } | undefined {
+// Extend globalThis type for TypeScript
+declare global {
+  // eslint-disable-next-line no-var
+  var __tokamak_sessions: Map<string, SessionData> | undefined;
+}
+
+// Get or create the global sessions Map
+function getSessionsMap(): Map<string, SessionData> {
+  if (!globalThis.__tokamak_sessions) {
+    globalThis.__tokamak_sessions = new Map<string, SessionData>();
+  }
+  return globalThis.__tokamak_sessions;
+}
+
+export function getSession(sessionId: string): SessionData | undefined {
+  const sessions = getSessionsMap();
   return sessions.get(sessionId);
 }
 
 export function createSession(client: MemoryClient, deployedContracts: Record<string, string>, contractAbis: Record<string, string[]>): string {
+  const sessions = getSessionsMap();
   const sessionId = Math.random().toString(36).substring(2, 15);
   sessions.set(sessionId, { client, deployedContracts, contractAbis });
   return sessionId;
 }
 
 export function deleteSession(sessionId: string): boolean {
+  const sessions = getSessionsMap();
   return sessions.delete(sessionId);
 }
 
 export function sessionExists(sessionId: string): boolean {
+  const sessions = getSessionsMap();
   return sessions.has(sessionId);
+}
+
+/**
+ * Recursively converts BigInt values to strings for JSON serialization.
+ * This is necessary because JSON.stringify cannot handle BigInt.
+ */
+function serializeBigInt(data: unknown): unknown {
+  if (typeof data === "bigint") {
+    return data.toString();
+  }
+  if (Array.isArray(data)) {
+    return data.map(serializeBigInt);
+  }
+  if (data !== null && typeof data === "object") {
+    const result: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(data)) {
+      result[key] = serializeBigInt(value);
+    }
+    return result;
+  }
+  return data;
 }
 
 export interface RunResult {
@@ -425,7 +470,7 @@ export async function executeContractCall(
 
     return {
       success: true,
-      data: returnValue,
+      data: serializeBigInt(returnValue),
     };
   } catch (error) {
     return {
