@@ -311,8 +311,24 @@ export function ContractInteraction({
   };
 
   const handleCheckStorage = async () => {
-    const slot = prompt("Enter storage slot (e.g., 0x0000...0000):");
-    if (!slot) return;
+    const input = prompt("Enter storage slot (number or hex, e.g., 0, 1, 0x0, 0x1):");
+    if (!input) return;
+
+    // Convert input to proper 32-byte slot format
+    let slot: string;
+    if (/^\d+$/.test(input.trim())) {
+      // Plain number (e.g., "0", "1")
+      const num = BigInt(input.trim());
+      slot = "0x" + num.toString(16).padStart(64, '0');
+    } else if (input.trim().startsWith("0x")) {
+      // Hex string (e.g., "0x0", "0x1")
+      const hex = input.trim().slice(2);
+      slot = "0x" + hex.padStart(64, '0');
+    } else {
+      // Unknown format, use as-is
+      slot = input.trim();
+    }
+
     await handleApiCall("getStorage", { target: selectedContract, slot });
   };
 
