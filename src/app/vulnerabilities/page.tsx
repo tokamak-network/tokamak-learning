@@ -1,9 +1,17 @@
+"use client";
+
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   vulnerabilityCategories,
   getChallengesByCategory,
 } from "@/data/vulnerabilities";
+
+const difficultyColors = {
+  beginner: "bg-[var(--color-success)]/10 text-[var(--color-success)] border-[var(--color-success)]/20",
+  intermediate: "bg-[var(--color-warning)]/10 text-[var(--color-warning)] border-[var(--color-warning)]/20",
+  advanced: "bg-[var(--color-danger)]/10 text-[var(--color-danger)] border-[var(--color-danger)]/20",
+};
 
 const containerVariants = {
   hidden: {},
@@ -61,11 +69,7 @@ export default function VulnerabilitiesPage() {
                       <div className="flex justify-between items-start mb-4">
                         <span
                           className={`text-xs px-2.5 py-1 rounded-md font-medium border ${
-                            challenge.difficulty === "beginner"
-                              ? "bg-[var(--color-success)]/10 text-[var(--color-success)] border-[var(--color-success)]/20"
-                              : challenge.difficulty === "intermediate"
-                              ? "bg-[var(--color-warning)]/10 text-[var(--color-warning)] border-[var(--color-warning)]/20"
-                              : "bg-[var(--color-danger)]/10 text-[var(--color-danger)] border-[var(--color-danger)]/20"
+                            difficultyColors[challenge.difficulty as keyof typeof difficultyColors] || difficultyColors.advanced
                           }`}
                         >
                           {challenge.difficulty}
