@@ -21,7 +21,7 @@ function isDailyCompleted(): boolean {
 
 export default function Header() {
   const pathname = usePathname();
-  const isProblemPage = pathname.startsWith("/problems/");
+  const isFullWidthPage = pathname.startsWith("/problems/") || pathname.startsWith("/vulnerabilities/");
   const { theme, toggleTheme } = useTheme();
   const [dailyDone, setDailyDone] = useState(false);
 
@@ -41,7 +41,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--color-border)] bg-[var(--color-background)]/80 backdrop-blur-xl">
       <div
-        className={`flex items-center justify-between h-14 px-3 md:px-6 ${isProblemPage ? "" : "max-w-6xl mx-auto"}`}
+        className={`flex items-center justify-between h-14 px-3 md:px-6 ${isFullWidthPage ? "" : "max-w-6xl mx-auto"}`}
       >
         <Link href="/" className="relative flex items-center group shrink-0">
           <Image src="/logo.png" alt="TokamakLearn logo" width={290} height={160} priority className={`absolute -left-2 h-[36px] w-auto transition-transform duration-300 group-hover:scale-105 group-hover:drop-shadow-[0_0_8px_rgba(56,189,248,0.4)] ${theme === "light" ? "brightness-200 contrast-125 saturate-150" : ""}`} />
