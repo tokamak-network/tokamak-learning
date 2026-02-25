@@ -65,6 +65,13 @@ export function ContractInteraction({
     }
   }, [selectedContract, contractAbis]);
 
+  // Reset input fields when target contract changes
+  useEffect(() => {
+    setFunctionName("");
+    setArgsInput("");
+    setValueInput("0");
+  }, [selectedContract]);
+
   useEffect(() => {
     if (contractNames.length > 0 && !selectedContract) {
       setSelectedContract(contractNames[0]);
