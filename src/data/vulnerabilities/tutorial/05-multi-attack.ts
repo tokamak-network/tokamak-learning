@@ -284,6 +284,19 @@ contract Exploit {
     },
   ],
 
+  constructorParams: {
+    params: [
+      {
+        name: "_target",
+        type: "address",
+        description: "The Treasury contract address to attack",
+      }
+    ],
+    autoFillOptions: {
+      useDeployedContract: "Treasury",
+    }
+  },
+
   successCondition: {
     checkDrained: {
       contract: "Treasury",

@@ -181,3 +181,35 @@ export function encodeConstructorArgs(
   const iface = new ethers.Interface(abi as ethers.InterfaceAbi);
   return iface.encodeDeploy(args).slice(2);
 }
+
+export interface ConstructorParam {
+  name: string;
+  type: string;
+}
+
+/**
+ * Extract constructor parameters from compiled ABI
+ */
+export function extractConstructorParams(abi: unknown[]): ConstructorParam[] {
+  if (!abi || !Array.isArray(abi)) return [];
+
+  const constructorAbi = (abi as { type: string; inputs?: { name?: string; type: string }[] }[]).find(
+    (item) => item.type === "constructor"
+  );
+
+  if (!constructorAbi || !constructorAbi.inputs || constructorAbi.inputs.length === 0) {
+    return [];
+  }
+
+  return constructorAbi.inputs.map((input) => ({
+    name: input.name || "",
+    type: input.type,
+  }));
+}
+
+/**
+ * Check if a contract has a constructor with parameters
+ */
+export function hasConstructorParams(abi: unknown[]): boolean {
+  return extractConstructorParams(abi).length > 0;
+}

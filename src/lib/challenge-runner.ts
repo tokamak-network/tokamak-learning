@@ -186,7 +186,8 @@ export async function deployUserContract(
   client: MemoryClient,
   userCode: string,
   deployedContracts: Record<string, string>,
-  contractAbis: Record<string, string[]>
+  contractAbis: Record<string, string[]>,
+  constructorArgs?: unknown[]
 ): Promise<{
   success: boolean;
   logs: Array<{ type: "info" | "success" | "error"; message: string }>;
@@ -209,9 +210,25 @@ export async function deployUserContract(
 
     logs.push({ type: "info", message: "Deploying exploit contract..." });
 
+    // Prepare deploy data with constructor arguments if provided
+    let deployData = `0x${compiled.bytecode}` as `0x${string}`;
+    if (constructorArgs && constructorArgs.length > 0 && compiled.abi) {
+      try {
+        deployData = encodeDeployData({
+          abi: compiled.abi,
+          bytecode: deployData,
+          args: constructorArgs,
+        });
+        logs.push({ type: "info", message: `Constructor args: ${constructorArgs.join(", ")}` });
+      } catch (encodeError) {
+        logs.push({ type: "error", message: `Failed to encode constructor args: ${encodeError instanceof Error ? encodeError.message : String(encodeError)}` });
+        return { success: false, logs, error: "Failed to encode constructor args" };
+      }
+    }
+
     const deployResult = await client.tevmCall({
       from: ATTACKER_ADDRESS,
-      data: `0x${compiled.bytecode}` as `0x${string}`,
+      data: deployData,
       gas: BigInt(10_000_000),
       addToBlockchain: true,
     });
@@ -461,8 +478,11 @@ async function validateSuccess(
     const { contract, ownerSlot, expectedOwner } = condition.checkOwnership;
     const resolvedContract = resolveAddress(contract as `0x${string}`, deployedContracts);
     const slot = ownerSlot || "0x0000000000000000000000000000000000000000000000000000000000000000" as `0x${string}`;
+    // Resolve expectedOwner - can be a contract name or an address
     // Default to the exploit contract address if no expected owner specified
-    const expected = expectedOwner || exploitAddress || ATTACKER_ADDRESS;
+    const expected = expectedOwner
+      ? resolveAddress(expectedOwner as `0x${string}`, deployedContracts)
+      : (exploitAddress || ATTACKER_ADDRESS);
 
     const value = await client.getStorageAt({ address: resolvedContract, slot });
 

@@ -28,12 +28,12 @@ export function ResultPanel({ logs, validationResult, isRunning }: ResultPanelPr
   }), []);
 
   return (
-    <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg p-4 mt-4">
-      <h3 className="text-sm font-semibold text-[var(--color-foreground)] mb-3">
+    <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg p-4 mt-4 h-full overflow-hidden flex flex-col">
+      <h3 className="text-sm font-semibold text-[var(--color-foreground)] mb-3 shrink-0">
         Execution Results
       </h3>
 
-      <div className="bg-[var(--color-background)] rounded p-3 min-h-[120px] max-h-[300px] overflow-y-auto font-mono text-xs">
+      <div className="bg-[var(--color-background)] rounded p-3 flex-1 min-h-0 overflow-y-auto font-mono text-xs">
         {logs.length === 0 && !isRunning && (
           <span className="text-[var(--color-muted)]">
             Run your exploit to see results...
@@ -48,7 +48,7 @@ export function ResultPanel({ logs, validationResult, isRunning }: ResultPanelPr
         )}
 
         {logs.map((log, i) => (
-          <div key={i} className={`${logColor[log.type]} py-0.5`}>
+          <div key={i} className={`${logColor[log.type]} py-0.5 break-words whitespace-pre-wrap`}>
             <span className="text-[var(--color-muted)] mr-2">
               [{log.type.toUpperCase()}]
             </span>
@@ -59,7 +59,7 @@ export function ResultPanel({ logs, validationResult, isRunning }: ResultPanelPr
 
       {validationResult && (
         <div
-          className={`mt-3 p-3 rounded ${
+          className={`mt-3 p-3 rounded shrink-0 ${
             validationResult.passed
               ? "bg-green-900/20 border border-green-800"
               : "bg-red-900/20 border border-red-800"
@@ -75,11 +75,13 @@ export function ResultPanel({ logs, validationResult, isRunning }: ResultPanelPr
           <div className="text-xs text-[var(--color-muted)] mt-1">
             {validationResult.message}
           </div>
-          {validationResult.details.map((detail, i) => (
-            <div key={i} className="text-xs text-[var(--color-muted)] mt-1">
-              {detail}
-            </div>
-          ))}
+          <div className="max-h-[120px] overflow-y-auto">
+            {validationResult.details.map((detail, i) => (
+              <div key={i} className="text-xs text-[var(--color-muted)] mt-1 break-words">
+                {detail}
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

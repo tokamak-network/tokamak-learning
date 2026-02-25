@@ -54,6 +54,22 @@ export function getChallengeById(id: string): VulnerabilityChallenge | undefined
   return vulnerabilityChallenges.find((c) => c.id === id);
 }
 
+export function getNextChallenge(currentId: string): VulnerabilityChallenge | undefined {
+  const currentIndex = vulnerabilityChallenges.findIndex((c) => c.id === currentId);
+  if (currentIndex === -1 || currentIndex === vulnerabilityChallenges.length - 1) {
+    return undefined;
+  }
+  return vulnerabilityChallenges[currentIndex + 1];
+}
+
+export function getChallengeIndex(id: string): number {
+  return vulnerabilityChallenges.findIndex((c) => c.id === id);
+}
+
+export function getTotalChallenges(): number {
+  return vulnerabilityChallenges.length;
+}
+
 export function getChallengesByCategory(categoryId: string): VulnerabilityChallenge[] {
   return vulnerabilityChallenges
     .filter((c) => c.category === categoryId)

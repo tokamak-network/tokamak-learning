@@ -147,6 +147,19 @@ contract Exploit {
     },
   ],
 
+  constructorParams: {
+    params: [
+      {
+        name: "_target",
+        type: "address",
+        description: "The WalletLibrary contract address to attack",
+      }
+    ],
+    autoFillOptions: {
+      useDeployedContract: "WalletLibrary",
+    }
+  },
+
   successCondition: {
     checkOwnership: {
       contract: "WalletLibrary",
