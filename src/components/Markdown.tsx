@@ -11,7 +11,7 @@ export default function Markdown({ content }: { content: string }) {
         components={{
           // Custom styling for code blocks
           pre: ({ children }) => (
-            <pre className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg p-4 overflow-x-auto">
+            <pre className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg p-4 overflow-x-auto max-w-full">
               {children}
             </pre>
           ),
@@ -20,7 +20,7 @@ export default function Markdown({ content }: { content: string }) {
             if (isInline) {
               return (
                 <code
-                  className="bg-[var(--color-surface)] px-1.5 py-0.5 rounded text-[var(--color-accent)]"
+                  className="bg-[var(--color-surface)] px-1.5 py-0.5 rounded text-[var(--color-accent)] break-all"
                   {...props}
                 >
                   {children}
