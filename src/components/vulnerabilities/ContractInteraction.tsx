@@ -37,6 +37,7 @@ export function ContractInteraction({
   const [result, setResult] = useState<CallResult | null>(null);
   const [activeTab, setActiveTab] = useState<"call" | "inspect">("call");
 
+  const containerRef = useRef<HTMLDivElement>(null);
   const reinitializingRef = useRef(false);
   const pendingCallRef = useRef<{ action: string; payload: Record<string, unknown> } | null>(null);
   const isExecutingRef = useRef(false);
@@ -232,14 +233,22 @@ export function ContractInteraction({
     return JSON.stringify(data, null, 2);
   };
 
+  const handleTabChange = (tab: "call" | "inspect") => {
+    setActiveTab(tab);
+    // Scroll to top of component when switching tabs to prevent layout issues
+    if (containerRef.current) {
+      containerRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
   const currentContractAbi = contractAbis[selectedContract] || [];
   const isReady = sessionId !== null && contractNames.length > 0 && !reinitializingRef.current && !loading;
 
   return (
-    <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg overflow-hidden">
+    <div ref={containerRef} className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg overflow-hidden">
       <div className="flex border-b border-[var(--color-border)]">
         <button
-          onClick={() => setActiveTab("call")}
+          onClick={() => handleTabChange("call")}
           className={`flex-1 px-4 py-2 text-sm font-medium transition-colors ${
             activeTab === "call"
               ? "text-[var(--color-foreground)] bg-[var(--color-background)]"
@@ -249,7 +258,7 @@ export function ContractInteraction({
           Call
         </button>
         <button
-          onClick={() => setActiveTab("inspect")}
+          onClick={() => handleTabChange("inspect")}
           className={`flex-1 px-4 py-2 text-sm font-medium transition-colors ${
             activeTab === "inspect"
               ? "text-[var(--color-foreground)] bg-[var(--color-background)]"
