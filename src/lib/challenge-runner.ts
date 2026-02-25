@@ -439,6 +439,20 @@ export async function executeContractCall(
   try {
     const targetAddress = resolveAddress(target as `0x${string}`, deployedContracts);
 
+    // Check if the function is view/pure (no state change)
+    let isView = false;
+    if (abi && Array.isArray(abi)) {
+      const func = abi.find(
+        (item) =>
+          typeof item === "object" && item !== null &&
+          "type" in item && item.type === "function" &&
+          "name" in item && item.name === functionName
+      ) as { type?: string; name?: string; stateMutability?: string } | undefined;
+      if (func && (func.stateMutability === "view" || func.stateMutability === "pure")) {
+        isView = true;
+      }
+    }
+
     const callData = encodeFunctionData({
       abi,
       functionName,
@@ -461,6 +475,7 @@ export async function executeContractCall(
         success: false,
         error: result.errors[0].message,
         reverted: true,
+        isView,
       };
     }
 
@@ -480,6 +495,7 @@ export async function executeContractCall(
     return {
       success: true,
       data: serializeBigInt(returnValue),
+      isView,
     };
   } catch (error) {
     return {
@@ -505,6 +521,7 @@ export async function readStorage(
     return {
       success: true,
       data: value,
+      isView: true,
     };
   } catch (error) {
     return {
@@ -529,6 +546,7 @@ export async function readBalance(
         wei: balance.toString(),
         eth: formatEther(balance),
       },
+      isView: true,
     };
   } catch (error) {
     return {
@@ -556,6 +574,7 @@ export async function readCode(
         isContract: codeValue !== "0x",
         size: codeValue !== "0x" ? (codeValue.length - 2) / 2 : 0,
       },
+      isView: true,
     };
   } catch (error) {
     return {
@@ -582,6 +601,7 @@ export async function getAccountInfo(
         nonce: account.nonce?.toString() || "0",
         codeHash: account.codeHash,
       },
+      isView: true,
     };
   } catch (error) {
     return {

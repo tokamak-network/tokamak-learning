@@ -17,6 +17,7 @@ interface CallResult {
   error?: string;
   gasUsed?: string;
   reverted?: boolean;
+  isView?: boolean;
 }
 
 export function ContractInteraction({
@@ -472,9 +473,11 @@ export function ContractInteraction({
                 </span>
               )}
             </div>
-            <pre className="whitespace-pre-wrap break-all text-[var(--color-foreground)]">
-              {result.error || formatResult(result.data)}
-            </pre>
+            {(result.error || (result.success && (result.isView || result.data !== "0x"))) && (
+              <pre className="whitespace-pre-wrap break-all text-[var(--color-foreground)]">
+                {result.error || formatResult(result.data)}
+              </pre>
+            )}
           </div>
         )}
       </div>
