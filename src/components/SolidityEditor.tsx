@@ -207,7 +207,7 @@ export default function SolidityEditor({ value, onChange, vimMode = false }: Sol
             wordWrap: "on",
             tabSize: 4,
             insertSpaces: true,
-            automaticLayout: false,
+            automaticLayout: true,
             padding: { top: 16 },
             lineNumbers: "on",
             renderLineHighlight: "line",
