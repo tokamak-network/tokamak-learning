@@ -221,7 +221,8 @@ contract Exploit {
   successCondition: {
     checkOwnership: {
       contract: "InitializableToken",
-      ownerSlot: "0x2",  // Owner is at slot 2 (after name[s0], symbol[s1])
+      ownerSlot: "0x2",
+      ownerOffset: 1,
       expectedOwner: "Exploit",
     },
   },

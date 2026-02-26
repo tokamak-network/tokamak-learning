@@ -189,9 +189,10 @@ contract Exploit {
   },
 
   successCondition: {
-    checkBalance: {
-      address: "Exploit",
-      minBalance: "1000000000000000000000000", // 1,000,000 tokens (18 decimals)
+    checkTokenBalance: {
+      token: "OverflowToken",
+      holder: "Exploit",
+      minBalance: "1000000000000000000000000",
     },
   },
 

@@ -474,30 +474,84 @@ async function validateSuccess(
     details.push(`Balance check: PASSED`);
   }
 
+  if (condition.checkTokenBalance) {
+    const { token, holder, minBalance, maxBalance } = condition.checkTokenBalance;
+    const tokenAddress = resolveAddress(token as `0x${string}`, deployedContracts);
+    const holderAddress = resolveAddress(holder as `0x${string}`, deployedContracts);
+
+    const balanceOfAbi = [{
+      type: 'function',
+      name: 'balanceOf',
+      inputs: [{ type: 'address' }],
+      outputs: [{ type: 'uint256' }],
+      stateMutability: 'view'
+    }] as const;
+
+    const calldata = encodeFunctionData({
+      abi: balanceOfAbi,
+      functionName: 'balanceOf',
+      args: [holderAddress]
+    });
+
+    const result = await client.tevmCall({
+      to: tokenAddress,
+      data: calldata,
+    });
+
+    if (result.errors) {
+      details.push(`Token balance check: FAILED (call error)`);
+      return { passed: false, message: "Failed to read token balance", details };
+    }
+
+    const decoded = decodeFunctionResult({
+      abi: balanceOfAbi,
+      functionName: 'balanceOf',
+      data: result.rawData as `0x${string}`
+    }) as bigint | readonly [bigint];
+
+    const balanceBigInt = typeof decoded === 'bigint' ? decoded : decoded[0];
+
+    if (minBalance !== undefined) {
+      const min = BigInt(minBalance);
+      if (balanceBigInt < min) {
+        details.push(`Token balance check: FAILED (below minimum)`);
+        details.push(`  Expected min: ${minBalance}`);
+        details.push(`  Actual: ${balanceBigInt.toString()}`);
+        return { passed: false, message: "Token balance too low", details };
+      }
+    }
+
+    if (maxBalance !== undefined) {
+      const max = BigInt(maxBalance);
+      if (balanceBigInt > max) {
+        details.push(`Token balance check: FAILED (above maximum)`);
+        return { passed: false, message: "Token balance too high", details };
+      }
+    }
+
+    details.push(`Token balance check: PASSED (${balanceBigInt.toString()})`);
+  }
+
   if (condition.checkOwnership) {
-    const { contract, ownerSlot, expectedOwner } = condition.checkOwnership;
+    const { contract, ownerSlot, ownerOffset, expectedOwner } = condition.checkOwnership;
     const resolvedContract = resolveAddress(contract as `0x${string}`, deployedContracts);
     const slot = ownerSlot || "0x0000000000000000000000000000000000000000000000000000000000000000" as `0x${string}`;
-    // Resolve expectedOwner - can be a contract name or an address
-    // Default to the exploit contract address if no expected owner specified
+    const offset = ownerOffset ?? 0;
     const expected = expectedOwner
       ? resolveAddress(expectedOwner as `0x${string}`, deployedContracts)
       : (exploitAddress || ATTACKER_ADDRESS);
 
     const value = await client.getStorageAt({ address: resolvedContract, slot });
 
-    // Check if the slot directly contains the expected owner (for single owner)
     if (value) {
-      const addressFromSlot = "0x" + value.slice(-40) as `0x${string}`;
+      const startChar = 64 - (offset + 20) * 2;
+      const addressFromSlot = "0x" + value.slice(startChar, startChar + 40) as `0x${string}`;
       if (addressFromSlot.toLowerCase() === expected.toLowerCase()) {
         details.push(`Ownership check: PASSED`);
         return { passed: true, message: "Ownership check passed", details };
       }
     }
 
-    // Check if owner array contains the expected owner (for owner arrays)
-    // For the WalletLibrary, owners are in a dynamic array at slot 0
-    // The first element is at keccak256(0) + 0
     const isOwner = await checkOwnerInArray(client, resolvedContract, expected);
 
     if (!isOwner) {

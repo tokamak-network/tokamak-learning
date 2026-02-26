@@ -203,9 +203,10 @@ contract Exploit {
   },
 
   successCondition: {
-    checkBalance: {
-      address: "Exploit",
-      minBalance: "500000000000000000000", // 500 tokens (with 18 decimals)
+    checkTokenBalance: {
+      token: "VulnerableToken",
+      holder: "Exploit",
+      minBalance: "500000000000000000000",
     },
   },
 
