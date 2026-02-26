@@ -73,6 +73,17 @@ export default function Header() {
             Daily{dailyDone && <span className="sr-only"> (completed)</span>}
           </Link>
           <Link
+            href="/blog"
+            aria-current={pathname === "/blog" ? "page" : undefined}
+            className={`hidden md:inline-block text-sm px-3 py-1.5 rounded-md transition-all ${
+              pathname === "/blog"
+                ? "text-[var(--color-accent)] bg-[var(--color-accent)]/10 font-medium"
+                : "text-[var(--color-muted)] hover:text-[var(--color-foreground)] hover:bg-[var(--color-surface)]"
+            }`}
+          >
+            Blog
+          </Link>
+          <Link
             href="/language/solidity"
             aria-current={pathname.startsWith("/language") ? "page" : undefined}
             className={`hidden md:inline-block text-sm px-3 py-1.5 rounded-md transition-all ${
